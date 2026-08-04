@@ -73,4 +73,9 @@ export const site = {
     "City-flexible by design. Launch areas first, then expand without renaming the brand.",
 } as const;
 
-export const whatsappHref = `https://wa.me/${site.contact.whatsapp.replace(/\D/g, "")}`;
+const whatsappNumber = site.contact.whatsapp.replace(/\D/g, "");
+const whatsappMessage = encodeURIComponent(
+  "Hi RoomSpa! I'd like to book a massage at my hotel/condo/home. What times are available?",
+);
+
+export const whatsappHref = `https://wa.me/${whatsappNumber}?text=${whatsappMessage}`;

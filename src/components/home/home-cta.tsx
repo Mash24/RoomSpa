@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { site } from "@/content/site";
+import { site, whatsappHref } from "@/content/site";
 
 export function HomeCta() {
   return (
@@ -17,7 +17,7 @@ export function HomeCta() {
           Ready when you are
         </h2>
         <p className="mt-4 max-w-lg text-base leading-relaxed text-white/70 md:text-lg">
-          {site.coverageNote}
+          Book online or message us on WhatsApp — we reply quickly and come to your hotel, condo, or home.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link
@@ -26,12 +26,14 @@ export function HomeCta() {
           >
             Book an appointment
           </Link>
-          <Link
-            href="/coverage"
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center justify-center rounded-sm border border-white/30 px-6 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10"
           >
-            See coverage areas
-          </Link>
+            WhatsApp {site.contact.whatsapp}
+          </a>
         </div>
       </div>
     </section>

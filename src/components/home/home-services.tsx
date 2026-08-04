@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { site } from "@/content/site";
+import { catalogProducts, productPriceLabel } from "@/content/pricing";
+
+const pricesBySlug = Object.fromEntries(
+  catalogProducts.map((product) => [product.slug, product.amountThb]),
+);
 
 export function HomeServices() {
   return (
@@ -16,31 +21,40 @@ export function HomeServices() {
         </div>
 
         <ul className="mt-12 grid gap-x-10 gap-y-12 sm:grid-cols-2">
-          {site.services.map((service, index) => (
-            <li
-              key={service.slug}
-              className="animate-fade-up border-t border-border pt-6"
-              style={{ animationDelay: `${0.08 * index}s` }}
-            >
-              <div className="flex items-baseline justify-between gap-4">
-                <h3 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
-                  {service.title}
-                </h3>
-                <span className="shrink-0 text-xs uppercase tracking-[0.14em] text-muted">
-                  {service.duration}
-                </span>
-              </div>
-              <p className="mt-3 max-w-md text-sm leading-relaxed text-muted md:text-base">
-                {service.summary}
-              </p>
-              <Link
-                href={`/services#${service.slug}`}
-                className="mt-5 inline-flex text-sm font-medium text-accent transition hover:opacity-80"
+          {site.services.map((service, index) => {
+            const price = pricesBySlug[service.slug];
+
+            return (
+              <li
+                key={service.slug}
+                className="animate-fade-up border-t border-border pt-6"
+                style={{ animationDelay: `${0.08 * index}s` }}
               >
-                Learn more
-              </Link>
-            </li>
-          ))}
+                <div className="flex items-baseline justify-between gap-4">
+                  <h3 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
+                    {service.title}
+                  </h3>
+                  <span className="shrink-0 text-xs uppercase tracking-[0.14em] text-muted">
+                    {service.duration}
+                  </span>
+                </div>
+                <p className="mt-3 max-w-md text-sm leading-relaxed text-muted md:text-base">
+                  {service.summary}
+                </p>
+                {price ? (
+                  <p className="mt-4 text-sm font-medium text-accent">{productPriceLabel(price)}</p>
+                ) : (
+                  <p className="mt-4 text-sm text-muted">Pricing coming soon</p>
+                )}
+                <Link
+                  href={price ? "/pricing" : `/services#${service.slug}`}
+                  className="mt-5 inline-flex text-sm font-medium text-accent transition hover:opacity-80"
+                >
+                  {price ? "View pricing" : "Learn more"}
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>
