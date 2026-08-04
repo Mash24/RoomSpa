@@ -8,7 +8,7 @@ export const site = {
   locale: "en",
   contact: {
     email: "hello@roomspa.com",
-    whatsapp: "+66000000000",
+    whatsapp: "+66984712237",
   },
   nav: [
     { label: "Services", href: "/services" },
@@ -72,3 +72,5 @@ export const site = {
   coverageNote:
     "City-flexible by design. Launch areas first, then expand without renaming the brand.",
 } as const;
+
+export const whatsappHref = `https://wa.me/${site.contact.whatsapp.replace(/\D/g, "")}`;

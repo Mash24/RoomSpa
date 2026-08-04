@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { site } from "@/content/site";
+import { site, whatsappHref } from "@/content/site";
 
 export function SiteFooter() {
   return (
@@ -42,6 +42,16 @@ export function SiteFooter() {
                 className="text-sm text-foreground/80 transition hover:text-accent"
               >
                 {site.contact.email}
+              </a>
+            </li>
+            <li>
+              <a
+                href={whatsappHref}
+                target="_blank"
+                rel="noreferrer"
+                className="text-sm text-foreground/80 transition hover:text-accent"
+              >
+                WhatsApp: {site.contact.whatsapp}
               </a>
             </li>
           </ul>

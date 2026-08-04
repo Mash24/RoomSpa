@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { site } from "@/content/site";
+import { site, whatsappHref } from "@/content/site";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export function SiteHeader() {
@@ -44,6 +44,14 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            className={link}
+          >
+            WhatsApp
+          </a>
           <ThemeToggle lightOnDark={onHero} />
           <Link href="/book" className={book}>
             Book
@@ -88,6 +96,15 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noreferrer"
+              className={onHero ? "text-base text-white/90" : "text-base text-foreground"}
+              onClick={() => setOpen(false)}
+            >
+              WhatsApp us
+            </a>
             <Link
               href="/book"
               className={

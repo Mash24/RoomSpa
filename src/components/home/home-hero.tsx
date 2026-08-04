@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { site } from "@/content/site";
+import { site, whatsappHref } from "@/content/site";
 
 const HERO_IMAGE =
   "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=2400&q=80";
@@ -44,13 +44,18 @@ export function HomeHero() {
           >
             {hero.primaryCta.label}
           </Link>
-          <Link
-            href={hero.secondaryCta.href}
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
             className="inline-flex items-center justify-center rounded-sm border border-white/35 px-6 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10"
           >
-            {hero.secondaryCta.label}
-          </Link>
+            WhatsApp now
+          </a>
         </div>
+        <p className="animate-fade-up delay-4 mt-4 text-sm text-white/65">
+          Quick booking help on WhatsApp: {site.contact.whatsapp}
+        </p>
       </div>
     </section>
   );

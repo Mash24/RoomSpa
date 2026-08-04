@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { useTheme } from "next-themes";
 
 type ThemeToggleProps = {
@@ -9,9 +9,11 @@ type ThemeToggleProps = {
 
 export function ThemeToggle({ lightOnDark = false }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => setMounted(true), []);
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
 
   const base = lightOnDark
     ? "inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/35 text-white transition hover:border-white hover:bg-white/10"
