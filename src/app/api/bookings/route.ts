@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 import type { BookingPayload } from "@/lib/booking/types";
@@ -5,6 +6,10 @@ import { site } from "@/content/site";
 
 function isEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function buildReferenceCode() {
+  return `RS-${randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
 }
 
 function buildWhatsAppHref(input: {
@@ -87,50 +92,53 @@ export async function POST(request: Request) {
       coverageAreaId = area?.id ?? null;
     }
 
-    const { data: booking, error: bookingError } = await supabase
-      .from("bookings")
-      .insert({
-        service_id: service.id,
-        coverage_area_id: coverageAreaId,
-        customer_name: body.customerName.trim(),
-        customer_email: body.customerEmail.trim().toLowerCase(),
-        customer_phone: body.customerPhone.trim(),
-        location_type: body.locationType,
-        location_label: body.locationLabel.trim(),
-        location_details: body.locationDetails?.trim() ?? "",
-        scheduled_date: body.scheduledDate,
-        scheduled_time: body.scheduledTime,
-        amount_thb: service.price_thb,
-        notes: body.notes?.trim() ?? "",
-        status: "pending",
-        source: "website",
-      })
-      .select("id, reference_code, amount_thb, scheduled_date, scheduled_time")
-      .single();
+    const bookingId = randomUUID();
+    const referenceCode = buildReferenceCode();
+    const scheduledTime = body.scheduledTime.slice(0, 5);
 
-    if (bookingError || !booking) {
-      const message = bookingError?.message?.includes("already booked")
+    // Insert without .select() — anon RLS allows INSERT but not SELECT on bookings.
+    const { error: bookingError } = await supabase.from("bookings").insert({
+      id: bookingId,
+      reference_code: referenceCode,
+      service_id: service.id,
+      coverage_area_id: coverageAreaId,
+      customer_name: body.customerName.trim(),
+      customer_email: body.customerEmail.trim().toLowerCase(),
+      customer_phone: body.customerPhone.trim(),
+      location_type: body.locationType,
+      location_label: body.locationLabel.trim(),
+      location_details: body.locationDetails?.trim() ?? "",
+      scheduled_date: body.scheduledDate,
+      scheduled_time: scheduledTime,
+      amount_thb: service.price_thb,
+      notes: body.notes?.trim() ?? "",
+      status: "pending",
+      source: "website",
+    });
+
+    if (bookingError) {
+      const message = bookingError.message?.includes("already booked")
         ? "That time slot was just taken. Please choose another time."
-        : bookingError?.message || "Could not create booking.";
+        : bookingError.message || "Could not create booking.";
       return NextResponse.json({ error: message }, { status: 400 });
     }
 
     const whatsappHref = buildWhatsAppHref({
-      referenceCode: booking.reference_code,
+      referenceCode,
       serviceName: service.name,
-      scheduledDate: booking.scheduled_date,
-      scheduledTime: String(booking.scheduled_time).slice(0, 5),
+      scheduledDate: body.scheduledDate,
+      scheduledTime,
       customerName: body.customerName.trim(),
       locationLabel: body.locationLabel.trim(),
     });
 
     return NextResponse.json({
-      id: booking.id,
-      referenceCode: booking.reference_code,
-      amountThb: booking.amount_thb,
+      id: bookingId,
+      referenceCode,
+      amountThb: service.price_thb,
       serviceName: service.name,
-      scheduledDate: booking.scheduled_date,
-      scheduledTime: String(booking.scheduled_time).slice(0, 5),
+      scheduledDate: body.scheduledDate,
+      scheduledTime,
       whatsappHref,
     });
   } catch (error) {
