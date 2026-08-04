@@ -1,36 +1,49 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RoomSpa
 
-## Getting Started
+Premium mobile-first booking platform for in-room massage at hotels, condos, and homes.
 
-First, run the development server:
+See [PROJECT_BRIEF.md](./PROJECT_BRIEF.md) for full product scope and [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for engineering notes.
+
+## Current status
+
+**Phase 1 — started**
+- Next.js + TypeScript + Tailwind scaffold
+- Premium landing page (dark / light mode)
+- SEO foundation: metadata, sitemap, robots.txt, JSON-LD
+- Route shells for all marketing pages
+
+**Next up:** Supabase, booking flow, admin CMS + media
+
+## Quick start
 
 ```bash
+npm install
+cp .env.example .env.local
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Accounts to connect (start here)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Service | Purpose |
+| --- | --- |
+| GitHub | Source control |
+| Vercel | Hosting |
+| Supabase | Database + auth + storage |
+| Domain | Cloudflare / Namecheap |
 
-## Learn More
+Add Stripe, Maps, email, and WhatsApp when those features ship. Store keys in `.env.local` / Vercel env vars only.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Local development |
+| `npm run build` | Production build |
+| `npm run start` | Serve production build |
+| `npm run lint` | ESLint |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Brand
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**RoomSpa** is city-agnostic by design. Expand service areas without renaming the product.
