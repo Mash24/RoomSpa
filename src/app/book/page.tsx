@@ -16,11 +16,11 @@ export default function BookPage() {
         Book your in-room massage
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
-        Pick a service and time. We’ll confirm quickly — or{" "}
+        Pick a service and time, then pay securely with Stripe. Prefer chat?{" "}
         <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
-          chat on WhatsApp
-        </a>{" "}
-        if you prefer.
+          WhatsApp us
+        </a>
+        .
       </p>
 
       <div className="mt-10">

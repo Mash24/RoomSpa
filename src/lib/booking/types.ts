@@ -22,6 +22,8 @@ export type BookingResult = {
   scheduledDate: string;
   scheduledTime: string;
   whatsappHref: string;
+  checkoutUrl?: string;
+  checkoutSessionId?: string;
 };
 
 export const TIME_SLOTS = [

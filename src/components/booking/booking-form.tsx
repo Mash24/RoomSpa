@@ -59,7 +59,13 @@ export function BookingForm() {
         throw new Error(data.error || "Booking failed.");
       }
 
-      setResult(data as BookingResult);
+      const booking = data as BookingResult;
+      if (booking.checkoutUrl) {
+        window.location.href = booking.checkoutUrl;
+        return;
+      }
+
+      setResult(booking);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Booking failed.");
     } finally {
@@ -292,17 +298,17 @@ export function BookingForm() {
 
       <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted">
-          {selectedService
-            ? `Total: ${productPriceLabel(selectedService.amountThb)} (pay later / confirm on WhatsApp)`
-            : null}
-        </p>
-        <button
-          type="submit"
-          disabled={submitting}
-          className="inline-flex items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
-        >
-          {submitting ? "Sending..." : "Request booking"}
-        </button>
+            {selectedService
+              ? `Total: ${productPriceLabel(selectedService.amountThb)} — pay securely with Stripe`
+              : null}
+          </p>
+          <button
+            type="submit"
+            disabled={submitting}
+            className="inline-flex items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
+          >
+            {submitting ? "Redirecting to payment..." : "Book & pay"}
+          </button>
       </div>
     </form>
   );
