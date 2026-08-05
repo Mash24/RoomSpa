@@ -20,10 +20,10 @@ export default function BookingCancelPage() {
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
-          href="/pay"
+          href="/my-booking"
           className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
         >
-          Pay by card
+          Manage booking
         </Link>
         <a
           href={whatsappHref}

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
+import { paymentMethodLabel } from "@/lib/booking/pin";
 import { isEmail, maskReferenceCode, normalizeEmail } from "@/lib/payments/lookup";
 
 const rateLimit = new Map<string, { count: number; resetAt: number }>();
@@ -21,13 +22,22 @@ function checkRateLimit(key: string) {
   return true;
 }
 
+function isValidPin(pin: string) {
+  return /^\d{4}$/.test(pin);
+}
+
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { email?: string };
+    const body = (await request.json()) as { email?: string; pin?: string };
     const email = normalizeEmail(body.email || "");
+    const pin = (body.pin || "").trim();
 
     if (!isEmail(email)) {
       return NextResponse.json({ error: "Please enter a valid email." }, { status: 400 });
+    }
+
+    if (!isValidPin(pin)) {
+      return NextResponse.json({ error: "Please enter your 4-digit booking PIN." }, { status: 400 });
     }
 
     const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -39,16 +49,17 @@ export async function POST(request: Request) {
     }
 
     const supabase = createAdminishAnonClient();
-    const { data, error } = await supabase.rpc("get_unpaid_bookings_for_email", {
+    const { data, error } = await supabase.rpc("get_bookings_for_email_and_pin", {
       p_email: email,
+      p_pin: pin,
     });
 
     if (error) {
-      if (error.message?.includes("get_unpaid_bookings_for_email")) {
+      if (error.message?.includes("get_bookings_for_email_and_pin")) {
         return NextResponse.json(
           {
             error:
-              "Payment lookup is not set up yet. Run supabase/migrations/20260805_payment_optional.sql in Supabase.",
+              "Booking lookup is not set up yet. Run supabase/migrations/20260805_booking_pin.sql in Supabase.",
           },
           { status: 500 },
         );
@@ -56,7 +67,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    const bookings = (data || []).map(
+    if (!data || data.length === 0) {
+      return NextResponse.json(
+        { error: "No bookings found. Check your email and 4-digit PIN." },
+        { status: 404 },
+      );
+    }
+
+    const bookings = data.map(
       (row: {
         id: string;
         reference_code: string;
@@ -64,6 +82,8 @@ export async function POST(request: Request) {
         scheduled_date: string;
         scheduled_time: string;
         amount_thb: number;
+        payment_status: string;
+        payment_method: string;
       }) => ({
         id: row.id,
         referenceMasked: maskReferenceCode(row.reference_code),
@@ -71,6 +91,10 @@ export async function POST(request: Request) {
         scheduledDate: row.scheduled_date,
         scheduledTime: String(row.scheduled_time).slice(0, 5),
         amountThb: row.amount_thb,
+        paymentStatus: row.payment_status,
+        paymentMethod: row.payment_method,
+        paymentMethodLabel: paymentMethodLabel(row.payment_method),
+        canPay: row.payment_status === "unpaid",
       }),
     );
 

@@ -5,6 +5,7 @@ import type { BookingPayload } from "@/lib/booking/types";
 import { site } from "@/content/site";
 import { getCatalogProduct } from "@/content/pricing";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
+import { generateBookingPin, mapPaymentPreferenceToMethod } from "@/lib/booking/pin";
 import { isEmail, normalizeEmail, resolveSiteUrl } from "@/lib/payments/lookup";
 
 function buildReferenceCode() {
@@ -44,10 +45,15 @@ async function insertBooking(
   const { error } = await supabase.from("bookings").insert(row);
   if (!error) return null;
 
-  if (error.message?.includes("payment_status") || error.message?.includes("payment_method")) {
-    const { payment_status, payment_method, ...fallback } = row;
+  if (
+    error.message?.includes("payment_status") ||
+    error.message?.includes("payment_method") ||
+    error.message?.includes("access_pin")
+  ) {
+    const { payment_status, payment_method, access_pin, ...fallback } = row;
     void payment_status;
     void payment_method;
+    void access_pin;
     const { error: retryError } = await supabase.from("bookings").insert(fallback);
     return retryError;
   }
@@ -82,6 +88,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid location type." }, { status: 400 });
     }
 
+    const preference = body.paymentPreference ?? "cash";
+    const payNow = Boolean(body.payNow) || preference === "card_now";
+    const paymentMethod = mapPaymentPreferenceToMethod(preference);
+
     const supabase = createAdminishAnonClient();
 
     const { data: service, error: serviceError } = await supabase
@@ -111,16 +121,16 @@ export async function POST(request: Request) {
 
     const bookingId = randomUUID();
     const referenceCode = buildReferenceCode();
+    const accessPin = generateBookingPin();
     const scheduledTime = body.scheduledTime.slice(0, 5);
     const customerName = body.customerName.trim();
     const customerEmail = normalizeEmail(body.customerEmail);
     const locationLabel = body.locationLabel.trim();
-    const payNow = Boolean(body.payNow);
-    const paymentMethod = payNow ? "card" : body.paymentPreference === "cash" ? "cash" : "not_selected";
 
     const bookingError = await insertBooking(supabase, {
       id: bookingId,
       reference_code: referenceCode,
+      access_pin: accessPin,
       service_id: service.id,
       coverage_area_id: coverageAreaId,
       customer_name: customerName,
@@ -158,13 +168,14 @@ export async function POST(request: Request) {
     const response: Record<string, unknown> = {
       id: bookingId,
       referenceCode,
+      accessPin,
       amountThb: service.price_thb,
       serviceName: service.name,
       scheduledDate: body.scheduledDate,
       scheduledTime,
       customerEmail,
-      whatsappHref,
       paymentMethod,
+      whatsappHref,
     };
 
     if (payNow) {
@@ -184,6 +195,7 @@ export async function POST(request: Request) {
         customerName,
         bookingId,
         referenceCode,
+        accessPin,
         serviceName: service.name,
         scheduledDate: body.scheduledDate,
         scheduledTime,

@@ -7,6 +7,7 @@ import { catalogProducts, productPriceLabel } from "@/content/pricing";
 import { coverageAreas } from "@/content/coverage";
 import { whatsappHref } from "@/content/site";
 import { PaymentBadges } from "@/components/payment/payment-badges";
+import { paymentMethodLabel } from "@/lib/booking/pin";
 import {
   TIME_SLOTS,
   type BookingResult,
@@ -88,7 +89,7 @@ export function BookingForm() {
   }
 
   if (result) {
-    const payLaterHref = `/pay?email=${encodeURIComponent(result.customerEmail)}`;
+    const manageHref = `/my-booking?email=${encodeURIComponent(result.customerEmail)}`;
 
     return (
       <div className="border border-border bg-surface-elevated p-6 md:p-8">
@@ -101,10 +102,18 @@ export function BookingForm() {
           {result.serviceName} on {result.scheduledDate} at {result.scheduledTime}. Amount:{" "}
           {productPriceLabel(result.amountThb)}.
         </p>
-        <p className="mt-3 text-sm text-muted">
-          Payment is optional now. Pay cash on arrival, or use your email to pay by card anytime before
-          your session.
+        <p className="mt-2 text-sm text-muted">
+          Payment plan: {paymentMethodLabel(result.paymentMethod)}
         </p>
+
+        <div className="mt-6 border border-accent/30 bg-accent-soft/30 p-5">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">Your booking PIN</p>
+          <p className="mt-2 font-display text-4xl tracking-[0.25em] text-foreground">{result.accessPin}</p>
+          <p className="mt-3 text-sm text-muted">
+            Screenshot or write this down. You’ll need your email + PIN to manage your booking or pay by
+            card later.
+          </p>
+        </div>
 
         <div className="mt-6">
           <PaymentBadges compact />
@@ -120,10 +129,10 @@ export function BookingForm() {
             Confirm on WhatsApp
           </a>
           <Link
-            href={payLaterHref}
+            href={manageHref}
             className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
           >
-            Pay by card later
+            Manage booking
           </Link>
           <Link
             href="/"

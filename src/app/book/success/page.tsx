@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getStripe } from "@/lib/stripe/server";
 import { productPriceLabel } from "@/content/pricing";
 import { site } from "@/content/site";
+import { paymentMethodLabel } from "@/lib/booking/pin";
 
 export const metadata: Metadata = {
   title: "Payment successful",
@@ -29,6 +30,20 @@ function buildPaidWhatsAppHref(meta: Record<string, string>) {
   return `https://wa.me/${number}?text=${message}`;
 }
 
+async function confirmPayment(sessionId: string) {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "http://localhost:3000";
+  try {
+    await fetch(`${siteUrl}/api/payments/confirm`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ sessionId }),
+      cache: "no-store",
+    });
+  } catch {
+    // Non-blocking — payment still succeeded in Stripe
+  }
+}
+
 export default async function BookingSuccessPage({ searchParams }: SuccessPageProps) {
   const params = await searchParams;
   const sessionId = params.session_id;
@@ -50,7 +65,12 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
   const paid = session.payment_status === "paid";
   const meta = (session.metadata || {}) as Record<string, string>;
   const amountThb = Number(meta.amountThb || 0);
+  const accessPin = meta.accessPin || "";
   const whatsappHref = buildPaidWhatsAppHref(meta);
+
+  if (paid) {
+    await confirmPayment(sessionId);
+  }
 
   return (
     <section className="mx-auto max-w-2xl px-5 py-24 md:px-8">
@@ -65,10 +85,21 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
         {meta.serviceName ? ` for ${meta.serviceName}` : ""}.
         {amountThb ? ` Amount: ${productPriceLabel(amountThb)}.` : ""}
       </p>
+      <p className="mt-2 text-sm text-muted">Payment: {paymentMethodLabel("card")}</p>
       {meta.scheduledDate ? (
         <p className="mt-2 text-sm text-muted">
           {meta.scheduledDate} at {meta.scheduledTime} · {meta.locationLabel}
         </p>
+      ) : null}
+
+      {accessPin ? (
+        <div className="mt-8 border border-accent/30 bg-accent-soft/30 p-5">
+          <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">Your booking PIN</p>
+          <p className="mt-2 font-display text-4xl tracking-[0.25em] text-foreground">{accessPin}</p>
+          <p className="mt-3 text-sm text-muted">
+            Save this PIN with your email — you’ll need both to manage your booking later.
+          </p>
+        </div>
       ) : null}
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -81,17 +112,12 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
           Send booking details on WhatsApp
         </a>
         <Link
-          href="/"
+          href="/my-booking"
           className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
         >
-          Back to home
+          Manage booking
         </Link>
       </div>
-
-      <p className="mt-8 text-xs text-muted">
-        Test card in Stripe sandbox: <span className="font-medium text-foreground">4242 4242 4242 4242</span>,
-        any future expiry, any CVC.
-      </p>
     </section>
   );
 }

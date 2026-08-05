@@ -4,16 +4,17 @@ import { useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { PaymentBadges, formatBookingAmount } from "@/components/payment/payment-badges";
-import type { UnpaidBookingSummary } from "@/lib/booking/types";
+import type { BookingSummary } from "@/lib/booking/types";
 import { redirectToUrl } from "@/lib/navigation";
 
-export function PayForm() {
+export function ManageBookingForm() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState(searchParams.get("email") ?? "");
+  const [pin, setPin] = useState("");
   const [loading, setLoading] = useState(false);
   const [payingId, setPayingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [bookings, setBookings] = useState<UnpaidBookingSummary[]>([]);
+  const [bookings, setBookings] = useState<BookingSummary[]>([]);
   const [searched, setSearched] = useState(false);
 
   async function onLookup(event: React.FormEvent<HTMLFormElement>) {
@@ -27,7 +28,7 @@ export function PayForm() {
       const response = await fetch("/api/payments/lookup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, pin }),
       });
 
       const data = await response.json();
@@ -52,7 +53,7 @@ export function PayForm() {
       const response = await fetch("/api/payments/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, bookingId }),
+        body: JSON.stringify({ email, pin, bookingId }),
       });
 
       const data = await response.json();
@@ -86,6 +87,23 @@ export function PayForm() {
             className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
           />
         </label>
+        <label className="block text-sm">
+          <span className="text-muted">4-digit booking PIN</span>
+          <input
+            required
+            type="text"
+            inputMode="numeric"
+            pattern="\d{4}"
+            maxLength={4}
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 4))}
+            placeholder="1234"
+            className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 tracking-[0.3em] text-foreground outline-none focus:border-accent"
+          />
+        </label>
+        <p className="text-xs text-muted">
+          Your PIN was shown when you booked. Save it like a hotel confirmation code.
+        </p>
         <button
           type="submit"
           disabled={loading}
@@ -105,7 +123,7 @@ export function PayForm() {
 
       {searched && bookings.length === 0 ? (
         <div className="border border-border bg-surface-elevated p-5 text-sm text-muted">
-          No unpaid bookings found for this email. You may have already paid, or used a different email.
+          No bookings found. Double-check your email and PIN.
           <div className="mt-4">
             <Link href="/book" className="text-accent underline">
               Make a new booking
@@ -128,15 +146,25 @@ export function PayForm() {
                   <p className="mt-2 text-sm font-medium text-accent">
                     {formatBookingAmount(booking.amountThb)}
                   </p>
+                  <p className="mt-2 text-xs text-muted">
+                    Payment: {booking.paymentMethodLabel}
+                    {booking.paymentStatus === "paid" ? " · Paid" : " · Unpaid"}
+                  </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onPay(booking.id)}
-                  disabled={payingId === booking.id}
-                  className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
-                >
-                  {payingId === booking.id ? "Redirecting..." : "Pay by card"}
-                </button>
+                {booking.canPay ? (
+                  <button
+                    type="button"
+                    onClick={() => onPay(booking.id)}
+                    disabled={payingId === booking.id}
+                    className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
+                  >
+                    {payingId === booking.id ? "Redirecting..." : "Pay by card"}
+                  </button>
+                ) : (
+                  <span className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm text-muted">
+                    Paid
+                  </span>
+                )}
               </div>
             </li>
           ))}

@@ -36,7 +36,12 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link href="/pay" className="text-sm text-foreground/80 transition hover:text-accent">
+              <Link href="/my-booking" className="text-sm text-foreground/80 transition hover:text-accent">
+                Manage booking
+              </Link>
+            </li>
+            <li>
+              <Link href="/my-booking" className="text-sm text-foreground/80 transition hover:text-accent">
                 Pay by card
               </Link>
             </li>

@@ -20,23 +20,28 @@ export type BookingPayload = {
 export type BookingResult = {
   id: string;
   referenceCode: string;
+  accessPin: string;
   amountThb: number;
   serviceName: string;
   scheduledDate: string;
   scheduledTime: string;
   customerEmail: string;
+  paymentMethod: string;
   whatsappHref: string;
-  paymentMethod?: string;
   checkoutUrl?: string;
 };
 
-export type UnpaidBookingSummary = {
+export type BookingSummary = {
   id: string;
   referenceMasked: string;
   serviceName: string;
   scheduledDate: string;
   scheduledTime: string;
   amountThb: number;
+  paymentStatus: string;
+  paymentMethod: string;
+  paymentMethodLabel: string;
+  canPay: boolean;
 };
 
 export const TIME_SLOTS = [

@@ -4,7 +4,7 @@ import { getCatalogProduct } from "@/content/pricing";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
 import { isEmail, normalizeEmail, resolveSiteUrl } from "@/lib/payments/lookup";
 
-type UnpaidBookingRow = {
+type BookingRow = {
   id: string;
   reference_code: string;
   service_name: string;
@@ -13,34 +13,42 @@ type UnpaidBookingRow = {
   scheduled_date: string;
   scheduled_time: string;
   amount_thb: number;
+  payment_status: string;
 };
+
+function isValidPin(pin: string) {
+  return /^\d{4}$/.test(pin);
+}
 
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { email?: string; bookingId?: string };
+    const body = (await request.json()) as { email?: string; pin?: string; bookingId?: string };
     const email = normalizeEmail(body.email || "");
+    const pin = (body.pin || "").trim();
     const bookingId = body.bookingId?.trim();
 
-    if (!isEmail(email) || !bookingId) {
-      return NextResponse.json({ error: "Email and booking are required." }, { status: 400 });
+    if (!isEmail(email) || !isValidPin(pin) || !bookingId) {
+      return NextResponse.json({ error: "Email, PIN, and booking are required." }, { status: 400 });
     }
 
     const supabase = createAdminishAnonClient();
-    const { data: rows, error } = await supabase.rpc("get_unpaid_bookings_for_email", {
+    const { data: rows, error } = await supabase.rpc("get_bookings_for_email_and_pin", {
       p_email: email,
+      p_pin: pin,
     });
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    const booking = (rows as UnpaidBookingRow[] | null)?.find((row) => row.id === bookingId);
+    const booking = (rows as BookingRow[] | null)?.find((row) => row.id === bookingId);
 
     if (!booking) {
-      return NextResponse.json(
-        { error: "No unpaid booking found for this email." },
-        { status: 404 },
-      );
+      return NextResponse.json({ error: "Booking not found." }, { status: 404 });
+    }
+
+    if (booking.payment_status === "paid") {
+      return NextResponse.json({ error: "This booking is already paid." }, { status: 400 });
     }
 
     const catalog = getCatalogProduct(booking.service_slug);
@@ -61,6 +69,7 @@ export async function POST(request: Request) {
       customerName: email,
       bookingId: booking.id,
       referenceCode: booking.reference_code,
+      accessPin: pin,
       serviceName: booking.service_name,
       scheduledDate: booking.scheduled_date,
       scheduledTime,

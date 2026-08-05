@@ -44,6 +44,9 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
+          <Link href="/my-booking" className={link}>
+            My booking
+          </Link>
           <a
             href={whatsappHref}
             target="_blank"
@@ -96,6 +99,13 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
+            <Link
+              href="/my-booking"
+              className={onHero ? "text-base text-white/90" : "text-base text-foreground"}
+              onClick={() => setOpen(false)}
+            >
+              My booking
+            </Link>
             <a
               href={whatsappHref}
               target="_blank"

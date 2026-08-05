@@ -6,6 +6,7 @@ type CheckoutInput = {
   customerName: string;
   bookingId: string;
   referenceCode: string;
+  accessPin: string;
   serviceName: string;
   scheduledDate: string;
   scheduledTime: string;
@@ -27,10 +28,11 @@ export async function createBookingCheckoutSession(input: CheckoutInput) {
       },
     ],
     success_url: `${input.siteUrl}/book/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${input.siteUrl}/pay?email=${encodeURIComponent(input.customerEmail)}`,
+    cancel_url: `${input.siteUrl}/my-booking?email=${encodeURIComponent(input.customerEmail)}`,
     metadata: {
       bookingId: input.bookingId,
       referenceCode: input.referenceCode,
+      accessPin: input.accessPin,
       serviceName: input.serviceName,
       scheduledDate: input.scheduledDate,
       scheduledTime: input.scheduledTime,

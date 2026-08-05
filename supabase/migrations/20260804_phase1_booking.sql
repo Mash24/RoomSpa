@@ -110,6 +110,14 @@ returns trigger
 language plpgsql
 as $$
 begin
+  if tg_op = 'UPDATE' then
+    if new.scheduled_date is not distinct from old.scheduled_date
+       and new.scheduled_time is not distinct from old.scheduled_time
+       and new.status is not distinct from old.status then
+      return new;
+    end if;
+  end if;
+
   if exists (
     select 1
     from public.bookings b
