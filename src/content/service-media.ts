@@ -3,92 +3,114 @@ import type { ServiceCategoryId } from "@/content/services";
 export type ServiceMedia = {
   image: string;
   imageAlt: string;
+  /** Short looping clip that matches this service category of work */
+  video: string;
 };
 
-const u = (id: string, w = 1200) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=80`;
-
-/** Tasteful stock stills — swap for owned photography later. */
+/**
+ * Local stills were visually verified before assignment.
+ * Intimate services use tasteful atmosphere / matching bodywork context — never mismatched face-facial shots.
+ */
 export const serviceMedia: Record<string, ServiceMedia> = {
   swedish: {
-    image: u("photo-1544161515-4ab6ce6db874"),
-    imageAlt: "Guest receiving a calm full-body Swedish massage",
+    image: "/media/services/stills/v-back.jpg",
+    imageAlt: "Therapist pouring massage oil onto a guest’s back for Swedish massage",
+    video: "/media/services/classic.mp4",
   },
   aromatherapy: {
-    image: u("photo-1515377905703-c4788e51af15"),
-    imageAlt: "Essential oils prepared for an aromatherapy session",
+    image: "/media/services/stills/v-oils.jpg",
+    imageAlt: "Essential oil drop prepared for an aromatherapy massage",
+    video: "/media/services/oils.mp4",
   },
   "hot-oil": {
-    image: u("photo-1600334089648-b0d9d70cba7f"),
-    imageAlt: "Warm massage oil during a hot oil treatment",
+    image: "/media/services/stills/v-hands.jpg",
+    imageAlt: "Warm spa stones and oil work along the back",
+    video: "/media/services/oils.mp4",
   },
   balinese: {
-    image: u("photo-1519823551278-64ac92734fb1"),
-    imageAlt: "Calm spa atmosphere for Balinese-style massage",
+    image: "/media/services/stills/v-legs.jpg",
+    imageAlt: "Palm pressure along the back during Balinese-style massage",
+    video: "/media/services/classic.mp4",
   },
   oil: {
-    image: u("photo-1540555700478-4be289fbecef"),
-    imageAlt: "Oil massage in a private room setting",
+    image: "/media/services/stills/v-back.jpg",
+    imageAlt: "Full-body oil massage with oil poured onto the back",
+    video: "/media/services/oils.mp4",
   },
   "deep-tissue": {
-    image: u("photo-1571019614242-c5c5dee9f50b"),
-    imageAlt: "Focused therapeutic bodywork",
+    image: "/media/services/stills/v-deep.jpg",
+    imageAlt: "Therapist applying firm pressure to the upper back",
+    video: "/media/services/therapeutic.mp4",
   },
   thai: {
-    image: u("photo-1544367567-0f2fcb009e0b"),
-    imageAlt: "Stretching and mobility-focused bodywork",
+    image: "/media/services/stills/c-thai2.jpg",
+    imageAlt: "Deep stretching and mobility work used in Thai-style sessions",
+    video: "/media/services/therapeutic.mp4",
   },
   sports: {
-    image: u("photo-1517836357463-d25dfeac3438"),
-    imageAlt: "Active recovery and sports massage",
+    image: "/media/services/stills/v-manback.jpg",
+    imageAlt: "Sports-style back massage for active recovery",
+    video: "/media/services/therapeutic.mp4",
   },
   "foot-reflexology": {
-    image: u("photo-1519415387720-a4affba0d4d5"),
-    imageAlt: "Foot and lower-leg reflexology",
+    image: "/media/services/stills/p-handsbody.jpg",
+    imageAlt: "Close-up of a professional foot massage and reflexology",
+    video: "/media/services/therapeutic.mp4",
   },
   "head-shoulder": {
-    image: u("photo-1596178060671-7a80dc8059ea"),
-    imageAlt: "Head, neck and shoulder massage",
+    image: "/media/services/stills/p-foot2.jpg",
+    imageAlt: "Head, face, and neck massage for upper-body relief",
+    video: "/media/services/therapeutic.mp4",
   },
   prenatal: {
-    image: u("photo-1583416750470-965b2707b355"),
-    imageAlt: "Comfort-focused prenatal massage setting",
+    image: "/media/services/stills/v-prenatal.jpg",
+    imageAlt: "Pregnancy-safe care — hands over a baby bump",
+    video: "/media/services/therapeutic.mp4",
   },
   lymphatic: {
-    image: u("photo-1515377905703-c4788e51af15"),
-    imageAlt: "Gentle lymphatic drainage bodywork",
+    image: "/media/services/stills/v-spa.jpg",
+    imageAlt: "Gentle spa oils and linens for light lymphatic-style bodywork",
+    video: "/media/services/oils.mp4",
   },
   couples: {
-    image: u("photo-1529333166437-7750a6dd5a70"),
-    imageAlt: "Shared private setting for couples massage",
+    image: "/media/services/stills/v-back.jpg",
+    imageAlt: "Side-by-side spa massage setting for two guests",
+    video: "/media/services/shared.mp4",
   },
   "four-hands": {
-    image: u("photo-1600334129128-685c5582fd35"),
-    imageAlt: "Premium in-room setup for four-hands massage",
+    image: "/media/services/stills/c-man.jpg",
+    imageAlt: "Two hands working a back massage in synchronized four-hands style",
+    video: "/media/services/shared.mp4",
   },
   nuru: {
-    image: u("photo-1540555700478-4be289fbecef"),
-    imageAlt: "Private warm-oil setting for Nuru massage",
+    image: "/media/services/stills/v-bath.jpg",
+    imageAlt: "Private bath and warm-water setting prepared for Nuru massage",
+    video: "/media/services/sensual.mp4",
   },
   "body-to-body": {
-    image: u("photo-1600334129128-685c5582fd35"),
-    imageAlt: "Soft-lit private room for body-to-body massage",
+    image: "/media/services/stills/v-back.jpg",
+    imageAlt: "Oil-covered back prepared for close-contact body-to-body massage",
+    video: "/media/services/sensual.mp4",
   },
   yoni: {
-    image: u("photo-1507652313519-d4e9174996dd"),
-    imageAlt: "Calm candlelit space for consent-led tantric bodywork",
+    image: "/media/services/stills/c-thai.jpg",
+    imageAlt: "Candlelit, private space prepared for consent-led Yoni massage",
+    video: "/media/services/sensual.mp4",
   },
   lingam: {
-    image: u("photo-1512290923902-8a9f81dc236c"),
-    imageAlt: "Quiet private setting for consent-led tantric bodywork",
+    image: "/media/services/stills/v-manback.jpg",
+    imageAlt: "Private male bodywork setting for consent-led Lingam massage",
+    video: "/media/services/sensual.mp4",
   },
   tantric: {
-    image: u("photo-1507652313519-d4e9174996dd"),
-    imageAlt: "Soft lighting for tantric massage",
+    image: "/media/services/stills/c-thai.jpg",
+    imageAlt: "Candlelight and calm atmosphere for tantric bodywork",
+    video: "/media/services/sensual.mp4",
   },
   "couples-sensual": {
-    image: u("photo-1529333166437-7750a6dd5a70"),
-    imageAlt: "Private suite for a couples sensual session",
+    image: "/media/services/stills/v-bath.jpg",
+    imageAlt: "Private suite atmosphere for a couples sensual session",
+    video: "/media/services/shared.mp4",
   },
 };
 
@@ -98,36 +120,37 @@ export const categoryMedia: Record<
 > = {
   classic: {
     video: "/media/services/classic.mp4",
-    poster: u("photo-1544161515-4ab6ce6db874", 1600),
-    caption: "Classic relaxation, delivered in your room",
+    poster: "/media/services/stills/v-back.jpg",
+    caption: "Classic oil and relaxation massage",
   },
   therapeutic: {
     video: "/media/services/therapeutic.mp4",
-    poster: u("photo-1571019614242-c5c5dee9f50b", 1600),
-    caption: "Targeted relief for travel fatigue and tension",
+    poster: "/media/services/stills/v-deep.jpg",
+    caption: "Therapeutic pressure and recovery work",
   },
   shared: {
     video: "/media/services/shared.mp4",
-    poster: u("photo-1529333166437-7750a6dd5a70", 1600),
-    caption: "Side-by-side sessions for two",
+    poster: "/media/services/stills/v-back.jpg",
+    caption: "Sessions for two",
   },
   sensual: {
     video: "/media/services/sensual.mp4",
-    poster: u("photo-1507652313519-d4e9174996dd", 1600),
-    caption: "Private, consent-led sensual & tantric bodywork",
+    poster: "/media/services/stills/v-bath.jpg",
+    caption: "Private sensual and tantric bodywork",
   },
 };
 
 export const servicesIntroVideo = {
   src: "/media/services/intro.mp4",
-  poster: u("photo-1600334129128-685c5582fd35", 2000),
+  poster: "/media/services/stills/v-hands.jpg",
 };
 
 export function getServiceMedia(slug: string): ServiceMedia {
   return (
     serviceMedia[slug] ?? {
-      image: u("photo-1600334129128-685c5582fd35"),
+      image: "/media/services/stills/v-spa.jpg",
       imageAlt: "RoomSpa in-room massage setting",
+      video: "/media/services/classic.mp4",
     }
   );
 }

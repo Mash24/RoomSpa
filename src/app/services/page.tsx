@@ -109,20 +109,28 @@ export default function ServicesPage() {
 
               <ul className="mt-10 grid gap-8 sm:grid-cols-2">
                 {services.map((service) => {
-                  const still = getServiceMedia(service.slug);
+                  const media = getServiceMedia(service.slug);
                   return (
                     <li
                       key={service.slug}
                       id={service.slug}
                       className="scroll-mt-28 overflow-hidden border border-border bg-surface-elevated"
                     >
-                      <div className="relative aspect-[16/11]">
+                      <div className="relative aspect-[16/10]">
                         <Image
-                          src={still.image}
-                          alt={still.imageAlt}
+                          src={media.image}
+                          alt={media.imageAlt}
                           fill
                           sizes="(max-width: 640px) 100vw, 50vw"
                           className="object-cover"
+                        />
+                      </div>
+                      <div className="relative aspect-[21/9] border-t border-border bg-surface">
+                        <AutoplayVideo
+                          src={media.video}
+                          poster={media.image}
+                          label={`${service.name} video`}
+                          className="absolute inset-0 h-full w-full object-cover"
                         />
                       </div>
                       <div className="p-5 md:p-6">
