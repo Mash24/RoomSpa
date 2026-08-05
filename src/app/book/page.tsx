@@ -18,7 +18,7 @@ export default function BookPage() {
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
         No payment required to book. Pay cash on arrival, or{" "}
-        <a href="/pay" className="text-accent underline">
+        <a href="/my-booking" className="text-accent underline">
           pay by card later
         </a>
         . Prefer chat?{" "}

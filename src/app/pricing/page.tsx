@@ -24,8 +24,12 @@ export default function PricingPage() {
         Transparent rates, dual currency
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
-        You pay in THB. USD is an approximate guide (~{THB_PER_USD} THB = 1 USD). Travel fees may
-        apply outside core coverage areas.
+        You pay in THB. USD is an approximate guide (~{THB_PER_USD} THB = 1 USD). For photos and
+        videos of each treatment, see{" "}
+        <Link href="/services" className="text-accent underline">
+          Services
+        </Link>
+        . Travel fees may apply outside core coverage areas.
       </p>
 
       <div className="mt-12 space-y-12">

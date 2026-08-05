@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
 import { mapAdminReview } from "@/lib/reviews/map";
-import type { ReviewStatus } from "@/lib/reviews/types";
 
 const VALID_FILTER = ["pending", "approved", "rejected", "all"] as const;
 

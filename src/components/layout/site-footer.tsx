@@ -5,7 +5,7 @@ import { PaymentBadges } from "@/components/payment/payment-badges";
 export function SiteFooter() {
   return (
     <footer className="border-t border-border bg-surface">
-      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-[1.2fr_1fr_1fr] md:px-8">
+      <div className="mx-auto grid max-w-6xl gap-10 px-5 py-14 md:grid-cols-[1.3fr_1fr_1fr] md:px-8">
         <div>
           <p className="font-display text-3xl tracking-tight text-foreground">{site.name}</p>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{site.tagline}</p>
@@ -24,6 +24,16 @@ export function SiteFooter() {
                 </Link>
               </li>
             ))}
+            <li>
+              <Link href="/blog" className="text-sm text-foreground/80 transition hover:text-accent">
+                Blog
+              </Link>
+            </li>
+            <li>
+              <Link href="/contact" className="text-sm text-foreground/80 transition hover:text-accent">
+                Contact
+              </Link>
+            </li>
           </ul>
         </div>
 
@@ -37,26 +47,8 @@ export function SiteFooter() {
             </li>
             <li>
               <Link href="/my-booking" className="text-sm text-foreground/80 transition hover:text-accent">
-                Manage booking
+                Manage / pay
               </Link>
-            </li>
-            <li>
-              <Link href="/my-booking" className="text-sm text-foreground/80 transition hover:text-accent">
-                Pay by card
-              </Link>
-            </li>
-            <li>
-              <Link href="/contact" className="text-sm text-foreground/80 transition hover:text-accent">
-                Contact
-              </Link>
-            </li>
-            <li>
-              <a
-                href={`mailto:${site.contact.email}`}
-                className="text-sm text-foreground/80 transition hover:text-accent"
-              >
-                {site.contact.email}
-              </a>
             </li>
             <li>
               <a
@@ -74,7 +66,9 @@ export function SiteFooter() {
 
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-5 text-xs text-muted md:flex-row md:items-center md:justify-between md:px-8">
-          <p>© {new Date().getFullYear()} {site.name}. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} {site.name}. All rights reserved.
+          </p>
           <p>Cash on arrival · Visa · Mastercard · Amex</p>
         </div>
       </div>

@@ -54,7 +54,7 @@ export function HomeHero() {
           </a>
         </div>
         <p className="animate-fade-up delay-4 mt-4 text-sm text-white/65">
-          Quick booking help on WhatsApp: {site.contact.whatsapp}
+          Hotels · condos · homes · classic to tantric
         </p>
       </div>
     </section>
