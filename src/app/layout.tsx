@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Cormorant_Garamond, Outfit } from "next/font/google";
 import { ThemeProvider } from "@/components/providers/theme-provider";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
-import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
+import { AppShell } from "@/components/layout/app-shell";
 import { site } from "@/content/site";
 import "./globals.css";
 
@@ -53,10 +51,7 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${sans.variable} h-full`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans antialiased">
         <ThemeProvider>
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <WhatsAppFloat />
-          <SiteFooter />
+          <AppShell>{children}</AppShell>
         </ThemeProvider>
       </body>
     </html>
