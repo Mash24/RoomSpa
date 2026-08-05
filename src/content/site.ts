@@ -25,9 +25,9 @@ export const site = {
     { label: "Services", href: "/services" },
     { label: "Pricing", href: "/pricing" },
     { label: "Coverage", href: "/coverage" },
+    { label: "Reviews", href: "/reviews" },
     { label: "About", href: "/about" },
     { label: "FAQ", href: "/faq" },
-    { label: "Blog", href: "/blog" },
   ],
   hero: {
     brand: "RoomSpa",

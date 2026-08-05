@@ -35,6 +35,11 @@ export const faqItems = [
       "Therapists arrive discreetly, use professional language with hotel staff when needed, and never share your booking details. Intimate sessions are handled with the same confidentiality as classic spa work.",
   },
   {
+    question: "Can I leave a review?",
+    answer:
+      "Yes — on the Reviews page. All reviews are moderated before they appear. We allow honest feedback about your RoomSpa experience, and we block hate, spam, links, graphic sexual detail, solicitation, and personal contact details. See the guidelines on that page.",
+  },
+  {
     question: "How do I change or cancel?",
     answer:
       "Use My booking with your email and PIN, or WhatsApp us with your reference code. Please give as much notice as you can so we can free the therapist’s time.",

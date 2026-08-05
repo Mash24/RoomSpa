@@ -40,6 +40,9 @@ If the user was created before the profile trigger existed, this insert is requi
 - **Confirm / Cancel** — for pending bookings
 - **Mark completed / Cancel / No show** — for confirmed bookings
 - **Stats** — today's count, upcoming, bookings this week, paid revenue this week
+- **Reviews** (`/admin/reviews`) — approve or reject guest submissions
+
+Also run `supabase/migrations/20260805_reviews.sql` for the reviews table.
 
 ## Security notes
 
