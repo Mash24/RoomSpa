@@ -2,14 +2,23 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { catalogProducts, productPriceLabel } from "@/content/pricing";
 import { coverageAreas } from "@/content/coverage";
 import { whatsappHref } from "@/content/site";
-import { TIME_SLOTS, type BookingResult, type LocationType } from "@/lib/booking/types";
+import { PaymentBadges } from "@/components/payment/payment-badges";
+import {
+  TIME_SLOTS,
+  type BookingResult,
+  type LocationType,
+  type PaymentPreference,
+} from "@/lib/booking/types";
+import { redirectToUrl } from "@/lib/navigation";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
 export function BookingForm() {
+  const searchParams = useSearchParams();
   const [serviceSlug, setServiceSlug] = useState<string>(catalogProducts[0]?.slug ?? "swedish");
   const [coverageAreaSlug, setCoverageAreaSlug] = useState<string>(coverageAreas[0]?.slug ?? "");
   const [locationType, setLocationType] = useState<LocationType>("hotel");
@@ -18,9 +27,10 @@ export function BookingForm() {
   const [scheduledDate, setScheduledDate] = useState(today());
   const [scheduledTime, setScheduledTime] = useState<string>(TIME_SLOTS[2]);
   const [customerName, setCustomerName] = useState("");
-  const [customerEmail, setCustomerEmail] = useState("");
+  const [customerEmail, setCustomerEmail] = useState(searchParams.get("email") ?? "");
   const [customerPhone, setCustomerPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [paymentPreference, setPaymentPreference] = useState<PaymentPreference>("cash");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<BookingResult | null>(null);
@@ -29,6 +39,8 @@ export function BookingForm() {
     () => catalogProducts.find((product) => product.slug === serviceSlug),
     [serviceSlug],
   );
+
+  const payNow = paymentPreference === "card_now";
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -51,6 +63,8 @@ export function BookingForm() {
           customerEmail,
           customerPhone,
           notes,
+          paymentPreference,
+          payNow,
         }),
       });
 
@@ -61,7 +75,7 @@ export function BookingForm() {
 
       const booking = data as BookingResult;
       if (booking.checkoutUrl) {
-        window.location.href = booking.checkoutUrl;
+        redirectToUrl(booking.checkoutUrl);
         return;
       }
 
@@ -74,11 +88,13 @@ export function BookingForm() {
   }
 
   if (result) {
+    const payLaterHref = `/pay?email=${encodeURIComponent(result.customerEmail)}`;
+
     return (
       <div className="border border-border bg-surface-elevated p-6 md:p-8">
-        <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Request received</p>
+        <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Booking received</p>
         <h2 className="mt-3 font-display text-3xl tracking-tight text-foreground">
-          You’re almost booked
+          You’re booked
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
           Reference <span className="font-medium text-foreground">{result.referenceCode}</span> for{" "}
@@ -86,9 +102,15 @@ export function BookingForm() {
           {productPriceLabel(result.amountThb)}.
         </p>
         <p className="mt-3 text-sm text-muted">
-          Tap WhatsApp to confirm with us now — we reply quickly.
+          Payment is optional now. Pay cash on arrival, or use your email to pay by card anytime before
+          your session.
         </p>
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+
+        <div className="mt-6">
+          <PaymentBadges compact />
+        </div>
+
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <a
             href={result.whatsappHref}
             target="_blank"
@@ -97,6 +119,12 @@ export function BookingForm() {
           >
             Confirm on WhatsApp
           </a>
+          <Link
+            href={payLaterHref}
+            className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+          >
+            Pay by card later
+          </Link>
           <Link
             href="/"
             className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
@@ -283,6 +311,57 @@ export function BookingForm() {
         </div>
       </fieldset>
 
+      <fieldset className="space-y-4">
+        <legend className="font-display text-2xl tracking-tight text-foreground">4. Payment (optional)</legend>
+        <p className="text-sm text-muted">
+          No payment is required to book. Choose what works best for you.
+        </p>
+        <div className="grid gap-3">
+          {[
+            {
+              value: "cash" as const,
+              title: "Pay cash on arrival",
+              body: "Most popular — book now, pay when your therapist arrives.",
+            },
+            {
+              value: "card_later" as const,
+              title: "Pay by card later",
+              body: "We’ll save your booking. Pay anytime with the email you used to book.",
+            },
+            {
+              value: "card_now" as const,
+              title: "Pay by card now",
+              body: "Secure checkout with Visa, Mastercard, or Amex.",
+            },
+          ].map((option) => (
+            <label
+              key={option.value}
+              className={`cursor-pointer border p-4 transition ${
+                paymentPreference === option.value
+                  ? "border-accent bg-accent-soft/40"
+                  : "border-border bg-surface-elevated"
+              }`}
+            >
+              <div className="flex items-start gap-3">
+                <input
+                  type="radio"
+                  name="paymentPreference"
+                  value={option.value}
+                  checked={paymentPreference === option.value}
+                  onChange={() => setPaymentPreference(option.value)}
+                  className="mt-1"
+                />
+                <div>
+                  <p className="font-medium text-foreground">{option.title}</p>
+                  <p className="mt-1 text-sm text-muted">{option.body}</p>
+                </div>
+              </div>
+            </label>
+          ))}
+        </div>
+        <PaymentBadges compact />
+      </fieldset>
+
       {error ? (
         <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
           {error}
@@ -298,17 +377,25 @@ export function BookingForm() {
 
       <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted">
-            {selectedService
-              ? `Total: ${productPriceLabel(selectedService.amountThb)} — pay securely with Stripe`
-              : null}
-          </p>
-          <button
-            type="submit"
-            disabled={submitting}
-            className="inline-flex items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
-          >
-            {submitting ? "Redirecting to payment..." : "Book & pay"}
-          </button>
+          {selectedService
+            ? `Total: ${productPriceLabel(selectedService.amountThb)}${
+                payNow ? " — you’ll pay by card next" : " — no payment required now"
+              }`
+            : null}
+        </p>
+        <button
+          type="submit"
+          disabled={submitting}
+          className="inline-flex items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
+        >
+          {submitting
+            ? payNow
+              ? "Redirecting to payment..."
+              : "Sending booking..."
+            : payNow
+              ? "Book & pay now"
+              : "Request booking"}
+        </button>
       </div>
     </form>
   );

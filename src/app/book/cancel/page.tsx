@@ -7,13 +7,7 @@ export const metadata: Metadata = {
   description: "Your RoomSpa checkout was cancelled. You can try again anytime.",
 };
 
-type CancelPageProps = {
-  searchParams: Promise<{ ref?: string }>;
-};
-
-export default async function BookingCancelPage({ searchParams }: CancelPageProps) {
-  const params = await searchParams;
-
+export default function BookingCancelPage() {
   return (
     <section className="mx-auto max-w-2xl px-5 py-24 md:px-8">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Checkout</p>
@@ -21,22 +15,15 @@ export default async function BookingCancelPage({ searchParams }: CancelPageProp
         Payment cancelled
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        No charge was made
-        {params.ref ? (
-          <>
-            {" "}
-            for reference <span className="font-medium text-foreground">{params.ref}</span>
-          </>
-        ) : null}
-        . You can complete payment whenever you’re ready.
+        No charge was made. Your booking is still saved — pay by card later, or cash on arrival.
       </p>
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <Link
-          href="/book"
+          href="/pay"
           className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
         >
-          Try booking again
+          Pay by card
         </Link>
         <a
           href={whatsappHref}

@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { BookingForm } from "@/components/booking/booking-form";
 import { whatsappHref } from "@/content/site";
 
 export const metadata: Metadata = {
   title: "Book Appointment",
   description:
-    "Book a RoomSpa massage at your hotel, condo, or home. Choose service, time, and location — confirm on WhatsApp.",
+    "Book a RoomSpa massage at your hotel, condo, or home. No payment required — pay cash on arrival or by card later.",
 };
 
 export default function BookPage() {
@@ -16,7 +17,11 @@ export default function BookPage() {
         Book your in-room massage
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
-        Pick a service and time, then pay securely with Stripe. Prefer chat?{" "}
+        No payment required to book. Pay cash on arrival, or{" "}
+        <a href="/pay" className="text-accent underline">
+          pay by card later
+        </a>
+        . Prefer chat?{" "}
         <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
           WhatsApp us
         </a>
@@ -24,7 +29,9 @@ export default function BookPage() {
       </p>
 
       <div className="mt-10">
-        <BookingForm />
+        <Suspense fallback={<p className="text-sm text-muted">Loading booking form...</p>}>
+          <BookingForm />
+        </Suspense>
       </div>
     </section>
   );

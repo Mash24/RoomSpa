@@ -5,10 +5,7 @@ import type { BookingPayload } from "@/lib/booking/types";
 import { site } from "@/content/site";
 import { getCatalogProduct } from "@/content/pricing";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
-
-function isEmail(value: string) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
-}
+import { isEmail, normalizeEmail, resolveSiteUrl } from "@/lib/payments/lookup";
 
 function buildReferenceCode() {
   return `RS-${randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
@@ -40,14 +37,22 @@ function buildWhatsAppHref(input: {
   return `https://wa.me/${number}?text=${message}`;
 }
 
-function resolveSiteUrl(request: Request) {
-  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
-  if (fromEnv) return fromEnv;
+async function insertBooking(
+  supabase: ReturnType<typeof createAdminishAnonClient>,
+  row: Record<string, unknown>,
+) {
+  const { error } = await supabase.from("bookings").insert(row);
+  if (!error) return null;
 
-  const origin = request.headers.get("origin");
-  if (origin) return origin.replace(/\/$/, "");
+  if (error.message?.includes("payment_status") || error.message?.includes("payment_method")) {
+    const { payment_status, payment_method, ...fallback } = row;
+    void payment_status;
+    void payment_method;
+    const { error: retryError } = await supabase.from("bookings").insert(fallback);
+    return retryError;
+  }
 
-  return "http://localhost:3000";
+  return error;
 }
 
 export async function POST(request: Request) {
@@ -88,20 +93,7 @@ export async function POST(request: Request) {
 
     if (serviceError || !service) {
       return NextResponse.json(
-        {
-          error:
-            "Service not found. Make sure the Supabase schema and seed SQL have been run.",
-        },
-        { status: 400 },
-      );
-    }
-
-    const catalog = getCatalogProduct(body.serviceSlug);
-    const stripePriceId = service.stripe_price_id || catalog?.stripePriceId;
-
-    if (!stripePriceId) {
-      return NextResponse.json(
-        { error: "This service is missing a Stripe price. Add the Price ID in Supabase/services." },
+        { error: "Service not found. Make sure the Supabase schema and seed SQL have been run." },
         { status: 400 },
       );
     }
@@ -121,10 +113,12 @@ export async function POST(request: Request) {
     const referenceCode = buildReferenceCode();
     const scheduledTime = body.scheduledTime.slice(0, 5);
     const customerName = body.customerName.trim();
-    const customerEmail = body.customerEmail.trim().toLowerCase();
+    const customerEmail = normalizeEmail(body.customerEmail);
     const locationLabel = body.locationLabel.trim();
+    const payNow = Boolean(body.payNow);
+    const paymentMethod = payNow ? "card" : body.paymentPreference === "cash" ? "cash" : "not_selected";
 
-    const { error: bookingError } = await supabase.from("bookings").insert({
+    const bookingError = await insertBooking(supabase, {
       id: bookingId,
       reference_code: referenceCode,
       service_id: service.id,
@@ -141,58 +135,16 @@ export async function POST(request: Request) {
       notes: body.notes?.trim() ?? "",
       status: "pending",
       payment_status: "unpaid",
+      payment_method: paymentMethod,
       source: "website",
     });
 
     if (bookingError) {
-      // If payment_status column isn't migrated yet, retry without it.
-      if (bookingError.message?.includes("payment_status")) {
-        const { error: retryError } = await supabase.from("bookings").insert({
-          id: bookingId,
-          reference_code: referenceCode,
-          service_id: service.id,
-          coverage_area_id: coverageAreaId,
-          customer_name: customerName,
-          customer_email: customerEmail,
-          customer_phone: body.customerPhone.trim(),
-          location_type: body.locationType,
-          location_label: locationLabel,
-          location_details: body.locationDetails?.trim() ?? "",
-          scheduled_date: body.scheduledDate,
-          scheduled_time: scheduledTime,
-          amount_thb: service.price_thb,
-          notes: body.notes?.trim() ?? "",
-          status: "pending",
-          source: "website",
-        });
-
-        if (retryError) {
-          const message = retryError.message?.includes("already booked")
-            ? "That time slot was just taken. Please choose another time."
-            : retryError.message || "Could not create booking.";
-          return NextResponse.json({ error: message }, { status: 400 });
-        }
-      } else {
-        const message = bookingError.message?.includes("already booked")
-          ? "That time slot was just taken. Please choose another time."
-          : bookingError.message || "Could not create booking.";
-        return NextResponse.json({ error: message }, { status: 400 });
-      }
+      const message = bookingError.message?.includes("already booked")
+        ? "That time slot was just taken. Please choose another time."
+        : bookingError.message || "Could not create booking.";
+      return NextResponse.json({ error: message }, { status: 400 });
     }
-
-    const session = await createBookingCheckoutSession({
-      priceId: stripePriceId,
-      customerEmail,
-      customerName,
-      bookingId,
-      referenceCode,
-      serviceName: service.name,
-      scheduledDate: body.scheduledDate,
-      scheduledTime,
-      locationLabel,
-      amountThb: service.price_thb,
-      siteUrl: resolveSiteUrl(request),
-    });
 
     const whatsappHref = buildWhatsAppHref({
       referenceCode,
@@ -203,17 +155,48 @@ export async function POST(request: Request) {
       locationLabel,
     });
 
-    return NextResponse.json({
+    const response: Record<string, unknown> = {
       id: bookingId,
       referenceCode,
       amountThb: service.price_thb,
       serviceName: service.name,
       scheduledDate: body.scheduledDate,
       scheduledTime,
+      customerEmail,
       whatsappHref,
-      checkoutUrl: session.url,
-      checkoutSessionId: session.id,
-    });
+      paymentMethod,
+    };
+
+    if (payNow) {
+      const catalog = getCatalogProduct(body.serviceSlug);
+      const stripePriceId = service.stripe_price_id || catalog?.stripePriceId;
+
+      if (!stripePriceId) {
+        return NextResponse.json(
+          { error: "Card payment is not available for this service yet." },
+          { status: 400 },
+        );
+      }
+
+      const session = await createBookingCheckoutSession({
+        priceId: stripePriceId,
+        customerEmail,
+        customerName,
+        bookingId,
+        referenceCode,
+        serviceName: service.name,
+        scheduledDate: body.scheduledDate,
+        scheduledTime,
+        locationLabel,
+        amountThb: service.price_thb,
+        siteUrl: resolveSiteUrl(request),
+      });
+
+      response.checkoutUrl = session.url;
+      response.checkoutSessionId = session.id;
+    }
+
+    return NextResponse.json(response);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected server error.";
     return NextResponse.json({ error: message }, { status: 500 });

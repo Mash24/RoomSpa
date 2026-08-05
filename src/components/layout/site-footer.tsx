@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { site, whatsappHref } from "@/content/site";
+import { PaymentBadges } from "@/components/payment/payment-badges";
 
 export function SiteFooter() {
   return (
@@ -8,6 +9,9 @@ export function SiteFooter() {
         <div>
           <p className="font-display text-3xl tracking-tight text-foreground">{site.name}</p>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{site.tagline}</p>
+          <div className="mt-6">
+            <PaymentBadges compact />
+          </div>
         </div>
 
         <div>
@@ -29,6 +33,11 @@ export function SiteFooter() {
             <li>
               <Link href="/book" className="text-sm text-foreground/80 transition hover:text-accent">
                 Book appointment
+              </Link>
+            </li>
+            <li>
+              <Link href="/pay" className="text-sm text-foreground/80 transition hover:text-accent">
+                Pay by card
               </Link>
             </li>
             <li>
@@ -61,7 +70,7 @@ export function SiteFooter() {
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-6xl flex-col gap-2 px-5 py-5 text-xs text-muted md:flex-row md:items-center md:justify-between md:px-8">
           <p>© {new Date().getFullYear()} {site.name}. All rights reserved.</p>
-          <p>City-flexible wellness — expand without a rebrand.</p>
+          <p>Cash on arrival · Visa · Mastercard · Amex</p>
         </div>
       </div>
     </footer>

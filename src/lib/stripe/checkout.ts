@@ -27,7 +27,7 @@ export async function createBookingCheckoutSession(input: CheckoutInput) {
       },
     ],
     success_url: `${input.siteUrl}/book/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${input.siteUrl}/book/cancel?ref=${encodeURIComponent(input.referenceCode)}`,
+    cancel_url: `${input.siteUrl}/pay?email=${encodeURIComponent(input.customerEmail)}`,
     metadata: {
       bookingId: input.bookingId,
       referenceCode: input.referenceCode,

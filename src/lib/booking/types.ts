@@ -1,4 +1,5 @@
 export type LocationType = "hotel" | "condo" | "home";
+export type PaymentPreference = "cash" | "card_later" | "card_now";
 
 export type BookingPayload = {
   serviceSlug: string;
@@ -12,6 +13,8 @@ export type BookingPayload = {
   scheduledDate: string;
   scheduledTime: string;
   notes?: string;
+  paymentPreference?: PaymentPreference;
+  payNow?: boolean;
 };
 
 export type BookingResult = {
@@ -21,9 +24,19 @@ export type BookingResult = {
   serviceName: string;
   scheduledDate: string;
   scheduledTime: string;
+  customerEmail: string;
   whatsappHref: string;
+  paymentMethod?: string;
   checkoutUrl?: string;
-  checkoutSessionId?: string;
+};
+
+export type UnpaidBookingSummary = {
+  id: string;
+  referenceMasked: string;
+  serviceName: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  amountThb: number;
 };
 
 export const TIME_SLOTS = [
