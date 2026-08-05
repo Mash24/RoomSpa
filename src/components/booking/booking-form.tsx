@@ -3,7 +3,12 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { catalogProducts, productPriceLabel } from "@/content/pricing";
+import {
+  catalogProducts,
+  productPriceLabel,
+  serviceAcceptsCardNow,
+  serviceCategories,
+} from "@/content/services";
 import { coverageAreas } from "@/content/coverage";
 import { whatsappHref } from "@/content/site";
 import { PaymentBadges } from "@/components/payment/payment-badges";
@@ -18,9 +23,18 @@ import { redirectToUrl } from "@/lib/navigation";
 
 const today = () => new Date().toISOString().slice(0, 10);
 
+function initialServiceSlug(fromQuery: string | null) {
+  if (fromQuery && catalogProducts.some((product) => product.slug === fromQuery)) {
+    return fromQuery;
+  }
+  return catalogProducts[0]?.slug ?? "swedish";
+}
+
 export function BookingForm() {
   const searchParams = useSearchParams();
-  const [serviceSlug, setServiceSlug] = useState<string>(catalogProducts[0]?.slug ?? "swedish");
+  const [serviceSlug, setServiceSlug] = useState<string>(() =>
+    initialServiceSlug(searchParams.get("service")),
+  );
   const [coverageAreaSlug, setCoverageAreaSlug] = useState<string>(coverageAreas[0]?.slug ?? "");
   const [locationType, setLocationType] = useState<LocationType>("hotel");
   const [locationLabel, setLocationLabel] = useState("");
@@ -41,7 +55,10 @@ export function BookingForm() {
     [serviceSlug],
   );
 
-  const payNow = paymentPreference === "card_now";
+  const canPayNow = selectedService ? serviceAcceptsCardNow(selectedService) : false;
+  const effectivePaymentPreference: PaymentPreference =
+    paymentPreference === "card_now" && !canPayNow ? "card_later" : paymentPreference;
+  const payNow = effectivePaymentPreference === "card_now";
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -64,7 +81,7 @@ export function BookingForm() {
           customerEmail,
           customerPhone,
           notes,
-          paymentPreference,
+          paymentPreference: effectivePaymentPreference,
           payNow,
         }),
       });
@@ -149,37 +166,37 @@ export function BookingForm() {
     <form onSubmit={onSubmit} className="space-y-8">
       <fieldset className="space-y-4">
         <legend className="font-display text-2xl tracking-tight text-foreground">1. Service</legend>
-        <div className="grid gap-3">
-          {catalogProducts.map((product) => {
-            const selected = product.slug === serviceSlug;
-            return (
-              <label
-                key={product.slug}
-                className={`cursor-pointer border p-4 transition ${
-                  selected ? "border-accent bg-accent-soft/40" : "border-border bg-surface-elevated"
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  <input
-                    type="radio"
-                    name="service"
-                    value={product.slug}
-                    checked={selected}
-                    onChange={() => setServiceSlug(product.slug)}
-                    className="mt-1"
-                  />
-                  <div>
-                    <p className="font-medium text-foreground">{product.name}</p>
-                    <p className="mt-1 text-sm text-muted">{product.summary}</p>
-                    <p className="mt-2 text-sm font-medium text-accent">
-                      {productPriceLabel(product.amountThb)} · {product.duration}
-                    </p>
-                  </div>
-                </div>
-              </label>
-            );
-          })}
-        </div>
+        <label className="block text-sm">
+          <span className="text-muted">Choose a massage</span>
+          <select
+            required
+            value={serviceSlug}
+            onChange={(e) => setServiceSlug(e.target.value)}
+            className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
+          >
+            {serviceCategories.map((category) => {
+              const options = catalogProducts.filter((product) => product.category === category.id);
+              if (options.length === 0) return null;
+              return (
+                <optgroup key={category.id} label={category.title}>
+                  {options.map((product) => (
+                    <option key={product.slug} value={product.slug}>
+                      {product.name} — {productPriceLabel(product.amountThb)}
+                    </option>
+                  ))}
+                </optgroup>
+              );
+            })}
+          </select>
+        </label>
+        {selectedService ? (
+          <div className="border border-border bg-surface-elevated p-4">
+            <p className="text-sm leading-relaxed text-muted">{selectedService.summary}</p>
+            <p className="mt-2 text-sm font-medium text-accent">
+              {productPriceLabel(selectedService.amountThb)} · {selectedService.duration}
+            </p>
+          </div>
+        ) : null}
       </fieldset>
 
       <fieldset className="space-y-4">
@@ -331,24 +348,31 @@ export function BookingForm() {
               value: "cash" as const,
               title: "Pay cash on arrival",
               body: "Most popular — book now, pay when your therapist arrives.",
+              available: true,
             },
             {
               value: "card_later" as const,
               title: "Pay by card later",
-              body: "We’ll save your booking. Pay anytime with the email you used to book.",
+              body: "Save your booking, then pay anytime from My booking with email + PIN.",
+              available: true,
             },
             {
               value: "card_now" as const,
               title: "Pay by card now",
-              body: "Secure checkout with Visa, Mastercard, or Amex.",
+              body: canPayNow
+                ? "Secure checkout with Visa, Mastercard, or Amex."
+                : "Online card checkout is not set up for this service yet — use cash or card later.",
+              available: canPayNow,
             },
           ].map((option) => (
             <label
               key={option.value}
-              className={`cursor-pointer border p-4 transition ${
-                paymentPreference === option.value
-                  ? "border-accent bg-accent-soft/40"
-                  : "border-border bg-surface-elevated"
+              className={`border p-4 transition ${
+                !option.available
+                  ? "cursor-not-allowed border-border bg-surface opacity-60"
+                  : effectivePaymentPreference === option.value
+                    ? "cursor-pointer border-accent bg-accent-soft/40"
+                    : "cursor-pointer border-border bg-surface-elevated"
               }`}
             >
               <div className="flex items-start gap-3">
@@ -356,7 +380,8 @@ export function BookingForm() {
                   type="radio"
                   name="paymentPreference"
                   value={option.value}
-                  checked={paymentPreference === option.value}
+                  checked={effectivePaymentPreference === option.value}
+                  disabled={!option.available}
                   onChange={() => setPaymentPreference(option.value)}
                   className="mt-1"
                 />

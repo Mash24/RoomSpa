@@ -1,67 +1,83 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { catalogProducts, comingSoonProducts, productPriceLabel } from "@/content/pricing";
+import {
+  catalogProducts,
+  productPriceLabel,
+  serviceAcceptsCardNow,
+  serviceCategories,
+} from "@/content/services";
 import { whatsappHref } from "@/content/site";
 import { THB_PER_USD } from "@/lib/currency";
+import { formatThb } from "@/lib/currency";
 
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "RoomSpa massage pricing in Thai Baht and approximate USD — Swedish and Couples sessions delivered to your hotel, condo, or home.",
+    "RoomSpa mobile massage pricing in THB and approximate USD — classic, therapeutic, couples, Nuru, Yoni, Lingam, and more.",
 };
 
 export default function PricingPage() {
   return (
-    <section className="mx-auto max-w-6xl px-5 py-24 md:px-8 md:py-32">
+    <section className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Pricing</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         Transparent rates, dual currency
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
-        You pay in THB. USD is shown as an approximate guide (~{THB_PER_USD} THB = 1 USD). Travel fees may apply
-        outside core coverage areas.
+        You pay in THB. USD is an approximate guide (~{THB_PER_USD} THB = 1 USD). Travel fees may
+        apply outside core coverage areas.
       </p>
 
-      <ul className="mt-12 grid gap-6 md:grid-cols-2">
-        {catalogProducts.map((product) => (
-          <li key={product.slug} className="border border-border bg-surface-elevated p-7 md:p-8">
-            <h2 className="font-display text-3xl tracking-tight text-foreground">{product.name}</h2>
-            <p className="mt-2 text-sm text-muted">{product.duration}</p>
-            <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">{product.summary}</p>
-            <p className="mt-6 font-display text-3xl text-accent">{productPriceLabel(product.amountThb)}</p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/book"
-                className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
-              >
-                Book this
-              </Link>
-              <a
-                href={whatsappHref}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
-              >
-                WhatsApp us
-              </a>
-            </div>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-12 space-y-12">
+        {serviceCategories.map((category) => {
+          const products = catalogProducts.filter((p) => p.category === category.id);
+          if (products.length === 0) return null;
 
-      <div className="mt-10">
-        <p className="text-sm text-muted">More services coming soon:</p>
-        <div className="mt-3 flex flex-wrap gap-3">
-          {comingSoonProducts.map((product) => (
-            <span
-              key={product.slug}
-              className="rounded-sm border border-dashed border-border px-4 py-2 text-sm text-muted"
-            >
-              {product.name}
-            </span>
-          ))}
-        </div>
+          return (
+            <div key={category.id}>
+              <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
+                {category.title}
+              </h2>
+              <ul className="mt-5 divide-y divide-border border border-border bg-surface-elevated">
+                {products.map((product) => (
+                  <li
+                    key={product.slug}
+                    className="flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between md:px-6"
+                  >
+                    <div className="min-w-0">
+                      <p className="font-medium text-foreground">{product.name}</p>
+                      <p className="mt-1 text-sm text-muted">
+                        {product.duration}
+                        {!serviceAcceptsCardNow(product) ? " · cash / card later" : " · cash / card"}
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-4">
+                      <p className="font-display text-xl text-accent sm:text-2xl">
+                        {productPriceLabel(product.amountThb)}
+                      </p>
+                      <Link
+                        href={`/book?service=${product.slug}`}
+                        className="rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+                      >
+                        Book
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
       </div>
+
+      <p className="mt-10 text-sm text-muted">
+        Starting from {formatThb(Math.min(...catalogProducts.map((p) => p.amountThb)))}. Need a
+        custom length or combo?{" "}
+        <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
+          WhatsApp us
+        </a>
+        .
+      </p>
     </section>
   );
 }

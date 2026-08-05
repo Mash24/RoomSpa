@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 import type { BookingPayload } from "@/lib/booking/types";
 import { site } from "@/content/site";
-import { getCatalogProduct } from "@/content/pricing";
+import { getCatalogProduct } from "@/content/services";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
 import { generateBookingPin, mapPaymentPreferenceToMethod } from "@/lib/booking/pin";
 import { isEmail, normalizeEmail, resolveSiteUrl } from "@/lib/payments/lookup";

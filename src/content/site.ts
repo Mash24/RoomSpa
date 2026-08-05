@@ -1,9 +1,20 @@
 /** Site content — CMS-ready shape for Phase 1 admin later */
+import { catalogServices, featuredServices } from "@/content/services";
+
+const homeServicePicks = (() => {
+  const featured = featuredServices.slice(0, 4);
+  if (featured.length >= 4) return featured;
+  const extras = catalogServices.filter(
+    (service) => !featured.some((item) => item.slug === service.slug),
+  );
+  return [...featured, ...extras].slice(0, 4);
+})();
+
 export const site = {
   name: "RoomSpa",
   tagline: "Premium massage, wherever you are",
   description:
-    "Book a professional in-room massage at your hotel, condo, or home. Designed for travelers, expats, and anyone who wants spa-quality care without leaving the room.",
+    "Book professional in-room massage at your hotel, condo, or home — classic, therapeutic, couples, and consent-led sensual or tantric sessions including Nuru, Yoni, and Lingam.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en",
   contact: {
@@ -22,46 +33,26 @@ export const site = {
     brand: "RoomSpa",
     headline: "Spa-quality massage at your door",
     support:
-      "Licensed therapists travel to your hotel, condo, or home — book in minutes.",
+      "Professional therapists travel to your hotel, condo, or home — classic to tantric, book in minutes.",
     primaryCta: { label: "Book an appointment", href: "/book" },
     secondaryCta: { label: "View services", href: "/services" },
   },
-  services: [
-    {
-      slug: "swedish",
-      title: "Swedish Massage",
-      summary: "Classic full-body relaxation with long, flowing strokes.",
-      duration: "60–90 min",
-    },
-    {
-      slug: "deep-tissue",
-      title: "Deep Tissue",
-      summary: "Targeted pressure for tension, travel fatigue, and desk strain.",
-      duration: "60–90 min",
-    },
-    {
-      slug: "aromatherapy",
-      title: "Aromatherapy",
-      summary: "Essential oils paired with gentle technique for deep calm.",
-      duration: "60–90 min",
-    },
-    {
-      slug: "couples",
-      title: "Couples Massage",
-      summary: "Side-by-side sessions for two — ideal for hotels and suites.",
-      duration: "60–90 min",
-    },
-  ],
+  services: homeServicePicks.map((service) => ({
+    slug: service.slug,
+    title: service.name,
+    summary: service.summary,
+    duration: service.duration,
+  })),
   howItWorks: [
     {
       step: "01",
       title: "Choose your service",
-      body: "Pick the massage style, duration, and where we should meet you.",
+      body: "From Swedish and Thai to Nuru, Yoni, Lingam, and couples — pick what you need.",
     },
     {
       step: "02",
-      title: "Pick a time",
-      body: "Real-time availability — we block travel time so nothing overlaps.",
+      title: "Pick a time & place",
+      body: "Hotel, condo, or home. Multiple therapists mean overlapping times are fine.",
     },
     {
       step: "03",
@@ -70,7 +61,7 @@ export const site = {
     },
   ],
   coverageNote:
-    "City-flexible by design. Launch areas first, then expand without renaming the brand.",
+    "Launching in Chiang Mai. City-flexible by design — expand without renaming the brand.",
 } as const;
 
 const whatsappNumber = site.contact.whatsapp.replace(/\D/g, "");

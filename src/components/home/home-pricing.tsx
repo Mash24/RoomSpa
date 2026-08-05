@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { catalogProducts, comingSoonProducts, productPriceLabel } from "@/content/pricing";
+import { featuredServices, productPriceLabel } from "@/content/services";
 import { whatsappHref } from "@/content/site";
 import { THB_PER_USD } from "@/lib/currency";
 
@@ -13,12 +13,13 @@ export function HomePricing() {
             Clear rates in THB and USD
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-            Charged in Thai Baht. USD shown as an approximate guide (~{THB_PER_USD} THB = 1 USD).
+            Charged in Thai Baht. USD shown as an approximate guide (~{THB_PER_USD} THB = 1 USD). Full
+            menu from classic Swedish to Nuru, Yoni, and Lingam.
           </p>
         </div>
 
         <ul className="mt-12 grid gap-6 md:grid-cols-2">
-          {catalogProducts.map((product) => (
+          {featuredServices.map((product) => (
             <li key={product.slug} className="border border-border bg-surface-elevated p-7 md:p-8">
               <div className="flex items-start justify-between gap-4">
                 <h3 className="font-display text-3xl tracking-tight text-foreground">{product.name}</h3>
@@ -32,7 +33,7 @@ export function HomePricing() {
               </p>
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/book"
+                  href={`/book?service=${product.slug}`}
                   className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
                 >
                   Book this
@@ -50,16 +51,17 @@ export function HomePricing() {
           ))}
         </ul>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          {comingSoonProducts.map((product) => (
-            <span
-              key={product.slug}
-              className="rounded-sm border border-dashed border-border px-4 py-2 text-sm text-muted"
-            >
-              {product.name} — {product.note}
-            </span>
-          ))}
-        </div>
+        <p className="mt-8 text-sm text-muted">
+          Looking for Thai, deep tissue, four-hands, or tantric?{" "}
+          <Link href="/pricing" className="text-accent underline">
+            See full pricing
+          </Link>{" "}
+          or{" "}
+          <Link href="/services" className="text-accent underline">
+            browse all services
+          </Link>
+          .
+        </p>
       </div>
     </section>
   );

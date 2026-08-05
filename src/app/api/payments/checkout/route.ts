@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
-import { getCatalogProduct } from "@/content/pricing";
+import { getCatalogProduct } from "@/content/services";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
 import { isEmail, normalizeEmail, resolveSiteUrl } from "@/lib/payments/lookup";
 

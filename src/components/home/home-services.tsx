@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { site } from "@/content/site";
-import { catalogProducts, productPriceLabel } from "@/content/pricing";
+import { catalogProducts, productPriceLabel } from "@/content/services";
 
 const pricesBySlug = Object.fromEntries(
   catalogProducts.map((product) => [product.slug, product.amountThb]),
@@ -16,7 +16,8 @@ export function HomeServices() {
             Treatments that travel with you
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-            Choose a session that fits how you feel — after a flight, a long workday, or a quiet evening in.
+            Classic spa work, therapeutic relief, couples sessions, and consent-led sensual or
+            tantric bodywork — all in your room.
           </p>
         </div>
 
@@ -43,19 +44,24 @@ export function HomeServices() {
                 </p>
                 {price ? (
                   <p className="mt-4 text-sm font-medium text-accent">{productPriceLabel(price)}</p>
-                ) : (
-                  <p className="mt-4 text-sm text-muted">Pricing coming soon</p>
-                )}
+                ) : null}
                 <Link
-                  href={price ? "/pricing" : `/services#${service.slug}`}
+                  href={`/services#${service.slug}`}
                   className="mt-5 inline-flex text-sm font-medium text-accent transition hover:opacity-80"
                 >
-                  {price ? "View pricing" : "Learn more"}
+                  Learn more
                 </Link>
               </li>
             );
           })}
         </ul>
+
+        <Link
+          href="/services"
+          className="mt-12 inline-flex text-sm font-medium text-accent transition hover:opacity-80"
+        >
+          View full service menu →
+        </Link>
       </div>
     </section>
   );
