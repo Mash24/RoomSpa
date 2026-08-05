@@ -55,4 +55,3 @@ If the user was created before the profile trigger existed, this insert is requi
 | "This account does not have admin access" | Run the SQL in step 3 with the correct user UUID |
 | Empty bookings list | Confirm the admin migration ran and you're signed in as admin |
 | "Forbidden" on stats | Re-run `20260805_admin_dashboard.sql` |
-| Cannot confirm booking — slot conflict | Another pending/confirmed booking exists at that time; cancel the duplicate first |

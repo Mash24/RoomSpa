@@ -17,6 +17,6 @@ Vercel and local `.env.local` need:
 4. Check Supabase → **Table Editor** → `bookings`
 
 ## Notes
-- Payments stay off for now (confirm via WhatsApp)
-- Double-booking of the same date/time is blocked at the database level
-- Stripe Checkout can be added next using the stored `stripe_price_id` values
+- Same date/time bookings are allowed (multi-therapist)
+- Stripe Checkout uses the stored `stripe_price_id` values
+- Customers look up bookings with email + PIN at `/my-booking`

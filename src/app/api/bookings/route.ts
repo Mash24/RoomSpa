@@ -150,10 +150,10 @@ export async function POST(request: Request) {
     });
 
     if (bookingError) {
-      const message = bookingError.message?.includes("already booked")
-        ? "That time slot was just taken. Please choose another time."
-        : bookingError.message || "Could not create booking.";
-      return NextResponse.json({ error: message }, { status: 400 });
+      return NextResponse.json(
+        { error: bookingError.message || "Could not create booking." },
+        { status: 400 },
+      );
     }
 
     const whatsappHref = buildWhatsAppHref({

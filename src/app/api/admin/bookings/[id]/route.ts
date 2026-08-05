@@ -36,10 +36,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     .single();
 
   if (dbError) {
-    const message = dbError.message.includes("already booked")
-      ? "Cannot confirm: this time slot conflicts with another booking."
-      : dbError.message;
-    return NextResponse.json({ error: message }, { status: 400 });
+    return NextResponse.json({ error: dbError.message }, { status: 400 });
   }
 
   return NextResponse.json({ booking: data });

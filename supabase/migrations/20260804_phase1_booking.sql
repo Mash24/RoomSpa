@@ -104,38 +104,8 @@ create trigger profiles_set_updated_at
 before update on public.profiles
 for each row execute function public.set_updated_at();
 
--- Simple double-booking guard for the same date/time (single-therapist MVP)
-create or replace function public.prevent_double_booking()
-returns trigger
-language plpgsql
-as $$
-begin
-  if tg_op = 'UPDATE' then
-    if new.scheduled_date is not distinct from old.scheduled_date
-       and new.scheduled_time is not distinct from old.scheduled_time
-       and new.status is not distinct from old.status then
-      return new;
-    end if;
-  end if;
-
-  if exists (
-    select 1
-    from public.bookings b
-    where b.scheduled_date = new.scheduled_date
-      and b.scheduled_time = new.scheduled_time
-      and b.status in ('pending', 'confirmed')
-      and b.id is distinct from new.id
-  ) then
-    raise exception 'This time slot is already booked';
-  end if;
-  return new;
-end;
-$$;
-
-drop trigger if exists bookings_prevent_double_booking on public.bookings;
-create trigger bookings_prevent_double_booking
-before insert or update on public.bookings
-for each row execute function public.prevent_double_booking();
+-- Concurrent same-time bookings are allowed (multi-therapist).
+-- Capacity / therapist assignment can be added later.
 
 create or replace function public.generate_booking_reference()
 returns trigger
