@@ -3,12 +3,14 @@ import Link from "next/link";
 import { coverageAreas } from "@/content/coverage";
 import { formatThb } from "@/lib/currency";
 import { site, whatsappHref } from "@/content/site";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Coverage Area",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Coverage | Chiang Mai hotel & condo massage zones",
   description:
-    "RoomSpa mobile massage coverage in Chiang Mai — Old City, Nimman, and Airport / Hang Dong.",
-};
+    "RoomSpa mobile massage coverage in Chiang Mai — Old City, Nimman, and Airport / Hang Dong. Travel fees and booking.",
+  path: "/coverage",
+});
 
 export default function CoveragePage() {
   return (
@@ -19,6 +21,11 @@ export default function CoveragePage() {
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
         {site.coverageNote} Hotels, condos, and private homes in these zones are our standard reach.
+        For SEO landing pages by neighborhood, see{" "}
+        <Link href="/city/chiang-mai" className="text-accent underline">
+          Chiang Mai city guide
+        </Link>
+        .
       </p>
 
       <ul className="mt-12 space-y-4">
@@ -46,12 +53,20 @@ export default function CoveragePage() {
         with your hotel or area.
       </p>
 
-      <Link
-        href="/book"
-        className="mt-8 inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
-      >
-        Book in coverage
-      </Link>
+      <div className="mt-8 flex flex-wrap gap-3">
+        <Link
+          href="/book"
+          className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+        >
+          Book in coverage
+        </Link>
+        <Link
+          href="/city"
+          className="inline-flex rounded-sm border border-border px-5 py-3 text-sm transition hover:border-accent hover:text-accent"
+        >
+          All cities
+        </Link>
+      </div>
     </section>
   );
 }

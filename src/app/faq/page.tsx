@@ -2,33 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { faqItems } from "@/content/pages";
 import { whatsappHref } from "@/content/site";
+import { FaqJsonLd } from "@/components/seo/json-ld";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "FAQ",
+export const metadata: Metadata = buildPageMetadata({
+  title: "FAQ | Booking, PIN, payments & sensual sessions",
   description:
-    "Questions about RoomSpa mobile massage — booking, PIN, payments, Nuru, Yoni, Lingam, and coverage.",
-};
+    "Questions about RoomSpa mobile massage — booking, PIN, payments, Nuru, Yoni, Lingam, discretion, and Chiang Mai coverage.",
+  path: "/faq",
+});
 
 export default function FaqPage() {
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqItems.map((item) => ({
-      "@type": "Question",
-      name: item.question,
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: item.answer,
-      },
-    })),
-  };
-
   return (
     <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <FaqJsonLd />
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">FAQ</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         Common questions

@@ -1,36 +1,58 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getAllBlogPosts } from "@/content/blog";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
-export const metadata: Metadata = {
-  title: "Blog",
-  description: "RoomSpa guides on hotel massage, travel recovery, and in-room wellness in Chiang Mai.",
-};
+export const metadata: Metadata = buildPageMetadata({
+  title: "Blog | Hotel massage & wellness guides",
+  description:
+    "Guides on hotel massage in Chiang Mai, Thai vs oil massage, couples sessions, Nuru expectations, and recovery tips.",
+  path: "/blog",
+});
 
 export default function BlogPage() {
+  const posts = getAllBlogPosts();
+
   return (
     <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
-      <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Blog</p>
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Home", path: "/" },
+          { name: "Blog", path: "/blog" },
+        ]}
+      />
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Blog" }]} />
+
+      <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">Blog</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         Guides & notes
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        SEO articles and guest guides are next — hotel massage tips, what to expect from Nuru or
-        tantric sessions, and Chiang Mai coverage notes. For now, start with our service menu.
+        Practical reading for travelers and locals — how in-room massage works, which service to
+        pick, and what to expect in Chiang Mai.
       </p>
-      <div className="mt-8 flex flex-wrap gap-3">
-        <Link
-          href="/services"
-          className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
-        >
-          Browse services
-        </Link>
-        <Link
-          href="/faq"
-          className="inline-flex rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
-        >
-          Read the FAQ
-        </Link>
-      </div>
+
+      <ul className="mt-12 space-y-6">
+        {posts.map((post) => (
+          <li key={post.slug} className="border-t border-border pt-6">
+            <p className="text-xs uppercase tracking-[0.14em] text-muted">{post.datePublished}</p>
+            <h2 className="mt-2 font-display text-2xl text-foreground md:text-3xl">
+              <Link href={`/blog/${post.slug}`} className="transition hover:text-accent">
+                {post.title}
+              </Link>
+            </h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">{post.description}</p>
+            <Link
+              href={`/blog/${post.slug}`}
+              className="mt-4 inline-flex text-sm font-medium text-accent"
+            >
+              Read guide
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

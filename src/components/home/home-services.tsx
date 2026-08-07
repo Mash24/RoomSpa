@@ -58,7 +58,7 @@ export function HomeServices() {
                     <p className="mt-4 text-sm font-medium text-accent">{productPriceLabel(price)}</p>
                   ) : null}
                   <Link
-                    href={`/services#${service.slug}`}
+                    href={`/services/${service.slug}`}
                     className="mt-5 inline-flex text-sm font-medium text-accent transition hover:opacity-80"
                   >
                     View details

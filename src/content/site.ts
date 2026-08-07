@@ -23,9 +23,10 @@ export const site = {
   },
   nav: [
     { label: "Services", href: "/services" },
+    { label: "Cities", href: "/city" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Coverage", href: "/coverage" },
     { label: "Reviews", href: "/reviews" },
+    { label: "Blog", href: "/blog" },
     { label: "About", href: "/about" },
     { label: "FAQ", href: "/faq" },
   ],

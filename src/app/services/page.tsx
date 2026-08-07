@@ -13,12 +13,14 @@ import {
   serviceCategories,
 } from "@/content/services";
 import { whatsappHref } from "@/content/site";
+import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  title: "Services",
+export const metadata: Metadata = buildPageMetadata({
+  title: "Services | Mobile massage menu Chiang Mai",
   description:
-    "Mobile massage with video guides — Swedish, Thai, deep tissue, couples, Nuru, Yoni, Lingam, and more at your hotel, condo, or home.",
-};
+    "Mobile massage with video guides — Swedish, Thai, deep tissue, couples, Nuru, Yoni, Lingam, and more at your hotel, condo, or home in Chiang Mai.",
+  path: "/services",
+});
 
 export default function ServicesPage() {
   return (
@@ -136,8 +138,10 @@ export default function ServicesPage() {
                       <div className="p-5 md:p-6">
                         <div className="flex items-start justify-between gap-3">
                           <h3 className="font-display text-2xl tracking-tight text-foreground">
+                          <Link href={`/services/${service.slug}`} className="transition hover:text-accent">
                             {service.name}
-                          </h3>
+                          </Link>
+                        </h3>
                           <span className="shrink-0 text-xs uppercase tracking-[0.14em] text-muted">
                             {service.duration}
                           </span>
@@ -146,12 +150,20 @@ export default function ServicesPage() {
                         <p className="mt-4 font-display text-2xl text-accent">
                           {productPriceLabel(service.amountThb)}
                         </p>
-                        <Link
-                          href={`/book?service=${service.slug}`}
-                          className="mt-5 inline-flex text-sm font-medium text-accent transition hover:opacity-80"
-                        >
-                          Book {service.name}
-                        </Link>
+                        <div className="mt-5 flex flex-wrap gap-4">
+                          <Link
+                            href={`/services/${service.slug}`}
+                            className="inline-flex text-sm font-medium text-foreground/80 transition hover:text-accent"
+                          >
+                            Details
+                          </Link>
+                          <Link
+                            href={`/book?service=${service.slug}`}
+                            className="inline-flex text-sm font-medium text-accent transition hover:opacity-80"
+                          >
+                            Book {service.name}
+                          </Link>
+                        </div>
                       </div>
                     </li>
                   );
