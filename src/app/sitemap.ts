@@ -3,6 +3,7 @@ import { getAllBlogPosts } from "@/content/blog";
 import { cities } from "@/content/cities";
 import { catalogServices } from "@/content/services";
 import { site } from "@/content/site";
+import { getServiceLocationParams } from "@/lib/seo/locations";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = site.url.replace(/\/$/, "");
@@ -37,6 +38,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.85,
     }));
 
+  const serviceLocationRoutes: MetadataRoute.Sitemap = getServiceLocationParams().map(
+    ({ slug, location }) => ({
+      url: `${base}/services/${slug}/${location}`,
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.8,
+    }),
+  );
+
   const cityRoutes: MetadataRoute.Sitemap = cities.flatMap((city) => [
     {
       url: `${base}/city/${city.slug}`,
@@ -59,5 +69,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }));
 
-  return [...staticRoutes, ...serviceRoutes, ...cityRoutes, ...blogRoutes];
+  return [
+    ...staticRoutes,
+    ...serviceRoutes,
+    ...serviceLocationRoutes,
+    ...cityRoutes,
+    ...blogRoutes,
+  ];
 }

@@ -3,8 +3,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AutoplayVideo } from "@/components/media/autoplay-video";
+import { AvailabilityBanner } from "@/components/seo/availability-banner";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
-import { BreadcrumbJsonLd, ServiceJsonLd } from "@/components/seo/json-ld";
+import { RelatedLinks } from "@/components/seo/related-links";
+import { ReviewSnapshot } from "@/components/seo/review-snapshot";
+import {
+  BreadcrumbJsonLd,
+  FaqJsonLd,
+  ServiceJsonLd,
+} from "@/components/seo/json-ld";
+import { getServiceFaqs } from "@/content/service-faqs";
 import { getServiceMedia } from "@/content/service-media";
 import {
   catalogServices,
@@ -13,11 +21,20 @@ import {
   serviceCategories,
 } from "@/content/services";
 import { whatsappHref } from "@/content/site";
+import { aggregateRating, getApprovedReviews, getApprovedReviewsForService } from "@/lib/reviews/fetch";
+import { getTodayAvailabilityTeaser } from "@/lib/seo/availability-teaser";
+import {
+  relatedBlogLinks,
+  relatedServices,
+  seoLocations,
+} from "@/lib/seo/locations";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
+
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return catalogServices.filter((s) => s.bookable).map((service) => ({ slug: service.slug }));
@@ -42,9 +59,22 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
   const media = getServiceMedia(service.slug);
   const category = serviceCategories.find((item) => item.id === service.category);
-  const related = catalogServices
-    .filter((item) => item.bookable && item.category === service.category && item.slug !== service.slug)
-    .slice(0, 3);
+  const faqs = getServiceFaqs(service.slug);
+  const serviceReviews = await getApprovedReviewsForService(service.slug, 8);
+  const displayReviews =
+    serviceReviews.length > 0 ? serviceReviews : await getApprovedReviews(4);
+  const aggregate = aggregateRating(displayReviews);
+  const teaser = await getTodayAvailabilityTeaser();
+  const related = relatedServices(service, 4);
+  const blogs = relatedBlogLinks([service.name, service.category, "Chiang Mai", "hotel"], 3);
+  const areaLinks = seoLocations
+    .filter((loc) => loc.bookable)
+    .slice(0, 6)
+    .map((loc) => ({
+      href: `/services/${service.slug}/${loc.slug}`,
+      label: `${service.name} ${loc.inPhrase}`,
+      hint: loc.bookable ? "Bookable coverage" : "Coming soon",
+    }));
 
   return (
     <article className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
@@ -54,7 +84,12 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         slug={service.slug}
         amountThb={service.amountThb}
         duration={service.duration}
+        aggregate={aggregate}
+        reviews={displayReviews}
+        videoUrl={media.video}
+        videoPoster={media.image}
       />
+      <FaqJsonLd faqs={faqs} />
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "/" },
@@ -82,6 +117,10 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">{service.summary}</p>
           <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">{service.details}</p>
 
+          <div className="mt-6">
+            <AvailabilityBanner teaser={teaser} bookHref={`/book?service=${service.slug}`} />
+          </div>
+
           <dl className="mt-8 grid gap-4 sm:grid-cols-2">
             <div className="border border-border bg-surface-elevated p-4">
               <dt className="text-xs uppercase tracking-[0.14em] text-muted">Duration</dt>
@@ -94,15 +133,6 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               </dd>
             </div>
           </dl>
-
-          <p className="mt-6 text-sm text-muted">
-            Available as in-room massage across Chiang Mai coverage zones (Old City, Nimman, Airport /
-            Hang Dong).{" "}
-            <Link href="/city/chiang-mai" className="text-accent underline">
-              See Chiang Mai areas
-            </Link>
-            .
-          </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
@@ -144,24 +174,45 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         </div>
       </div>
 
-      {related.length > 0 ? (
-        <section className="mt-20 border-t border-border pt-12">
-          <h2 className="font-display text-3xl tracking-tight text-foreground">Related services</h2>
-          <ul className="mt-6 grid gap-4 sm:grid-cols-3">
-            {related.map((item) => (
-              <li key={item.slug}>
-                <Link
-                  href={`/services/${item.slug}`}
-                  className="block border border-border bg-surface-elevated p-4 transition hover:border-accent"
-                >
-                  <p className="font-display text-xl text-foreground">{item.name}</p>
-                  <p className="mt-2 text-sm text-muted line-clamp-2">{item.summary}</p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      <section className="mt-16 border-t border-border pt-10">
+        <h2 className="font-display text-3xl tracking-tight text-foreground">
+          Frequently asked questions
+        </h2>
+        <dl className="mt-6 space-y-6">
+          {faqs.map((item) => (
+            <div key={item.question}>
+              <dt className="font-display text-xl text-foreground">{item.question}</dt>
+              <dd className="mt-2 text-sm leading-relaxed text-muted md:text-base">{item.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </section>
+
+      <div className="mt-10">
+        <ReviewSnapshot reviews={displayReviews} heading={`${service.name} reviews`} />
+      </div>
+
+      <div className="mt-10 space-y-10">
+        <RelatedLinks
+          title="Book this service by area"
+          links={areaLinks}
+        />
+        <RelatedLinks
+          title="Related services"
+          links={related.map((item) => ({
+            href: `/services/${item.slug}`,
+            label: item.name,
+            hint: productPriceLabel(item.amountThb),
+          }))}
+        />
+        <RelatedLinks
+          title="Guides"
+          links={blogs.map((post) => ({
+            href: `/blog/${post.slug}`,
+            label: post.title,
+          }))}
+        />
+      </div>
     </article>
   );
 }

@@ -43,7 +43,33 @@ ChatGPT-style pages like `/spa/chiang-mai/lanna-spa` (listing **other** spas) wo
 3. **New live city** — set `status: "active"` and real neighborhood copy when ops are ready
 4. **New blog post** — append to `blogPosts` in `src/content/blog.ts`
 
-## Realistic expectations
-- Long-tail (“hotel massage Nimman”, “Nuru Chiang Mai”) can move in weeks–months
-- Head terms (“massage Thailand”) take authority + time
-- Ads can fill the gap while SEO compounds
+## Phase 2 improvements (richer SEO)
+
+### City pages
+- Top services, price range/average, neighborhoods, hotels list, embedded map
+- Live same-day availability banner, reviews, FAQ, blog links
+
+### Internal linking
+- `RelatedLinks` blocks: services ↔ areas ↔ blog ↔ city guides
+- Programmatic URLs: `/services/{service}/{location}`
+
+### Service pages
+- Per-service FAQs + FAQ schema
+- Review snapshot + AggregateRating / Review schema
+- VideoObject when preview video exists
+- Availability (“same-day”) banner
+
+### Images
+- Service stills use descriptive alts including Chiang Mai / hotel context
+
+### Programmatic SEO (safe scale)
+- Generate combinations for **real bookable locations** (Chiang Mai + neighborhoods)
+- Coming-soon cities only get **featured** service combos (no 20k empty pages)
+
+### Schema added
+- Organization, WebSite + SearchAction, AggregateRating, Review, VideoObject, FAQPage, Service, BreadcrumbList
+
+### International SEO (next, not fully built)
+- Site is English-first (`lang="en"`)
+- When Thai/CN/JP/KR land, add `hreflang` via Next.js `alternates.languages` — do not add empty locales yet
+

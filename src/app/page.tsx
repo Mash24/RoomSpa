@@ -3,14 +3,16 @@ import { HomeHero } from "@/components/home/home-hero";
 import { HomeHowItWorks } from "@/components/home/home-how-it-works";
 import { HomeServices } from "@/components/home/home-services";
 import { HomeTestimonials } from "@/components/home/home-testimonials";
-import { LocalBusinessJsonLd } from "@/components/seo/json-ld";
+import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 import { testimonials } from "@/content/marketing";
-import { getApprovedReviews } from "@/lib/reviews/fetch";
+import { aggregateRating, getApprovedReviews } from "@/lib/reviews/fetch";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const approved = await getApprovedReviews(6);
+  const allForRating = await getApprovedReviews(50);
+  const aggregate = aggregateRating(allForRating);
   const fromGuests = approved.length > 0;
   const items = fromGuests
     ? approved.map((review) => ({
@@ -26,7 +28,9 @@ export default async function HomePage() {
 
   return (
     <>
-      <LocalBusinessJsonLd />
+      <OrganizationJsonLd />
+      <WebSiteJsonLd />
+      <LocalBusinessJsonLd aggregate={aggregate} />
       <HomeHero />
       <HomeServices />
       <HomeHowItWorks />
