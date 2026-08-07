@@ -32,7 +32,7 @@ Use the exact `include:` value Resend displays (often Amazon SES). Do not remove
 |------|--------|
 | `NEXT_PUBLIC_SITE_URL` | `https://www.getroomspa.com` |
 | `RESEND_API_KEY` | from Resend → API Keys |
-| `EMAIL_FROM` | `RoomSpa <hello@getroomspa.com>` |
+| `EMAIL_FROM` | `GetRoomSpa <hello@getroomspa.com>` |
 | `EMAIL_REPLY_TO` | `support@getroomspa.com` |
 | `EMAIL_HELLO` | `hello@getroomspa.com` |
 | `EMAIL_BOOKING` | `booking@getroomspa.com` |

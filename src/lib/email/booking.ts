@@ -3,9 +3,8 @@ import { productPriceLabel } from "@/content/services";
 import { paymentMethodLabel } from "@/lib/booking/pin";
 import {
   getBookingNotifyEmails,
-  getEmailFrom,
-  getEmailReplyTo,
   getResend,
+  sendAppEmail,
 } from "@/lib/email/resend";
 
 export type BookingEmailInput = {
@@ -182,45 +181,36 @@ function bookingEmailText(input: BookingEmailInput) {
 
 /** Sends guest confirmation. Never throws — booking must still succeed if email fails. */
 export async function sendBookingConfirmationEmail(input: BookingEmailInput) {
-  const resend = getResend();
-  if (!resend) {
+  if (!getResend()) {
     console.info("[email] RESEND_API_KEY not set — skipped booking confirmation.");
     return { sent: false as const, reason: "not_configured" as const };
   }
 
-  const payload = {
-    from: getEmailFrom(),
+  const subject = `Your RoomSpa booking ${input.referenceCode}`;
+  const html = bookingEmailHtml(input);
+  const text = bookingEmailText(input);
+  const notify = getBookingNotifyEmails().filter(
+    (email) => email.toLowerCase() !== input.customerEmail.toLowerCase(),
+  );
+
+  let result = await sendAppEmail({
     to: input.customerEmail,
-    replyTo: getEmailReplyTo(),
-    subject: `Your RoomSpa booking ${input.referenceCode}`,
-    html: bookingEmailHtml(input),
-    text: bookingEmailText(input),
-  };
+    subject,
+    html,
+    text,
+    ...(notify.length ? { bcc: notify } : {}),
+  });
 
-  try {
-    const notify = getBookingNotifyEmails().filter(
-      (email) => email.toLowerCase() !== input.customerEmail.toLowerCase(),
-    );
-
-    let result = await resend.emails.send({
-      ...payload,
-      ...(notify.length ? { bcc: notify } : {}),
+  // If BCC/domain notify fails, still deliver to the guest.
+  if (!result.sent && notify.length) {
+    console.warn("[email] booking BCC failed, retrying guest-only:", result);
+    result = await sendAppEmail({
+      to: input.customerEmail,
+      subject,
+      html,
+      text,
     });
-
-    // If BCC/domain notify fails, still deliver to the guest.
-    if (result.error && notify.length) {
-      console.warn("[email] booking BCC failed, retrying guest-only:", result.error);
-      result = await resend.emails.send(payload);
-    }
-
-    if (result.error) {
-      console.error("[email] booking confirmation failed:", result.error);
-      return { sent: false as const, reason: "send_error" as const, error: result.error };
-    }
-
-    return { sent: true as const, id: result.data?.id };
-  } catch (error) {
-    console.error("[email] booking confirmation exception:", error);
-    return { sent: false as const, reason: "exception" as const, error };
   }
+
+  return result;
 }
