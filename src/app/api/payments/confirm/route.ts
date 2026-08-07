@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStripe } from "@/lib/stripe/server";
-import { createAdminishAnonClient } from "@/lib/supabase/anon";
+import { confirmBookingPayment } from "@/lib/payments/confirm-booking";
 
 export async function POST(request: Request) {
   try {
@@ -11,31 +10,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Session ID is required." }, { status: 400 });
     }
 
-    const stripe = getStripe();
-    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    const result = await confirmBookingPayment(sessionId, request);
 
-    if (session.payment_status !== "paid") {
-      return NextResponse.json({ error: "Payment not completed yet." }, { status: 400 });
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    const bookingId = session.metadata?.bookingId;
-    if (!bookingId) {
-      return NextResponse.json({ error: "Booking not found in payment session." }, { status: 400 });
-    }
-
-    const supabase = createAdminishAnonClient();
-    const { data: updated, error } = await supabase.rpc("mark_booking_paid", {
-      p_booking_id: bookingId,
-      p_stripe_session_id: session.id,
-      p_stripe_payment_intent_id:
-        typeof session.payment_intent === "string" ? session.payment_intent : null,
+    return NextResponse.json({
+      updated: result.updated,
+      emailSent: result.emailSent,
     });
-
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 400 });
-    }
-
-    return NextResponse.json({ updated: Boolean(updated) });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unexpected server error.";
     return NextResponse.json({ error: message }, { status: 500 });

@@ -376,3 +376,107 @@ export async function sendBookingStatusEmail(input: BookingStatusEmailInput) {
 
   return result;
 }
+
+/** Payment receipt after Stripe Checkout succeeds. Never throws. */
+export async function sendBookingPaidEmail(input: BookingEmailInput) {
+  if (!getResend()) {
+    console.info("[email] RESEND_API_KEY not set — skipped paid receipt.");
+    return { sent: false as const, reason: "not_configured" as const };
+  }
+
+  const manage = manageUrl(input);
+  const placeType = locationTypeLabel(input.locationType);
+
+  const html = `<!DOCTYPE html>
+<html>
+  <body style="margin:0;padding:0;background:#f6f4f1;font-family:Georgia,'Times New Roman',serif;color:#1c1917;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f4f1;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fffaf5;border:1px solid #e7e0d6;padding:32px;">
+            <tr>
+              <td>
+                <p style="margin:0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#9a6b3f;">RoomSpa</p>
+                <h1 style="margin:12px 0 0;font-size:28px;font-weight:normal;line-height:1.2;">Payment received</h1>
+                <p style="margin:16px 0 0;font-size:16px;line-height:1.5;color:#57534e;">
+                  Hi ${escapeHtml(input.customerName)}, we’ve received your card payment. Here is your receipt and booking details.
+                </p>
+                <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#44403c;">
+                  <strong>${escapeHtml(input.serviceName)}</strong><br />
+                  ${escapeHtml(input.scheduledDate)} at ${escapeHtml(input.scheduledTime)}<br />
+                  ${placeType ? `${escapeHtml(placeType)} · ` : ""}${escapeHtml(input.locationLabel)}<br />
+                  ${escapeHtml(productPriceLabel(input.amountThb))} · Paid by card<br />
+                  Reference: <strong>${escapeHtml(input.referenceCode)}</strong>
+                </p>
+                ${
+                  input.accessPin
+                    ? `<div style="margin:24px 0;padding:20px;border:1px solid #d4b896;background:#f3ebe1;">
+                  <p style="margin:0;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#9a6b3f;">Your booking PIN</p>
+                  <p style="margin:10px 0 0;font-size:36px;letter-spacing:0.25em;font-family:ui-monospace,monospace;">${escapeHtml(input.accessPin)}</p>
+                  <p style="margin:12px 0 0;font-size:13px;line-height:1.5;color:#57534e;">
+                    Keep this PIN with your email to manage your booking.
+                  </p>
+                </div>`
+                    : ""
+                }
+                <p style="margin:0;">
+                  <a href="${escapeHtml(manage)}" style="display:inline-block;background:#9a6b3f;color:#fffaf5;text-decoration:none;padding:12px 18px;font-size:14px;">
+                    Manage booking
+                  </a>
+                </p>
+                <p style="margin:28px 0 0;font-size:13px;line-height:1.5;color:#78716c;">
+                  Questions? Reply to this email or WhatsApp ${escapeHtml(site.contact.whatsapp)}.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+
+  const text = [
+    `Hi ${input.customerName},`,
+    ``,
+    `Payment received for your RoomSpa booking.`,
+    ``,
+    `Service: ${input.serviceName}`,
+    `When: ${input.scheduledDate} at ${input.scheduledTime}`,
+    `Where: ${placeType ? `${placeType} · ` : ""}${input.locationLabel}`,
+    `Amount: ${productPriceLabel(input.amountThb)} · Paid by card`,
+    `Reference: ${input.referenceCode}`,
+    input.accessPin ? `PIN: ${input.accessPin}` : "",
+    ``,
+    `Manage booking: ${manage}`,
+    ``,
+    `WhatsApp: ${site.contact.whatsapp}`,
+    `Email: ${site.contact.email}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const subject = `Payment received — RoomSpa ${input.referenceCode}`;
+  const notify = getBookingNotifyEmails().filter(
+    (email) => email.toLowerCase() !== input.customerEmail.toLowerCase(),
+  );
+
+  let result = await sendAppEmail({
+    to: input.customerEmail,
+    subject,
+    html,
+    text,
+    ...(notify.length ? { bcc: notify } : {}),
+  });
+
+  if (!result.sent && notify.length) {
+    result = await sendAppEmail({
+      to: input.customerEmail,
+      subject,
+      html,
+      text,
+    });
+  }
+
+  return result;
+}

@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe/server";
 import { productPriceLabel } from "@/content/pricing";
 import { site } from "@/content/site";
 import { paymentMethodLabel } from "@/lib/booking/pin";
+import { confirmBookingPayment } from "@/lib/payments/confirm-booking";
 
 export const metadata: Metadata = {
   title: "Payment successful",
@@ -30,20 +31,6 @@ function buildPaidWhatsAppHref(meta: Record<string, string>) {
   return `https://wa.me/${number}?text=${message}`;
 }
 
-async function confirmPayment(sessionId: string) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "http://localhost:3000";
-  try {
-    await fetch(`${siteUrl}/api/payments/confirm`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId }),
-      cache: "no-store",
-    });
-  } catch {
-    // Non-blocking — payment still succeeded in Stripe
-  }
-}
-
 export default async function BookingSuccessPage({ searchParams }: SuccessPageProps) {
   const params = await searchParams;
   const sessionId = params.session_id;
@@ -67,9 +54,13 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
   const amountThb = Number(meta.amountThb || 0);
   const accessPin = meta.accessPin || "";
   const whatsappHref = buildPaidWhatsAppHref(meta);
+  const customerEmail =
+    session.customer_email || session.customer_details?.email || "";
 
+  let emailSent = false;
   if (paid) {
-    await confirmPayment(sessionId);
+    const result = await confirmBookingPayment(sessionId);
+    emailSent = result.emailSent;
   }
 
   return (
@@ -102,6 +93,14 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
         </div>
       ) : null}
 
+      {paid && customerEmail ? (
+        <p className="mt-4 text-sm text-muted">
+          {emailSent
+            ? `A payment receipt was emailed to ${customerEmail}.`
+            : `If you don’t see a receipt email at ${customerEmail}, check spam — or use Manage booking with your email + PIN.`}
+        </p>
+      ) : null}
+
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
         <a
           href={whatsappHref}
@@ -112,7 +111,11 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
           Send booking details on WhatsApp
         </a>
         <Link
-          href="/my-booking"
+          href={
+            customerEmail
+              ? `/my-booking?email=${encodeURIComponent(customerEmail)}`
+              : "/my-booking"
+          }
           className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
         >
           Manage booking
