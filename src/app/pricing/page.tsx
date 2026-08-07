@@ -3,7 +3,6 @@ import Link from "next/link";
 import {
   catalogProducts,
   productPriceLabel,
-  serviceAcceptsCardNow,
   serviceCategories,
 } from "@/content/services";
 import { whatsappHref } from "@/content/site";
@@ -51,8 +50,7 @@ export default function PricingPage() {
                     <div className="min-w-0">
                       <p className="font-medium text-foreground">{product.name}</p>
                       <p className="mt-1 text-sm text-muted">
-                        {product.duration}
-                        {!serviceAcceptsCardNow(product) ? " · cash / card later" : " · cash / card"}
+                        {product.duration} · cash / card
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-4">

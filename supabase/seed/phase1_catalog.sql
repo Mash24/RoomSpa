@@ -8,7 +8,7 @@ insert into public.services (
   'swedish',
   'Swedish Massage',
   'Classic full-body therapy with long, flowing strokes to ease tension and improve circulation.',
-  60, 800, 'prod_V0lNbo1klB5AQn', 'price_1U0jqz2E50DqFYh5G4dF1w1M', true, 1
+  60, 800, null, null, true, 1
 ),
 (
   'aromatherapy',
@@ -80,7 +80,7 @@ insert into public.services (
   'couples',
   'Couples Massage',
   'Two therapists, side by side, in the same private room.',
-  60, 2500, 'prod_V0lPwaRImIqAPQ', 'price_1U0jsJ2E50DqFYh5EItwggZ4', true, 13
+  60, 2500, null, null, true, 13
 ),
 (
   'four-hands',

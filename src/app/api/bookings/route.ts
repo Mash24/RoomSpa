@@ -99,7 +99,7 @@ export async function POST(request: Request) {
 
     const { data: service, error: serviceError } = await supabase
       .from("services")
-      .select("id, name, price_thb, stripe_price_id, is_active")
+      .select("id, name, price_thb, is_active")
       .eq("slug", body.serviceSlug)
       .eq("is_active", true)
       .single();
@@ -109,6 +109,14 @@ export async function POST(request: Request) {
         { error: "Service not found. Make sure the Supabase schema and seed SQL have been run." },
         { status: 400 },
       );
+    }
+
+    const catalog = getCatalogProduct(body.serviceSlug);
+    const amountThb = Number(catalog?.amountThb ?? service.price_thb);
+    const serviceName = catalog?.name ?? service.name;
+
+    if (!(amountThb > 0)) {
+      return NextResponse.json({ error: "This service has no valid price." }, { status: 400 });
     }
 
     let coverageAreaId: string | null = null;
@@ -166,7 +174,7 @@ export async function POST(request: Request) {
       location_details: body.locationDetails?.trim() ?? "",
       scheduled_date: body.scheduledDate,
       scheduled_time: scheduledTime,
-      amount_thb: service.price_thb,
+      amount_thb: amountThb,
       notes: body.notes?.trim() ?? "",
       status: "pending",
       payment_status: "unpaid",
@@ -183,7 +191,7 @@ export async function POST(request: Request) {
 
     const whatsappHref = buildWhatsAppHref({
       referenceCode,
-      serviceName: service.name,
+      serviceName,
       scheduledDate: body.scheduledDate,
       scheduledTime,
       customerName,
@@ -198,14 +206,14 @@ export async function POST(request: Request) {
       customerPhone: body.customerPhone.trim(),
       referenceCode,
       accessPin,
-      serviceName: service.name,
+      serviceName,
       scheduledDate: body.scheduledDate,
       scheduledTime,
       locationType: body.locationType,
       locationLabel,
       locationDetails: body.locationDetails?.trim() ?? "",
       notes: body.notes?.trim() ?? "",
-      amountThb: Number(service.price_thb),
+      amountThb,
       paymentMethod,
       siteUrl,
     });
@@ -214,8 +222,8 @@ export async function POST(request: Request) {
       id: bookingId,
       referenceCode,
       accessPin,
-      amountThb: service.price_thb,
-      serviceName: service.name,
+      amountThb,
+      serviceName,
       scheduledDate: body.scheduledDate,
       scheduledTime,
       customerEmail,
@@ -225,28 +233,17 @@ export async function POST(request: Request) {
     };
 
     if (payNow) {
-      const catalog = getCatalogProduct(body.serviceSlug);
-      const stripePriceId = service.stripe_price_id || catalog?.stripePriceId || null;
-
-      if (!stripePriceId && !(Number(service.price_thb) > 0)) {
-        return NextResponse.json(
-          { error: "Card payment is not available for this service yet." },
-          { status: 400 },
-        );
-      }
-
       const session = await createBookingCheckoutSession({
-        priceId: stripePriceId,
         customerEmail,
         customerName,
         bookingId,
         referenceCode,
         accessPin,
-        serviceName: service.name,
+        serviceName,
         scheduledDate: body.scheduledDate,
         scheduledTime,
         locationLabel,
-        amountThb: service.price_thb,
+        amountThb,
         siteUrl,
       });
 

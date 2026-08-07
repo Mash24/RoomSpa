@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
-import { getCatalogProduct } from "@/content/services";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
 import { isEmail, normalizeEmail, resolveSiteUrl } from "@/lib/payments/lookup";
 
@@ -9,11 +8,11 @@ type BookingRow = {
   reference_code: string;
   service_name: string;
   service_slug: string;
-  stripe_price_id: string | null;
   scheduled_date: string;
   scheduled_time: string;
   amount_thb: number;
   payment_status: string;
+  customer_name?: string | null;
 };
 
 function isValidPin(pin: string) {
@@ -51,10 +50,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "This booking is already paid." }, { status: 400 });
     }
 
-    const catalog = getCatalogProduct(booking.service_slug);
-    const stripePriceId = booking.stripe_price_id || catalog?.stripePriceId || null;
-
-    if (!stripePriceId && !(Number(booking.amount_thb) > 0)) {
+    const amountThb = Number(booking.amount_thb);
+    if (!(amountThb > 0)) {
       return NextResponse.json(
         { error: "Card payment is not available for this booking." },
         { status: 400 },
@@ -64,9 +61,8 @@ export async function POST(request: Request) {
     const scheduledTime = String(booking.scheduled_time).slice(0, 5);
 
     const session = await createBookingCheckoutSession({
-      priceId: stripePriceId,
       customerEmail: email,
-      customerName: email,
+      customerName: booking.customer_name?.trim() || email,
       bookingId: booking.id,
       referenceCode: booking.reference_code,
       accessPin: pin,
@@ -74,7 +70,7 @@ export async function POST(request: Request) {
       scheduledDate: booking.scheduled_date,
       scheduledTime,
       locationLabel: "See booking details",
-      amountThb: booking.amount_thb,
+      amountThb,
       siteUrl: resolveSiteUrl(request),
     });
 

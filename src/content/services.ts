@@ -19,11 +19,9 @@ export type CatalogService = {
   details: string;
   duration: string;
   durationMinutes: number;
+  /** Source of truth for display + Stripe Checkout (THB). */
   amountThb: number;
   category: ServiceCategoryId;
-  /** Stripe products only exist for a subset today; others use cash / card later. */
-  stripeProductId?: string;
-  stripePriceId?: string;
   featured?: boolean;
   bookable: boolean;
 };
@@ -54,8 +52,7 @@ export const serviceCategories: ServiceCategory[] = [
 
 /**
  * Full mobile-capable catalog.
- * Swedish + Couples keep live Stripe sandbox IDs; other services are bookable
- * with cash or card-later until Stripe products are added.
+ * Prices live here (`amountThb`) and drive the site + Stripe Checkout via dynamic amounts.
  */
 export const catalogServices: CatalogService[] = [
   {
@@ -69,10 +66,6 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 60,
     amountThb: 800,
     category: "classic",
-    stripeProductId:
-      process.env.NEXT_PUBLIC_STRIPE_PRODUCT_SWEDISH ?? "prod_V0lNbo1klB5AQn",
-    stripePriceId:
-      process.env.NEXT_PUBLIC_STRIPE_PRICE_SWEDISH ?? "price_1U0jqz2E50DqFYh5G4dF1w1M",
     featured: true,
     bookable: true,
   },
@@ -219,10 +212,6 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 60,
     amountThb: 2500,
     category: "shared",
-    stripeProductId:
-      process.env.NEXT_PUBLIC_STRIPE_PRODUCT_COUPLES ?? "prod_V0lPwaRImIqAPQ",
-    stripePriceId:
-      process.env.NEXT_PUBLIC_STRIPE_PRICE_COUPLES ?? "price_1U0jsJ2E50DqFYh5EItwggZ4",
     featured: true,
     bookable: true,
   },
@@ -334,6 +323,7 @@ export function getServicesByCategory(category: ServiceCategoryId) {
   );
 }
 
+/** Every bookable service can use cash, card later, or card now (Stripe amount from catalog). */
 export function serviceAcceptsCardNow(service: CatalogService) {
-  return Boolean(service.stripePriceId);
+  return service.bookable && service.amountThb > 0;
 }

@@ -23,5 +23,5 @@ Vercel and local `.env.local` need:
 - Same date/time bookings are allowed up to `BOOKING_SLOT_CAPACITY` (default 3)
 - The booking form loads live availability from `/api/availability`
 - Full slots are blocked in the UI and again in `POST /api/bookings`
-- Stripe Checkout uses the stored `stripe_price_id` values
+- Stripe Checkout charges the catalog `amountThb` via dynamic `price_data` (no Stripe Price IDs)
 - Customers look up bookings with email + PIN at `/my-booking`
