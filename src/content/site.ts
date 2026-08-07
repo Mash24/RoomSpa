@@ -23,7 +23,7 @@ export const site = {
   },
   nav: [
     { label: "Services", href: "/services" },
-    { label: "Cities", href: "/city" },
+    { label: "Locations", href: "/city" },
     { label: "Pricing", href: "/pricing" },
     { label: "Reviews", href: "/reviews" },
     { label: "Blog", href: "/blog" },

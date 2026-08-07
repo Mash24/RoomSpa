@@ -7,9 +7,9 @@ import { whatsappHref } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Cities we serve | In-room massage Thailand",
+  title: "Locations | In-room massage Thailand",
   description:
-    "RoomSpa mobile massage by city — live in Chiang Mai (Old City, Nimman, Airport). Bangkok and Phuket coming soon.",
+    "RoomSpa mobile massage by location — live in Chiang Mai (Old City, Nimman, Airport). Bangkok and Phuket coming soon.",
   path: "/city",
 });
 
@@ -19,14 +19,14 @@ export default function CitiesIndexPage() {
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "/" },
-          { name: "Cities", path: "/city" },
+          { name: "Locations", path: "/city" },
         ]}
       />
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Cities" }]} />
+      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Locations" }]} />
 
       <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">Coverage</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-        Cities we serve
+        Locations we serve
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
         Start with Chiang Mai — hotel, condo, and home massage with live booking. Bangkok and Phuket

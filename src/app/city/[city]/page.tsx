@@ -68,7 +68,7 @@ export default async function CityPage({ params }: PageProps) {
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "/" },
-          { name: "Cities", path: "/city" },
+          { name: "Locations", path: "/city" },
           { name: city.name, path: `/city/${city.slug}` },
         ]}
       />
@@ -99,7 +99,7 @@ export default async function CityPage({ params }: PageProps) {
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "Cities", href: "/city" },
+          { label: "Locations", href: "/city" },
           { label: city.name },
         ]}
       />
