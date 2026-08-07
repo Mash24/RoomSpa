@@ -10,19 +10,19 @@ const pricesBySlug = Object.fromEntries(
 
 export function HomeServices() {
   return (
-    <section className="bg-background px-5 py-20 md:px-8 md:py-28">
+    <section className="bg-background px-4 py-14 xs:px-5 xs:py-16 md:px-8 md:py-28">
       <div className="mx-auto max-w-6xl">
         <div className="max-w-2xl">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Services</p>
-          <h2 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
+          <h2 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
             Treatments that travel with you
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
+          <p className="mt-3 text-sm leading-relaxed text-muted xs:mt-4 xs:text-base md:text-lg">
             A short look at popular sessions. Full menu with videos lives on the Services page.
           </p>
         </div>
 
-        <ul className="mt-12 grid gap-8 sm:grid-cols-2">
+        <ul className="mt-8 grid gap-5 xs:mt-10 xs:gap-6 sm:mt-12 sm:grid-cols-2 sm:gap-8">
           {site.services.map((service, index) => {
             const price = pricesBySlug[service.slug];
             const media = getServiceMedia(service.slug);

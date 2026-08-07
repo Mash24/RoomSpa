@@ -11,12 +11,12 @@ export const metadata: Metadata = {
 
 export default function BookPage() {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <section className="mx-auto max-w-3xl px-4 py-14 xs:px-5 xs:py-16 md:px-8 md:py-28">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Book</p>
-      <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
+      <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         Book your in-room massage
       </h1>
-      <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
+      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted xs:mt-4 xs:text-base md:text-lg">
         No payment required to book. Pay cash on arrival, or{" "}
         <a href="/my-booking" className="text-accent underline">
           pay by card later
@@ -28,7 +28,7 @@ export default function BookPage() {
         .
       </p>
 
-      <div className="mt-10">
+      <div className="mt-8 xs:mt-10">
         <Suspense fallback={<p className="text-sm text-muted">Loading booking form...</p>}>
           <BookingForm />
         </Suspense>

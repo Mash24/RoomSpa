@@ -16,8 +16,8 @@ export function ThemeToggle({ lightOnDark = false }: ThemeToggleProps) {
   );
 
   const base = lightOnDark
-    ? "inline-flex h-9 w-9 items-center justify-center rounded-full border border-white/35 text-white transition hover:border-white hover:bg-white/10"
-    : "inline-flex h-9 w-9 items-center justify-center rounded-full border border-border text-foreground transition hover:border-accent hover:text-accent";
+    ? "inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/35 text-white transition hover:border-white hover:bg-white/10 md:h-9 md:w-9"
+    : "inline-flex h-11 w-11 items-center justify-center rounded-full border border-border text-foreground transition hover:border-accent hover:text-accent md:h-9 md:w-9";
 
   if (!mounted) {
     return <span className={base} aria-hidden />;

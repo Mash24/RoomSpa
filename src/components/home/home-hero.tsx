@@ -17,7 +17,7 @@ export function HomeHero() {
           fill
           priority
           sizes="100vw"
-          className="object-cover animate-slow-zoom"
+          className="object-cover object-[center_30%] animate-slow-zoom sm:object-center"
         />
         <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
         <div
@@ -27,20 +27,20 @@ export function HomeHero() {
         />
       </div>
 
-      <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-5 pb-16 pt-28 md:justify-center md:px-8 md:pb-24 md:pt-24">
-        <p className="animate-fade-up font-display text-5xl leading-none tracking-tight text-white sm:text-6xl md:text-7xl lg:text-8xl">
+      <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] pt-[max(6.5rem,calc(env(safe-area-inset-top)+5rem))] xs:px-5 sm:pb-20 md:justify-center md:px-8 md:pb-24 md:pt-24">
+        <p className="animate-fade-up font-display text-[2.75rem] leading-[0.95] tracking-tight text-white xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
           {hero.brand}
         </p>
-        <h1 className="animate-fade-up delay-1 mt-5 max-w-xl font-display text-2xl font-normal leading-snug tracking-tight text-white/95 sm:text-3xl md:mt-6 md:text-4xl">
+        <h1 className="animate-fade-up delay-1 mt-4 max-w-xl font-display text-[1.35rem] font-normal leading-snug tracking-tight text-white/95 xs:text-2xl sm:text-3xl md:mt-6 md:text-4xl">
           {hero.headline}
         </h1>
-        <p className="animate-fade-up delay-2 mt-4 max-w-md text-base leading-relaxed text-white/75 md:text-lg">
+        <p className="animate-fade-up delay-2 mt-3 max-w-md text-[0.95rem] leading-relaxed text-white/75 xs:mt-4 xs:text-base md:text-lg">
           {hero.support}
         </p>
-        <div className="animate-fade-up delay-3 mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="animate-fade-up delay-3 mt-7 flex w-full flex-col gap-2.5 xs:mt-8 xs:gap-3 sm:max-w-md sm:flex-row sm:items-center">
           <Link
             href={hero.primaryCta.href}
-            className="inline-flex items-center justify-center rounded-sm bg-white px-6 py-3.5 text-sm font-medium text-[#1a221c] transition hover:bg-white/90"
+            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm bg-white px-5 py-3.5 text-sm font-medium text-[#1a221c] transition hover:bg-white/90 sm:flex-none"
           >
             {hero.primaryCta.label}
           </Link>
@@ -48,13 +48,13 @@ export function HomeHero() {
             href={whatsappHref}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-sm border border-white/35 px-6 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10"
+            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm border border-white/35 px-5 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10 sm:flex-none"
           >
             WhatsApp now
           </a>
         </div>
-        <p className="animate-fade-up delay-4 mt-4 text-sm text-white/65">
-          Hotels · condos · homes · classic to tantric
+        <p className="animate-fade-up delay-4 mt-4 text-xs text-white/65 xs:text-sm">
+          Hotels · condos · homes · Chiang Mai
         </p>
       </div>
     </section>

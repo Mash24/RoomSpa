@@ -279,7 +279,7 @@ export function BookingForm() {
             {slotsLoading ? (
               <p className="mt-2 text-sm text-muted">Checking availability...</p>
             ) : (
-              <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+              <div className="mt-2 grid grid-cols-2 gap-2 min-[380px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-6">
                 {(slots.length ? slots : TIME_SLOTS.map((time) => ({
                   time,
                   booked: 0,
@@ -294,7 +294,7 @@ export function BookingForm() {
                       type="button"
                       disabled={!slot.available}
                       onClick={() => setScheduledTime(slot.time)}
-                      className={`rounded-sm border px-2 py-2.5 text-sm transition ${
+                      className={`min-h-12 rounded-sm border px-2 py-2.5 text-sm transition ${
                         !slot.available
                           ? "cursor-not-allowed border-border bg-surface text-muted line-through opacity-50"
                           : selected

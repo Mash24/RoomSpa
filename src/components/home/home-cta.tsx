@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { site, whatsappHref } from "@/content/site";
+import { whatsappHref } from "@/content/site";
 
 export function HomeCta() {
   return (
-    <section className="relative overflow-hidden bg-[#1a221c] px-5 py-20 text-white md:px-8 md:py-28">
+    <section className="relative overflow-hidden bg-[#1a221c] px-4 py-14 text-white xs:px-5 xs:py-16 md:px-8 md:py-28">
       <div
         className="pointer-events-none absolute inset-0 opacity-30"
         style={{
@@ -13,16 +13,16 @@ export function HomeCta() {
         aria-hidden
       />
       <div className="relative mx-auto max-w-6xl">
-        <h2 className="max-w-2xl font-display text-4xl tracking-tight md:text-5xl">
+        <h2 className="max-w-2xl font-display text-[1.85rem] leading-tight tracking-tight xs:text-4xl md:text-5xl">
           Ready when you are
         </h2>
-        <p className="mt-4 max-w-lg text-base leading-relaxed text-white/70 md:text-lg">
+        <p className="mt-3 max-w-lg text-sm leading-relaxed text-white/70 xs:mt-4 xs:text-base md:text-lg">
           Book online or message us on WhatsApp — we reply quickly and come to your hotel, condo, or home.
         </p>
-        <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-7 flex w-full flex-col gap-2.5 xs:mt-8 xs:gap-3 sm:max-w-lg sm:flex-row">
           <Link
             href="/book"
-            className="inline-flex items-center justify-center rounded-sm bg-white px-6 py-3.5 text-sm font-medium text-[#1a221c] transition hover:bg-white/90"
+            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm bg-white px-5 py-3.5 text-sm font-medium text-[#1a221c] transition hover:bg-white/90 sm:flex-none sm:px-6"
           >
             Book an appointment
           </Link>
@@ -30,9 +30,9 @@ export function HomeCta() {
             href={whatsappHref}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-sm border border-white/30 px-6 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10"
+            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm border border-white/30 px-5 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10 sm:flex-none sm:px-6"
           >
-            WhatsApp {site.contact.whatsapp}
+            WhatsApp us
           </a>
         </div>
       </div>
