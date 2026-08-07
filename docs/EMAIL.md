@@ -52,6 +52,10 @@ Redeploy after saving.
 ### 4. What the app sends
 After a successful `/api/bookings` create:
 - Guest receives confirmation with reference + **PIN** + manage link
-- `hello@getroomspa.com` is BCC’d (forwards to your Gmail)
+- `booking@` and `admin@` are BCC’d
 
-If `RESEND_API_KEY` is missing, booking still works; email is skipped.
+When an admin changes booking status in the dashboard:
+- Guest receives a status update email (confirmed / cancelled / completed / etc.)
+- Same BCC list as above
+
+If `RESEND_API_KEY` is missing, booking/status updates still work; email is skipped.

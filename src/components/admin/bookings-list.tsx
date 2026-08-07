@@ -194,6 +194,7 @@ export function AdminDashboardPanel() {
   const [loading, setLoading] = useState(true);
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -260,6 +261,7 @@ export function AdminDashboardPanel() {
   async function onStatusChange(id: string, status: BookingStatus) {
     setUpdatingId(id);
     setError(null);
+    setNotice(null);
 
     try {
       const response = await fetch(`/api/admin/bookings/${id}`, {
@@ -272,6 +274,11 @@ export function AdminDashboardPanel() {
 
       setBookings((current) =>
         current.map((booking) => (booking.id === id ? { ...booking, status } : booking)),
+      );
+      setNotice(
+        data.emailSent
+          ? `Status updated to ${STATUS_LABELS[status]}. Guest was emailed.`
+          : `Status updated to ${STATUS_LABELS[status]}. Email was not sent.`,
       );
       await refreshStats();
     } catch (err) {
@@ -321,6 +328,12 @@ export function AdminDashboardPanel() {
       {error ? (
         <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
           {error}
+        </div>
+      ) : null}
+
+      {notice ? (
+        <div className="border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100">
+          {notice}
         </div>
       ) : null}
 

@@ -214,3 +214,165 @@ export async function sendBookingConfirmationEmail(input: BookingEmailInput) {
 
   return result;
 }
+
+function statusLabel(status: string) {
+  switch (status) {
+    case "pending":
+      return "Pending";
+    case "confirmed":
+      return "Confirmed";
+    case "completed":
+      return "Completed";
+    case "cancelled":
+      return "Cancelled";
+    case "no_show":
+      return "No-show";
+    default:
+      return status;
+  }
+}
+
+function statusHeadline(status: string) {
+  switch (status) {
+    case "confirmed":
+      return "Your booking is confirmed";
+    case "cancelled":
+      return "Your booking was cancelled";
+    case "completed":
+      return "Thanks for visiting RoomSpa";
+    case "pending":
+      return "Your booking is pending";
+    case "no_show":
+      return "Booking update: marked as no-show";
+    default:
+      return "Your booking was updated";
+  }
+}
+
+function statusIntro(status: string) {
+  switch (status) {
+    case "confirmed":
+      return "Good news — we’ve confirmed your appointment. Here are the details:";
+    case "cancelled":
+      return "Your appointment has been cancelled. If this was unexpected, reply to this email or WhatsApp us.";
+    case "completed":
+      return "We hope you enjoyed your session. You can book again anytime.";
+    case "pending":
+      return "Your booking is back to pending while we review availability.";
+    case "no_show":
+      return "We marked this booking as a no-show. Contact us if you need to rebook.";
+    default:
+      return "Your booking status was updated. Current details:";
+  }
+}
+
+export type BookingStatusEmailInput = BookingEmailInput & {
+  status: string;
+  previousStatus?: string;
+};
+
+function statusEmailHtml(input: BookingStatusEmailInput) {
+  const manage = manageUrl(input);
+  const placeType = locationTypeLabel(input.locationType);
+
+  return `<!DOCTYPE html>
+<html>
+  <body style="margin:0;padding:0;background:#f6f4f1;font-family:Georgia,'Times New Roman',serif;color:#1c1917;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f6f4f1;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#fffaf5;border:1px solid #e7e0d6;padding:32px;">
+            <tr>
+              <td>
+                <p style="margin:0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#9a6b3f;">RoomSpa</p>
+                <h1 style="margin:12px 0 0;font-size:28px;font-weight:normal;line-height:1.2;">${escapeHtml(statusHeadline(input.status))}</h1>
+                <p style="margin:16px 0 0;font-size:16px;line-height:1.5;color:#57534e;">
+                  Hi ${escapeHtml(input.customerName)}, ${escapeHtml(statusIntro(input.status))}
+                </p>
+                <p style="margin:20px 0 0;font-size:15px;line-height:1.6;color:#44403c;">
+                  Status: <strong>${escapeHtml(statusLabel(input.status))}</strong>
+                  ${
+                    input.previousStatus
+                      ? `<span style="color:#78716c;"> (was ${escapeHtml(statusLabel(input.previousStatus))})</span>`
+                      : ""
+                  }
+                </p>
+                <p style="margin:16px 0 0;font-size:15px;line-height:1.6;color:#44403c;">
+                  <strong>${escapeHtml(input.serviceName)}</strong><br />
+                  ${escapeHtml(input.scheduledDate)} at ${escapeHtml(input.scheduledTime)}<br />
+                  ${placeType ? `${escapeHtml(placeType)} · ` : ""}${escapeHtml(input.locationLabel)}<br />
+                  Reference: <strong>${escapeHtml(input.referenceCode)}</strong>
+                </p>
+                <p style="margin:24px 0 0;">
+                  <a href="${escapeHtml(manage)}" style="display:inline-block;background:#9a6b3f;color:#fffaf5;text-decoration:none;padding:12px 18px;font-size:14px;">
+                    Manage booking
+                  </a>
+                </p>
+                <p style="margin:28px 0 0;font-size:13px;line-height:1.5;color:#78716c;">
+                  Questions? Reply to this email or WhatsApp ${escapeHtml(site.contact.whatsapp)}.
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+function statusEmailText(input: BookingStatusEmailInput) {
+  const placeType = locationTypeLabel(input.locationType);
+  return [
+    `Hi ${input.customerName},`,
+    ``,
+    statusHeadline(input.status),
+    statusIntro(input.status),
+    ``,
+    `Status: ${statusLabel(input.status)}${input.previousStatus ? ` (was ${statusLabel(input.previousStatus)})` : ""}`,
+    `Service: ${input.serviceName}`,
+    `When: ${input.scheduledDate} at ${input.scheduledTime}`,
+    `Where: ${placeType ? `${placeType} · ` : ""}${input.locationLabel}`,
+    `Reference: ${input.referenceCode}`,
+    ``,
+    `Manage booking: ${manageUrl(input)}`,
+    ``,
+    `WhatsApp: ${site.contact.whatsapp}`,
+    `Email: ${site.contact.email}`,
+  ].join("\n");
+}
+
+/** Emails guest when admin changes booking status. Never throws. */
+export async function sendBookingStatusEmail(input: BookingStatusEmailInput) {
+  if (!getResend()) {
+    console.info("[email] RESEND_API_KEY not set — skipped status email.");
+    return { sent: false as const, reason: "not_configured" as const };
+  }
+
+  const subject = `RoomSpa booking ${input.referenceCode}: ${statusLabel(input.status)}`;
+  const html = statusEmailHtml(input);
+  const text = statusEmailText(input);
+  const notify = getBookingNotifyEmails().filter(
+    (email) => email.toLowerCase() !== input.customerEmail.toLowerCase(),
+  );
+
+  let result = await sendAppEmail({
+    to: input.customerEmail,
+    subject,
+    html,
+    text,
+    ...(notify.length ? { bcc: notify } : {}),
+  });
+
+  if (!result.sent && notify.length) {
+    console.warn("[email] status BCC failed, retrying guest-only:", result);
+    result = await sendAppEmail({
+      to: input.customerEmail,
+      subject,
+      html,
+      text,
+    });
+  }
+
+  return result;
+}
