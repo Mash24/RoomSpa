@@ -52,9 +52,9 @@ export async function POST(request: Request) {
     }
 
     const catalog = getCatalogProduct(booking.service_slug);
-    const stripePriceId = booking.stripe_price_id || catalog?.stripePriceId;
+    const stripePriceId = booking.stripe_price_id || catalog?.stripePriceId || null;
 
-    if (!stripePriceId) {
+    if (!stripePriceId && !(Number(booking.amount_thb) > 0)) {
       return NextResponse.json(
         { error: "Card payment is not available for this booking." },
         { status: 400 },

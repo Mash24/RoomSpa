@@ -226,9 +226,9 @@ export async function POST(request: Request) {
 
     if (payNow) {
       const catalog = getCatalogProduct(body.serviceSlug);
-      const stripePriceId = service.stripe_price_id || catalog?.stripePriceId;
+      const stripePriceId = service.stripe_price_id || catalog?.stripePriceId || null;
 
-      if (!stripePriceId) {
+      if (!stripePriceId && !(Number(service.price_thb) > 0)) {
         return NextResponse.json(
           { error: "Card payment is not available for this service yet." },
           { status: 400 },
