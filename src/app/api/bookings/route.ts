@@ -2,10 +2,13 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 import type { BookingPayload } from "@/lib/booking/types";
+import { TIME_SLOTS } from "@/lib/booking/types";
+import { getSlotCapacity, normalizeSlotTime } from "@/lib/booking/availability";
 import { site } from "@/content/site";
 import { getCatalogProduct } from "@/content/services";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
 import { generateBookingPin, mapPaymentPreferenceToMethod } from "@/lib/booking/pin";
+import { sendBookingConfirmationEmail } from "@/lib/email/booking";
 import { isEmail, normalizeEmail, resolveSiteUrl } from "@/lib/payments/lookup";
 
 function buildReferenceCode() {
@@ -122,10 +125,32 @@ export async function POST(request: Request) {
     const bookingId = randomUUID();
     const referenceCode = buildReferenceCode();
     const accessPin = generateBookingPin();
-    const scheduledTime = body.scheduledTime.slice(0, 5);
+    const scheduledTime = normalizeSlotTime(body.scheduledTime);
     const customerName = body.customerName.trim();
     const customerEmail = normalizeEmail(body.customerEmail);
     const locationLabel = body.locationLabel.trim();
+
+    if (!TIME_SLOTS.includes(scheduledTime as (typeof TIME_SLOTS)[number])) {
+      return NextResponse.json({ error: "Please choose a valid time slot." }, { status: 400 });
+    }
+
+    const { data: slotRows, error: slotError } = await supabase.rpc("get_slot_booking_counts", {
+      p_date: body.scheduledDate,
+    });
+
+    if (!slotError && slotRows) {
+      const capacity = getSlotCapacity();
+      const match = (slotRows as { scheduled_time: string; booking_count: number }[]).find(
+        (row) => normalizeSlotTime(String(row.scheduled_time)) === scheduledTime,
+      );
+      const booked = Number(match?.booking_count ?? 0);
+      if (booked >= capacity) {
+        return NextResponse.json(
+          { error: "That time just filled up. Please choose another slot." },
+          { status: 409 },
+        );
+      }
+    }
 
     const bookingError = await insertBooking(supabase, {
       id: bookingId,
@@ -165,6 +190,26 @@ export async function POST(request: Request) {
       locationLabel,
     });
 
+    const siteUrl = resolveSiteUrl(request);
+
+    const emailResult = await sendBookingConfirmationEmail({
+      customerName,
+      customerEmail,
+      customerPhone: body.customerPhone.trim(),
+      referenceCode,
+      accessPin,
+      serviceName: service.name,
+      scheduledDate: body.scheduledDate,
+      scheduledTime,
+      locationType: body.locationType,
+      locationLabel,
+      locationDetails: body.locationDetails?.trim() ?? "",
+      notes: body.notes?.trim() ?? "",
+      amountThb: Number(service.price_thb),
+      paymentMethod,
+      siteUrl,
+    });
+
     const response: Record<string, unknown> = {
       id: bookingId,
       referenceCode,
@@ -176,6 +221,7 @@ export async function POST(request: Request) {
       customerEmail,
       paymentMethod,
       whatsappHref,
+      emailSent: emailResult.sent,
     };
 
     if (payNow) {
@@ -201,7 +247,7 @@ export async function POST(request: Request) {
         scheduledTime,
         locationLabel,
         amountThb: service.price_thb,
-        siteUrl: resolveSiteUrl(request),
+        siteUrl,
       });
 
       response.checkoutUrl = session.url;

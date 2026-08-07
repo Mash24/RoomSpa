@@ -18,7 +18,7 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en",
   contact: {
-    email: "hello@roomspa.com",
+    email: "hello@getroomspa.com",
     whatsapp: "+66984712237",
   },
   nav: [

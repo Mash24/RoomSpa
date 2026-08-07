@@ -29,6 +29,7 @@ export type BookingResult = {
   paymentMethod: string;
   whatsappHref: string;
   checkoutUrl?: string;
+  emailSent?: boolean;
 };
 
 export type BookingSummary = {

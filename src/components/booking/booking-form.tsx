@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -13,6 +13,7 @@ import { coverageAreas } from "@/content/coverage";
 import { whatsappHref } from "@/content/site";
 import { PaymentBadges } from "@/components/payment/payment-badges";
 import { paymentMethodLabel } from "@/lib/booking/pin";
+import type { SlotAvailability } from "@/lib/booking/availability";
 import {
   TIME_SLOTS,
   type BookingResult,
@@ -21,7 +22,14 @@ import {
 } from "@/lib/booking/types";
 import { redirectToUrl } from "@/lib/navigation";
 
-const today = () => new Date().toISOString().slice(0, 10);
+function todayInBangkok() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Bangkok",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
 
 function initialServiceSlug(fromQuery: string | null) {
   if (fromQuery && catalogProducts.some((product) => product.slug === fromQuery)) {
@@ -39,8 +47,10 @@ export function BookingForm() {
   const [locationType, setLocationType] = useState<LocationType>("hotel");
   const [locationLabel, setLocationLabel] = useState("");
   const [locationDetails, setLocationDetails] = useState("");
-  const [scheduledDate, setScheduledDate] = useState(today());
+  const [scheduledDate, setScheduledDate] = useState(todayInBangkok);
   const [scheduledTime, setScheduledTime] = useState<string>(TIME_SLOTS[2]);
+  const [slots, setSlots] = useState<SlotAvailability[]>([]);
+  const [slotsLoading, setSlotsLoading] = useState(true);
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState(searchParams.get("email") ?? "");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -60,8 +70,58 @@ export function BookingForm() {
     paymentPreference === "card_now" && !canPayNow ? "card_later" : paymentPreference;
   const payNow = effectivePaymentPreference === "card_now";
 
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      setSlotsLoading(true);
+      try {
+        const response = await fetch(`/api/availability?date=${scheduledDate}`);
+        const data = await response.json();
+        if (cancelled) return;
+        if (!response.ok) throw new Error(data.error || "Could not load times.");
+
+        const nextSlots = (data.slots ?? []) as SlotAvailability[];
+        setSlots(nextSlots);
+
+        const stillOpen = nextSlots.find((slot) => slot.time === scheduledTime && slot.available);
+        if (!stillOpen) {
+          const firstOpen = nextSlots.find((slot) => slot.available);
+          setScheduledTime(firstOpen?.time ?? "");
+        }
+        setError(null);
+      } catch (err) {
+        if (!cancelled) {
+          setSlots(
+            TIME_SLOTS.map((time) => ({
+              time,
+              booked: 0,
+              capacity: 3,
+              remaining: 3,
+              available: true,
+            })),
+          );
+          setError(err instanceof Error ? err.message : "Could not load times.");
+        }
+      } finally {
+        if (!cancelled) setSlotsLoading(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // Only refetch when the date changes; scheduledTime is adjusted inside.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scheduledDate]);
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!scheduledTime) {
+      setError("Please choose an available time.");
+      return;
+    }
+
     setSubmitting(true);
     setError(null);
 
@@ -127,8 +187,9 @@ export function BookingForm() {
           <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">Your booking PIN</p>
           <p className="mt-2 font-display text-4xl tracking-[0.25em] text-foreground">{result.accessPin}</p>
           <p className="mt-3 text-sm text-muted">
-            Screenshot or write this down. You’ll need your email + PIN to manage your booking or pay by
-            card later.
+            {result.emailSent
+              ? `We emailed these details and your PIN to ${result.customerEmail}. Check spam if you do not see it within a few minutes.`
+              : `Screenshot or write this down. We could not send email yet — keep this PIN. You’ll need email + PIN to manage your booking or pay by card later.`}
           </p>
         </div>
 
@@ -207,27 +268,57 @@ export function BookingForm() {
             <input
               type="date"
               required
-              min={today()}
+              min={todayInBangkok()}
               value={scheduledDate}
               onChange={(e) => setScheduledDate(e.target.value)}
               className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
             />
           </label>
-          <label className="block text-sm">
-            <span className="text-muted">Time</span>
-            <select
-              required
-              value={scheduledTime}
-              onChange={(e) => setScheduledTime(e.target.value)}
-              className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
-            >
-              {TIME_SLOTS.map((slot) => (
-                <option key={slot} value={slot}>
-                  {slot}
-                </option>
-              ))}
-            </select>
-          </label>
+          <div className="block text-sm sm:col-span-2">
+            <span className="text-muted">Available times</span>
+            {slotsLoading ? (
+              <p className="mt-2 text-sm text-muted">Checking availability...</p>
+            ) : (
+              <div className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
+                {(slots.length ? slots : TIME_SLOTS.map((time) => ({
+                  time,
+                  booked: 0,
+                  capacity: 3,
+                  remaining: 3,
+                  available: true,
+                }))).map((slot) => {
+                  const selected = scheduledTime === slot.time;
+                  return (
+                    <button
+                      key={slot.time}
+                      type="button"
+                      disabled={!slot.available}
+                      onClick={() => setScheduledTime(slot.time)}
+                      className={`rounded-sm border px-2 py-2.5 text-sm transition ${
+                        !slot.available
+                          ? "cursor-not-allowed border-border bg-surface text-muted line-through opacity-50"
+                          : selected
+                            ? "border-accent bg-accent text-accent-foreground"
+                            : "border-border bg-surface-elevated text-foreground hover:border-accent"
+                      }`}
+                    >
+                      <span className="block font-medium">{slot.time}</span>
+                      <span className="mt-0.5 block text-[10px] uppercase tracking-wide opacity-80">
+                        {slot.available
+                          ? slot.remaining <= 1
+                            ? "Last spot"
+                            : `${slot.remaining} left`
+                          : "Full"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+            <p className="mt-2 text-xs text-muted">
+              Multiple therapists can take the same time. Full slots are hidden from new bookings.
+            </p>
+          </div>
         </div>
 
         <label className="block text-sm">

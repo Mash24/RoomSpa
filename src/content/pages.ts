@@ -17,7 +17,7 @@ export const faqItems = [
   {
     question: "What is the booking PIN?",
     answer:
-      "When you book, we show a 4-digit PIN once. Save it (screenshot or note). You need your email + PIN to open My booking, pay later, or check status. We will also email the PIN once our domain email is live.",
+      "When you book, we show a 4-digit PIN once and email it to you from hello@getroomspa.com. Save it (screenshot or note). You need your email + PIN to open My booking, pay later, or check status.",
   },
   {
     question: "Can more than one booking happen at the same time?",

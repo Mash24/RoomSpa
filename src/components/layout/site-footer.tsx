@@ -52,6 +52,14 @@ export function SiteFooter() {
             </li>
             <li>
               <a
+                href={`mailto:${site.contact.email}`}
+                className="text-sm text-foreground/80 transition hover:text-accent"
+              >
+                {site.contact.email}
+              </a>
+            </li>
+            <li>
+              <a
                 href={whatsappHref}
                 target="_blank"
                 rel="noreferrer"
