@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { MediaEmbed } from "@/components/media/media-embed";
+import { GalleryGrid } from "@/components/media/gallery-grid";
 import { getPublishedGalleryMedia } from "@/lib/media/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -28,44 +27,7 @@ export default async function GalleryPage() {
       {items.length === 0 ? (
         <p className="mt-12 text-sm text-muted">New videos coming soon.</p>
       ) : (
-        <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((item) => {
-            const label =
-              item.serviceNames.length > 0 ? item.serviceNames.join(" · ") : "RoomSpa";
-            const primarySlug = item.serviceSlugs[0];
-
-            return (
-              <li key={item.id} className="min-w-0">
-                <MediaEmbed
-                  url={item.mediaUrl}
-                  kind={item.kind}
-                  title={item.title}
-                  description={item.description}
-                  thumbnailUrl={item.thumbnailUrl}
-                />
-                <p className="mt-3 text-xs font-medium uppercase tracking-[0.16em] text-accent">
-                  {label}
-                </p>
-                <h2 className="mt-1 font-display text-xl tracking-tight text-foreground">
-                  {item.title}
-                </h2>
-                {item.description ? (
-                  <p className="mt-1 text-sm leading-relaxed text-muted line-clamp-3">
-                    {item.description}
-                  </p>
-                ) : null}
-                {primarySlug ? (
-                  <Link
-                    href={`/services/${primarySlug}`}
-                    className="mt-3 inline-flex text-sm font-medium text-accent"
-                  >
-                    View service →
-                  </Link>
-                ) : null}
-              </li>
-            );
-          })}
-        </ul>
+        <GalleryGrid items={items} />
       )}
     </section>
   );

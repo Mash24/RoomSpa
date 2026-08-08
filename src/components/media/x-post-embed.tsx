@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { AutoplayVideo } from "@/components/media/autoplay-video";
+import type { GalleryPlaybackProps } from "@/components/media/gallery-playback";
+import { GalleryVideo } from "@/components/media/gallery-video";
 import { extractXStatusId } from "@/lib/media/urls";
 
 type Resolved = {
@@ -14,6 +16,7 @@ type Props = {
   url: string;
   title: string;
   className?: string;
+  galleryPlayback?: GalleryPlaybackProps;
 };
 
 /**
@@ -21,7 +24,7 @@ type Props = {
  * Uses FxEmbed-resolved MP4s instead of official widgets — those often show
  * "Not found" for sensitive/adult posts that RoomSpa links.
  */
-export function XPostEmbed({ url, title, className = "" }: Props) {
+export function XPostEmbed({ url, title, className = "", galleryPlayback }: Props) {
   const statusId = extractXStatusId(url);
   const [resolved, setResolved] = useState<Resolved | null>(null);
   const [error, setError] = useState(false);
@@ -82,6 +85,19 @@ export function XPostEmbed({ url, title, className = "" }: Props) {
   }
 
   if (resolved.videoUrl) {
+    if (galleryPlayback) {
+      return (
+        <GalleryVideo
+          id={galleryPlayback.id}
+          src={resolved.videoUrl}
+          poster={resolved.posterUrl || ""}
+          label={title}
+          autoplay={galleryPlayback.autoplay}
+          className={className}
+        />
+      );
+    }
+
     return (
       <div className={`relative aspect-video overflow-hidden bg-surface ${className}`}>
         <AutoplayVideo

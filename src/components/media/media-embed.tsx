@@ -6,6 +6,8 @@ import {
   youtubeEmbedUrl,
 } from "@/lib/media/urls";
 import { AutoplayVideo } from "@/components/media/autoplay-video";
+import type { GalleryPlaybackProps } from "@/components/media/gallery-playback";
+import { GalleryVideo } from "@/components/media/gallery-video";
 import { XPostEmbed } from "@/components/media/x-post-embed";
 
 type Props = {
@@ -15,6 +17,8 @@ type Props = {
   description?: string;
   thumbnailUrl?: string | null;
   className?: string;
+  /** Exclusive gallery play/pause (uploads + X links). */
+  galleryPlayback?: GalleryPlaybackProps;
 };
 
 export function MediaEmbed({
@@ -24,10 +28,24 @@ export function MediaEmbed({
   description,
   thumbnailUrl,
   className = "",
+  galleryPlayback,
 }: Props) {
   const source = classifyMediaUrl(url, kind);
 
   if (source === "direct-video") {
+    if (galleryPlayback) {
+      return (
+        <GalleryVideo
+          id={galleryPlayback.id}
+          src={url}
+          poster={thumbnailUrl || ""}
+          label={title}
+          autoplay={galleryPlayback.autoplay}
+          className={className}
+        />
+      );
+    }
+
     return (
       <div className={`relative aspect-video overflow-hidden bg-surface ${className}`}>
         <AutoplayVideo
@@ -77,7 +95,14 @@ export function MediaEmbed({
   }
 
   if (source === "x") {
-    return <XPostEmbed url={url} title={title} className={className} />;
+    return (
+      <XPostEmbed
+        url={url}
+        title={title}
+        className={className}
+        galleryPlayback={galleryPlayback}
+      />
+    );
   }
 
   if (source === "direct-image") {
