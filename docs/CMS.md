@@ -15,9 +15,10 @@
 - Hidden services (`is_active = false`) stay off the public site
 - `/gallery` lists published media, labeled by the services chosen in admin
 - Matching service pages show linked published media under “Videos & photos”
-- `/blog` lists **titles only**, grouped by category; open a title for the full educational article
+- `/blog` lists **article titles only**, grouped by category; open a title for the full article
+- Quick guest questions belong on `/faq`, not the blog
 - Booking Checkout charges the selected duration tier from `service_prices`
-- Static TypeScript catalog / blog guides are only a fallback if the DB is empty
+- Static TypeScript catalog / blog articles are only a fallback if the DB is empty
 
 ## Media upload notes
 - Do **not** send large MP4s through the Next.js API (Vercel ~4.5 MB body limit → `Request Entity Too Large`)
@@ -28,6 +29,7 @@
 
 ## Blog notes
 - Categories: Booking & hotels · Treatments & techniques · Wellness & travel · Chiang Mai areas · Sensual & consent
+- Write **articles** (topic titles), not FAQ-style questions
 - Separate paragraphs in the body with a blank line
 - Only `published` posts appear on the public site
 

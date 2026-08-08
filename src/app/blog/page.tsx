@@ -9,9 +9,9 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Blog | Educational massage guides Chiang Mai",
+  title: "Blog | Massage articles Chiang Mai",
   description:
-    "Educational guides on hotel outcall massage, treatments, wellness travel, Chiang Mai areas, and consent-led sensual bodywork.",
+    "Articles on in-room massage, treatments, wellness travel, Chiang Mai areas, and consent-led sensual bodywork.",
   path: "/blog",
 });
 
@@ -34,15 +34,15 @@ export default async function BlogPage() {
 
       <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">Blog</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-        Educational guides
+        Articles
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Clear answers about in-room massage in Chiang Mai — pick a category, then open a title to
-        read the full guide.
+        Stories and guides about in-room massage in Chiang Mai. Browse a category, then open a title
+        to read the full article. Quick questions live on the FAQ.
       </p>
 
       {byCategory.length === 0 ? (
-        <p className="mt-12 text-sm text-muted">Guides coming soon.</p>
+        <p className="mt-12 text-sm text-muted">Articles coming soon.</p>
       ) : (
         <div className="mt-12 space-y-14">
           {byCategory.map((category) => (

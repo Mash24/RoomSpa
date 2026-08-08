@@ -1,4 +1,4 @@
--- Blog CMS: educational posts with categories
+-- Blog CMS: educational articles with categories (not FAQ Q&A)
 -- Run in Supabase SQL Editor after prior migrations
 
 create table if not exists public.blog_posts (
@@ -48,202 +48,222 @@ to authenticated
 using (public.is_admin())
 with check (public.is_admin());
 
--- Seed educational guides (skip if slug already exists)
+-- Remove older Q&A-style seed slugs if they were inserted previously
+delete from public.blog_posts
+where slug in (
+  'massage-therapist-to-hotel-chiang-mai',
+  'is-hotel-massage-more-expensive-chiang-mai',
+  'massage-after-midnight-chiang-mai',
+  'hotel-policy-outside-massage-therapist-chiang-mai'
+);
+
 insert into public.blog_posts (
   slug, title, description, category, body, status, published_at,
-  primary_cta_label, primary_cta_href, secondary_cta_label, secondary_cta_href, sort_order
+  primary_cta_label, primary_cta_href, secondary_cta_label, secondary_cta_href, sort_order, updated_at
 )
 values
 (
-  'massage-therapist-to-hotel-chiang-mai',
-  'Can a massage therapist come to my hotel in Chiang Mai?',
-  'Yes — outcall / in-room massage brings a therapist to your Chiang Mai hotel, condo, or Airbnb. How it works, what to tell the front desk, and how to book RoomSpa.',
+  'in-room-massage-chiang-mai-guide',
+  'In-room massage in Chiang Mai: a practical guide',
+  'How mobile massage works in Chiang Mai hotels, condos, and Airbnbs — what to prepare, how arrival usually goes, and why travelers choose outcall care.',
   'booking-hotels',
-  $body$Yes. In Chiang Mai you can book an outcall (also called in-room or mobile) massage: a professional therapist travels to your hotel room, condo, villa, or Airbnb with oils, towels, and sheets as needed.
+  $body$In-room massage — sometimes called outcall or mobile massage — brings a professional therapist to wherever you are staying. In Chiang Mai that usually means a hotel room in the Old City, a Nimman condo, a villa, or a short-term Airbnb.
 
-RoomSpa is built for this model. You choose a service, pick a time, enter your hotel or residence details, and we confirm. You get a booking reference and a 4-digit PIN by email so you can manage or pay later.
+The appeal is simple. After a long flight or a day of temples and traffic, you do not need another tuk-tuk ride to a spa lobby. The therapist arrives with oils, towels, and sheets as needed, sets up in your space, and works around your schedule.
 
-Before arrival, clear a bed or floor space and keep the room reasonably quiet. For oil or gel sessions we bring waterproof covers. You do not need spa equipment.
+A workable room only needs a clear bed or floor area and a reasonably quiet atmosphere. For oil or gel-based sessions, waterproof covers are part of the kit. Guests do not need spa furniture or special equipment.
 
-Some hotels ask outside visitors to check in at reception. Tell us the hotel name in your booking; therapists use professional language with staff and keep your session details private.
+Many properties ask visitors to check in at reception. Therapists present as professional wellness visitors, keep language discreet with staff, and never share private session details at the desk.
 
-If your property blocks outside therapists, message us on WhatsApp before you book — we can advise or suggest timing that works with your stay.$body$,
+RoomSpa is built around this model: choose a service and time online, share your hotel or residence details, confirm, and receive a booking reference plus PIN by email so you can manage the visit later.$body$,
   'published', '2026-08-08',
-  'Book in-room massage', '/book', 'Chiang Mai coverage', '/city/chiang-mai', 10
+  'Book in-room massage', '/book', 'Chiang Mai coverage', '/city/chiang-mai', 10, now()
 ),
 (
-  'is-hotel-massage-more-expensive-chiang-mai',
-  'Is hotel massage more expensive in Chiang Mai?',
-  'How in-room hotel massage pricing compares to spa walk-ins in Chiang Mai — what you pay for, travel fees, and transparent RoomSpa rates in THB.',
+  'understanding-hotel-massage-pricing-chiang-mai',
+  'Understanding hotel massage pricing in Chiang Mai',
+  'What goes into in-room massage rates compared with walk-in spas — travel, setup, transparency, and how RoomSpa publishes THB prices.',
   'booking-hotels',
-  $body$In-room massage in Chiang Mai is often similar to a mid-range spa visit, sometimes a little higher — and for good reason. You are paying for a therapist who travels to you, brings equipment, and works around your schedule so you skip tuk-tuks and waiting rooms.
+  $body$Travelers often compare an in-room session with a walk-in spa menu and wonder why the numbers look different. Outcall pricing reflects more than the minutes of bodywork: travel across town, carrying equipment, setting up in a guest room, and working within hotel quiet hours.
 
-Hotel spa menus can look cheaper on paper until you add travel time, waitlists, and tip expectations. Outcall rates usually include the convenience of setup in your room.
+A hotel spa can look cheaper on paper until you add transit time, waitlists, and tip expectations. Mobile rates package convenience — the therapist comes to you, so recovery starts where you already are.
 
-RoomSpa publishes clear prices on the site. Core coverage in Old City and Nimman typically has no travel fee; the Airport / Hang Dong corridor may add a small travel fee depending on distance.
+RoomSpa publishes clear THB prices on the site. Core coverage in Old City and Nimman typically has no travel fee. The Airport / Hang Dong corridor may include a light travel fee depending on distance, shown when you book.
 
-You can pay cash on arrival, card later from My booking, or card now at checkout. No surprise add-ons for standard sessions — extras are only what you choose.
+Payment options are straightforward: card at checkout, card later from My booking, or cash on arrival. Standard sessions do not hide surprise add-ons; extras only appear when you choose them.
 
-Compare the full menu on Pricing, then book the service that matches your pressure and duration needs.$body$,
+Use the Pricing page to compare durations, then match the treatment to the pressure and recovery you want rather than shopping only by the lowest line item.$body$,
   'published', '2026-08-08',
-  'See pricing', '/pricing', 'Book a session', '/book', 20
+  'See pricing', '/pricing', 'Book a session', '/book', 20, now()
 ),
 (
   'how-outcall-massage-works-chiang-mai',
-  'How does outcall massage work in Chiang Mai?',
-  'Step-by-step: booking outcall / mobile massage in Chiang Mai — choosing a service, sharing your hotel details, arrival, payment, and PIN access.',
+  'How outcall massage works from booking to arrival',
+  'A step-by-step look at mobile massage in Chiang Mai: choosing a treatment, sharing your stay details, confirmation, and what happens on the day.',
   'booking-hotels',
-  $body$Outcall massage means the spa comes to you. In Chiang Mai the usual flow is: pick a treatment, share where you are staying, confirm a time, and welcome a therapist who arrives ready to work.
+  $body$Outcall massage means the spa comes to you. In Chiang Mai the flow is familiar once you have done it once: pick a treatment, share where you are staying, lock a time, and welcome a therapist who arrives ready to work.
 
-With RoomSpa: (1) choose a service online, (2) select date and time slot, (3) enter hotel/condo/home details and contact info, (4) choose cash, card later, or card now, (5) receive email confirmation with reference + PIN.
+With RoomSpa the steps are: choose a service, select a date and slot, enter hotel, condo, or home details with contact info, pick cash, card later, or card now, then receive email confirmation with a reference and PIN.
 
-Before the session we confirm availability. On the day, the therapist arrives within the agreed window, sets up discreetly, and begins after a short check-in on pressure and any health notes you shared.
+Before the visit we confirm availability. On the day, arrival sits inside the agreed window. Setup is discreet. A short check-in covers pressure preferences and any health notes you shared when booking.
 
-Afterward you can manage the booking with email + PIN, pay any remaining balance by card, and — once the visit is marked complete — leave a moderated review.
+Afterward you can manage the booking with email and PIN, settle any remaining balance by card, and — once the visit is marked complete — leave a moderated review.
 
-Same-day slots are often available when capacity allows. Evening times (roughly 5–9 pm) fill first, so book ahead when you can.$body$,
+Same-day slots appear when capacity allows. Early evening hours fill first, so booking ahead still helps during peak travel weeks.$body$,
   'published', '2026-08-08',
-  'Start booking', '/book', 'Read FAQ', '/faq', 30
+  'Start booking', '/book', 'Read FAQ', '/faq', 30, now()
 ),
 (
-  'massage-after-midnight-chiang-mai',
-  'Can I book a massage after midnight in Chiang Mai?',
-  'Late-night and after-midnight massage options in Chiang Mai — what RoomSpa covers, how same-day late slots work, and when to WhatsApp for last-minute requests.',
+  'evening-and-late-outcall-massage-chiang-mai',
+  'Evening and late outcall massage in Chiang Mai',
+  'How late-evening mobile massage fits traveler schedules — landing flights, dinner plans, quiet hotel hours, and planning a smooth arrival window.',
   'booking-hotels',
-  $body$Many travelers land late or want a session after dinner and nightlife. Some Chiang Mai outcall providers advertise until 1:00 am; availability always depends on therapists on shift.
+  $body$Many guests want bodywork after dinner, nightlife, or a delayed flight. Chiang Mai’s mobile massage culture often stretches into late evening when therapists are on shift — always subject to real capacity that day.
 
-RoomSpa aims for flexible hours, including late evening when capacity allows. Online slots show what is bookable right now. If you need a time after the last listed slot — including after midnight — WhatsApp us with your hotel and preferred window.
+Online slots show what is bookable in the moment. When you need a window after the last listed time, WhatsApp with your hotel and preferred range is the practical path; last-minute requests work best with at least an hour or two of notice when possible.
 
-Late requests work best with 1–2 hours notice when possible. Flight delays happen: message your reference or new request as soon as you know your ETA.
+Hotels may enforce quiet hours. Low volume, a do-not-disturb sign, and a clear floor or bed space keep the visit comfortable for you and your neighbors.
 
-Hotels may have quiet-hour rules. Keep volume low and use the do-not-disturb sign when appropriate so staff and neighbors stay comfortable.
+Flight delays are common. Updating your ETA early — with your booking reference if you already have one — helps the therapist adjust without wasting travel time.
 
-For the smoothest late arrival, book a confirmed evening slot earlier in the day, or message WhatsApp before you leave the airport.$body$,
+For the smoothest night arrival, reserve a confirmed evening slot earlier in the day, or message before you leave the airport so timing stays realistic.$body$,
   'published', '2026-08-08',
-  'Check available times', '/book', 'Contact / WhatsApp', '/contact', 40
+  'Check available times', '/book', 'Contact / WhatsApp', '/contact', 40, now()
 ),
 (
-  'hotel-policy-outside-massage-therapist-chiang-mai',
-  'Does my Chiang Mai hotel allow outside massage therapists?',
-  'How hotel policies affect outcall massage in Chiang Mai — what to ask the front desk, how RoomSpa handles discreet arrival, and what to do if outside therapists are restricted.',
+  'hotel-policies-and-visiting-therapists',
+  'Hotel policies and visiting massage therapists',
+  'How property rules shape in-room massage in Chiang Mai — visitor registration, discretion at reception, and planning around restricted hotels.',
   'booking-hotels',
-  $body$Policies vary. Many Chiang Mai hotels and boutique properties allow professional outcall therapists, especially when guests book in advance. Some luxury brands or hostels restrict outside visitors for security.
+  $body$Not every property treats outside wellness visitors the same way. Many Chiang Mai hotels and boutiques allow professional therapists when guests book in advance. Some luxury brands or hostels restrict outside guests for security.
 
-Ask the front desk: “Do you allow an outside massage therapist for an in-room appointment?” If they say yes, note any visitor registration or deposit rules and put them in your booking notes.
+A useful front-desk question is whether an outside massage therapist is allowed for an in-room appointment, and whether visitor registration or a deposit applies. Those details belong in your booking notes.
 
-RoomSpa therapists arrive as professional wellness visitors — calm, discreet, and clear with staff. We never share intimate session details at the desk.
+RoomSpa therapists arrive as calm wellness visitors. They keep language professional with staff and never discuss intimate session details at reception.
 
-If the hotel says no, options include: book a condo/Airbnb stay that allows visitors, choose a nearby private spa room, or ask us on WhatsApp whether another coverage option fits your dates.
+When a hotel says no, alternatives include staying somewhere that allows visitors, choosing a nearby private space, or adjusting timing after a quick WhatsApp check on coverage options for your dates.
 
-When in doubt, check policy before you pay. We would rather help you adjust than send a therapist who cannot enter.$body$,
+Confirming policy before you pay protects everyone. It is better to adjust early than to send a therapist who cannot enter the building.$body$,
   'published', '2026-08-08',
-  'Book with hotel notes', '/book', 'WhatsApp us first', '/contact', 50
+  'Book with hotel notes', '/book', 'WhatsApp us first', '/contact', 50, now()
 ),
 (
   'best-areas-chiang-mai-hotel-massage',
   'Best areas in Chiang Mai for hotel massage',
-  'Old City, Nimman, and Airport / Hang Dong — where in-room hotel massage works best in Chiang Mai and how RoomSpa coverage maps to each area.',
+  'Old City, Nimman, and the Airport / Hang Dong corridor — how demand, travel time, and RoomSpa coverage map across Chiang Mai neighborhoods.',
   'areas',
-  $body$The best area for hotel massage is wherever you are already staying — that is the point of outcall. Still, demand clusters in a few Chiang Mai neighborhoods.
+  $body$The best place for hotel massage is wherever you already sleep — that is the point of outcall. Still, demand clusters in a few Chiang Mai neighborhoods where travelers and therapists meet most easily.
 
-Old City / Center: guesthouses and heritage hotels inside and around the moat. Ideal after temple days and night markets. RoomSpa covers this as a core zone.
+Old City and the center: guesthouses and heritage hotels inside and around the moat. Ideal after temple days and night markets, and covered as a RoomSpa core zone.
 
-Nimman / University area: boutiques, condos, and digital-nomad stays near Nimmanhaemin and Maya. Fast to reach for therapists; popular for evening couples and recovery sessions.
+Nimman and the university area: boutiques, condos, and digital-nomad stays near Nimmanhaemin and Maya. Short therapist travel times and strong evening demand for couples and recovery sessions.
 
-Airport / Hang Dong corridor: convenient after landing or for residences south of the center. A light travel fee may apply depending on distance — shown when you book.
+Airport and Hang Dong corridor: convenient after landing or for residences south of the center. A light travel fee may apply depending on distance and is shown at booking.
 
-Bangkok and Phuket are coming soon; Chiang Mai is available today. Open the Chiang Mai page for neighborhoods, then book with your hotel name.$body$,
+Bangkok and Phuket are on the roadmap; Chiang Mai is live today. Start with the Chiang Mai city page for neighborhoods, then book with your hotel name so routing stays accurate.$body$,
   'published', '2026-08-08',
-  'Explore Chiang Mai', '/city/chiang-mai', 'Book now', '/book', 60
+  'Explore Chiang Mai', '/city/chiang-mai', 'Book now', '/book', 60, now()
 ),
 (
   'hotel-massage-chiang-mai-how-it-works',
-  'Hotel massage in Chiang Mai: how in-room booking works',
-  'How RoomSpa brings a therapist to your Chiang Mai hotel room — what to prepare, pricing basics, and how to book with a PIN.',
+  'Hotel massage without leaving your room',
+  'What a Chiang Mai in-room session looks like from preparation to payment — space, discretion, and how RoomSpa bookings stay simple.',
   'booking-hotels',
-  $body$Looking for a massage without leaving your hotel in Chiang Mai? In-room (mobile) massage means a professional therapist travels to you — Old City guesthouses, Nimman boutiques, and airport-corridor hotels included.
+  $body$Hotel massage in Chiang Mai does not have to mean finding a spa across town. Mobile therapists travel to Old City guesthouses, Nimman boutiques, and airport-corridor hotels with what they need for a full session.
 
-You choose a service online, pick a time, and share your hotel name or room details. We confirm availability and you receive a booking reference plus a 4-digit PIN by email.
+Online booking captures the service, time, and stay details. Confirmation arrives with a reference and PIN so you can manage or pay later without chasing messages.
 
-Prepare a clear bed or floor space and a quiet room. We bring oils, towels, and sheets as needed. For oil or Nuru sessions we use waterproof covers. You do not need spa equipment.
+Prepare a clear bed or floor space and a quiet room. Oils, towels, and sheets come with the visit. Waterproof covers are used for oil or Nuru work. Guests do not need spa equipment.
 
-Pay cash on arrival, card later from My booking, or card now at checkout. Discretion is standard: therapists use professional language with hotel staff and never share your booking details.
+Payment can be cash on arrival, card later from My booking, or card at checkout. Discretion is standard: professional language with hotel staff and private booking details.
 
-Ready to book? Open the booking form, choose your service, and select Chiang Mai coverage that matches your hotel area.$body$,
+When you are ready, open the booking form, choose your treatment, and match coverage to the area of your hotel.$body$,
   'published', '2026-08-07',
-  'Book a session', '/book', 'Browse services', '/services', 70
+  'Book a session', '/book', 'Browse services', '/services', 70, now()
 ),
 (
   'best-couples-massage-chiang-mai-in-room',
-  'Best couples massage in Chiang Mai — in your room',
-  'Side-by-side or dual-therapist couples massage at your Chiang Mai hotel or condo. How RoomSpa sessions work and what to expect.',
+  'Couples massage in your Chiang Mai hotel room',
+  'Side-by-side and dual-therapist couples sessions at the hotel or condo — space tips, formats, and how private evenings usually unfold.',
   'treatments',
-  $body$Couples massage in Chiang Mai does not have to mean a crowded spa lobby. RoomSpa offers couples and four-hands sessions in your hotel, condo, or home — private, timed around your evening plans.
+  $body$Couples massage in Chiang Mai does not require a shared spa lobby. In-room sessions keep the evening private — timed around dinner plans, flights, or a quiet night in.
 
-Classic couples massage focuses on relaxation side by side. Four-hands sessions use two therapists on one guest when you want deeper unwind. We also offer a consent-led couples sensual format when both partners want a more intimate, professional session — boundaries are set before touch begins.
+Classic couples work focuses on relaxation side by side. Four-hands sessions use two therapists on one guest for deeper unwind. Consent-led couples sensual formats exist for partners who want a more intimate, professional session with boundaries set before touch begins.
 
-Space tip: a king bed or clear floor area works best. Tell us the room type in notes so we bring the right setup.
+Space matters. A king bed or clear floor area works best. Mentioning room type in notes helps the team bring the right setup.
 
-Book Couples or Couples Sensual from Services, or message WhatsApp if you want help choosing a duration.$body$,
+Couples and Couples Sensual sit on the Services menu. WhatsApp helps when you want a second opinion on duration or format before you lock a time.$body$,
   'published', '2026-08-07',
-  'Book couples massage', '/book?service=couples', 'View couples services', '/services', 80
+  'Book couples massage', '/book?service=couples', 'View couples services', '/services', 80, now()
 ),
 (
   'thai-massage-vs-oil-massage',
-  'Thai massage vs oil massage: which should you book?',
-  'A clear comparison of Thai (dry, stretch-focused) and oil-based massage — and when to choose deep tissue or Swedish instead.',
+  'Thai massage vs oil massage: choosing your treatment',
+  'A clear comparison of Thai stretch-focused work and oil-based relaxation — plus when deep tissue or Swedish is the better fit.',
   'treatments',
-  $body$Thai massage is typically performed clothed, on a mat, with rhythmic compressions and assisted stretches. It is excellent for mobility, travel stiffness, and guests who prefer less oil.
+  $body$Thai massage is typically performed clothed, on a mat, with rhythmic compressions and assisted stretches. It suits guests who want mobility, travel stiffness relief, or less oil on the skin.
 
-Oil massage (Swedish, aromatherapy, hot oil, Balinese) uses lotion or oil with longer gliding strokes. Choose these when you want classic spa relaxation, softer pressure, or scent-led unwind.
+Oil massage — Swedish, aromatherapy, hot oil, Balinese — uses longer gliding strokes with lotion or oil. Choose it for classic spa relaxation, softer pressure, or scent-led unwind.
 
-Deep tissue and sports sit between therapeutic goals and pressure — better when you have a specific tight area after hiking Doi Suthep or sitting through long flights.
+Deep tissue and sports sit closer to therapeutic goals: useful after hiking Doi Suthep, long walks, or desk-heavy nomad weeks when a specific area feels locked.
 
-Not sure? Start with Swedish for general recovery or Thai if you want stretch-focused work. You can note pressure preferences when you book.$body$,
+If you are unsure, Swedish is a strong general recovery start; Thai is the stretch-focused path. Note pressure preferences when you book so the session matches what your body needs that day.$body$,
   'published', '2026-08-07',
-  'Compare on Services', '/services', 'Book now', '/book', 90
+  'Compare on Services', '/services', 'Book now', '/book', 90, now()
 ),
 (
   'deep-tissue-massage-after-hiking-chiang-mai',
-  'Deep tissue massage after hiking in Chiang Mai',
-  'Recover from Doi Suthep, Doi Inthanon, or city walking tours with in-room deep tissue or sports massage in Chiang Mai.',
+  'Deep tissue after hiking in Chiang Mai',
+  'Recovering from Doi Suthep, Doi Inthanon, or temple climbs with in-room deep tissue and sports massage — what to tell your therapist and how to plan the evening after.',
   'treatments',
-  $body$Chiang Mai hikes and temple climbs leave calves, hips, and shoulders tight. An in-room deep tissue or sports session lets you recover without another tuk-tuk ride across town.
+  $body$Chiang Mai hikes and temple climbs leave calves, hips, and shoulders tight. An in-room deep tissue or sports session lets you recover without another cross-town ride after you already walked for hours.
 
-Tell your therapist which trails or activities you did and where you feel sore. We adjust pressure and avoid inflamed areas.
+Share which trails or activities you did and where soreness sits. Therapists adjust pressure and avoid inflamed areas so the work stays productive rather than aggressive.
 
-Hydrate after the session and keep the evening light. Pair with foot reflexology if your feet took the worst of the climb.
+Hydrate after the session and keep the evening light. Foot reflexology pairs well when feet took the worst of the climb.
 
-Book Deep Tissue or Sports from the therapeutic menu — available in Old City, Nimman, and Airport / Hang Dong coverage.$body$,
+Deep Tissue and Sports sit on the therapeutic menu and are available across Old City, Nimman, and Airport / Hang Dong coverage.$body$,
   'published', '2026-08-07',
-  'Book deep tissue', '/book?service=deep-tissue', 'Therapeutic menu', '/services', 100
+  'Book deep tissue', '/book?service=deep-tissue', 'Therapeutic menu', '/services', 100, now()
 ),
 (
   'nuru-massage-chiang-mai-what-to-expect',
-  'Nuru massage in Chiang Mai: what to expect',
-  'A clear, professional overview of consent-led Nuru bodywork with RoomSpa — boundaries, hygiene, and how to book discreetly.',
+  'Nuru bodywork in Chiang Mai: a professional overview',
+  'What consent-led Nuru sessions involve — boundaries, hygiene, discretion at hotels, and how RoomSpa frames sensual bodywork as professional care.',
   'sensual-consent',
-  $body$Nuru is a gel-based body-to-body massage offered as consent-led professional bodywork — not an escort service. RoomSpa sessions begin with clear boundaries; you can pause or stop anytime.
+  $body$Nuru is a gel-based body-to-body massage offered as consent-led professional bodywork — not an escort service. Sessions begin with clear boundaries, and guests can pause or stop at any time.
 
-We bring waterproof sheets and towels. A shower nearby is helpful. Privacy and discretion are standard for hotel arrivals.
+Waterproof sheets and towels come with the visit. A nearby shower helps. Discretion is standard for hotel arrivals, including calm language with front-desk staff.
 
-If you are new to sensual or tantric work, read the service description and FAQ first, then book Nuru or related sessions from the sensual menu. Questions before booking are welcome on WhatsApp.$body$,
+Guests new to sensual or tantric work usually read the service description first, then book Nuru or related sessions from the sensual menu. Pre-booking questions are welcome on WhatsApp.$body$,
   'published', '2026-08-07',
-  'View Nuru', '/services/nuru', 'Read FAQ', '/faq', 110
+  'View Nuru', '/services/nuru', 'Read FAQ', '/faq', 110, now()
 ),
 (
   'how-often-should-you-get-a-massage',
-  'How often should you get a massage when traveling?',
-  'Practical guidance on massage frequency for tourists and digital nomads in Thailand — recovery, budget, and booking tips.',
+  'Massage rhythm for travelers and digital nomads',
+  'Practical guidance on how often to book massage during a Thailand trip — flights, hiking weeks, desk work, and listening to your body.',
   'wellness-travel',
-  $body$There is no single rule. Many travelers feel best with a session after a long flight, then again mid-trip if they are hiking or sitting for work.
+  $body$There is no single correct schedule. Many travelers feel best with a session after a long flight, then again mid-trip if they are hiking hard or sitting for work.
 
-Digital nomads in Chiang Mai often book weekly Swedish or Thai to manage desk tension. Athletes lean toward sports or deep tissue after hard training days.
+Digital nomads in Chiang Mai often book weekly Swedish or Thai to manage desk tension. Athletes lean toward sports or deep tissue after demanding training days.
 
-Listen to your body: soreness that improves with movement is different from sharp pain — mention injuries when you book so we can adapt or decline unsafe work.
+Soreness that eases with gentle movement differs from sharp pain. Mention injuries when you book so the therapist can adapt or decline work that would be unsafe.
 
-RoomSpa makes repeat visits easy: save your email + PIN from My booking, or rebook from the site in a few taps.$body$,
+Repeat visits stay simple: keep your email and PIN from My booking, or rebook from the site in a few taps when your calendar opens up.$body$,
   'published', '2026-08-07',
-  'Book a session', '/book', 'Manage booking', '/my-booking', 120
+  'Book a session', '/book', 'Manage booking', '/my-booking', 120, now()
 )
-on conflict (slug) do nothing;
+on conflict (slug) do update set
+  title = excluded.title,
+  description = excluded.description,
+  category = excluded.category,
+  body = excluded.body,
+  status = excluded.status,
+  published_at = excluded.published_at,
+  primary_cta_label = excluded.primary_cta_label,
+  primary_cta_href = excluded.primary_cta_href,
+  secondary_cta_label = excluded.secondary_cta_label,
+  secondary_cta_href = excluded.secondary_cta_href,
+  sort_order = excluded.sort_order,
+  updated_at = now();

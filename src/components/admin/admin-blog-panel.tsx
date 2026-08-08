@@ -122,8 +122,9 @@ export function AdminBlogPanel() {
       <div>
         <h1 className="font-display text-3xl tracking-tight text-foreground md:text-4xl">Blog</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Write educational guides by category. Published posts appear on the public Blog page as
-          titles under each category; guests open a post to read the full article.
+          Write articles about what RoomSpa does — treatments, Chiang Mai stays, wellness travel,
+          consent-led work. FAQ is for short Q&A. Published titles appear under each category on
+          the public Blog; guests open a title to read the full article.
         </p>
       </div>
 
@@ -242,7 +243,8 @@ export function AdminBlogPanel() {
         <label className="block text-sm">
           <span className="text-muted">Article body</span>
           <p className="mt-1 text-xs text-muted">
-            Write educational paragraphs. Separate paragraphs with a blank line.
+            Write an article in paragraphs. Separate paragraphs with a blank line. Avoid question
+            titles — those belong on the FAQ.
           </p>
           <textarea
             required

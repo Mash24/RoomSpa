@@ -2,27 +2,27 @@ export const BLOG_CATEGORIES = [
   {
     slug: "booking-hotels",
     name: "Booking & hotels",
-    description: "How outcall booking works, hotel policies, pricing, and late-night requests.",
+    description: "Articles on outcall booking, hotel stays, pricing, and evening sessions.",
   },
   {
     slug: "treatments",
     name: "Treatments & techniques",
-    description: "Educational guides to Thai, oil, deep tissue, couples, and recovery work.",
+    description: "Articles on Thai, oil, deep tissue, couples, and recovery bodywork.",
   },
   {
     slug: "wellness-travel",
     name: "Wellness & travel",
-    description: "Practical tips for travelers and nomads who book massage on the road.",
+    description: "Articles for travelers and nomads who book massage on the road.",
   },
   {
     slug: "areas",
     name: "Chiang Mai areas",
-    description: "Where in-room massage works best across Old City, Nimman, and beyond.",
+    description: "Articles on neighborhoods where in-room massage works best.",
   },
   {
     slug: "sensual-consent",
     name: "Sensual & consent",
-    description: "Clear, professional education on consent-led sensual and tantric bodywork.",
+    description: "Articles on consent-led sensual and tantric bodywork.",
   },
 ] as const;
 
