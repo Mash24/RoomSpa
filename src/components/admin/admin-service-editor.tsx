@@ -221,7 +221,8 @@ export function AdminServiceEditor({ serviceId }: Props) {
                 required
                 type="number"
                 min={0}
-                step={50}
+                step="any"
+                inputMode="numeric"
                 value={value}
                 onChange={(e) => setter(e.target.value)}
                 className="mt-1 w-full border border-border bg-background px-3 py-2.5"
