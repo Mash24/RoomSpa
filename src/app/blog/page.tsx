@@ -6,9 +6,9 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Blog | Hotel massage & wellness guides",
+  title: "Blog | Hotel & outcall massage Chiang Mai",
   description:
-    "Guides on hotel massage in Chiang Mai, Thai vs oil massage, couples sessions, Nuru expectations, and recovery tips.",
+    "Answers to real booking questions: hotel outcall, pricing, late-night sessions, hotel policies, and best areas for in-room massage in Chiang Mai.",
   path: "/blog",
 });
 
@@ -27,11 +27,11 @@ export default function BlogPage() {
 
       <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">Blog</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-        Guides & notes
+        Questions travelers actually ask
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Practical reading for travelers and locals — how in-room massage works, which service to
-        pick, and what to expect in Chiang Mai.
+        Commercial guides for hotel and outcall massage in Chiang Mai — then a clear path to book,
+        not filler posts.
       </p>
 
       <ul className="mt-12 space-y-6">

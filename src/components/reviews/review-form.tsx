@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { catalogProducts } from "@/content/services";
 import {
   REVIEW_MAX_BODY,
@@ -11,13 +12,16 @@ import {
 } from "@/lib/reviews/rules";
 
 export function ReviewForm() {
+  const searchParams = useSearchParams();
   const [authorName, setAuthorName] = useState("");
-  const [authorEmail, setAuthorEmail] = useState("");
+  const [authorEmail, setAuthorEmail] = useState(searchParams.get("email") ?? "");
   const [rating, setRating] = useState(5);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
-  const [serviceSlug, setServiceSlug] = useState("");
-  const [bookingReference, setBookingReference] = useState("");
+  const [serviceSlug, setServiceSlug] = useState(searchParams.get("service") ?? "");
+  const [bookingReference, setBookingReference] = useState(
+    (searchParams.get("ref") ?? "").toUpperCase(),
+  );
   const [acceptedGuidelines, setAcceptedGuidelines] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);

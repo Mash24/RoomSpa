@@ -25,3 +25,5 @@ Vercel and local `.env.local` need:
 - Full slots are blocked in the UI and again in `POST /api/bookings`
 - Stripe Checkout charges the catalog `amountThb` via dynamic `price_data` (no Stripe Price IDs)
 - Customers look up bookings with email + PIN at `/my-booking`
+- After admin marks a booking **completed**, the guest email includes a **Leave a review** CTA
+- Run `supabase/migrations/20260808_lookup_include_completed.sql` so completed bookings appear in My booking for reviews

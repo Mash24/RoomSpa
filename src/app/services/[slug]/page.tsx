@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getPublishedMediaForServiceSlug } from "@/lib/media/public";
 import { AutoplayVideo } from "@/components/media/autoplay-video";
 import { AvailabilityBanner } from "@/components/seo/availability-banner";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
@@ -14,9 +15,11 @@ import {
 } from "@/components/seo/json-ld";
 import { getServiceFaqs } from "@/content/service-faqs";
 import { getServiceMedia } from "@/content/service-media";
+import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import {
   catalogServices,
   getCatalogProduct,
+  getServicePriceTiers,
   productPriceLabel,
   serviceCategories,
 } from "@/content/services";
@@ -58,6 +61,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   if (!service || !service.bookable) notFound();
 
   const media = getServiceMedia(service.slug);
+  const libraryMedia = await getPublishedMediaForServiceSlug(service.slug);
   const category = serviceCategories.find((item) => item.id === service.category);
   const faqs = getServiceFaqs(service.slug);
   const serviceReviews = await getApprovedReviewsForService(service.slug, 8);
@@ -121,22 +125,17 @@ export default async function ServiceDetailPage({ params }: PageProps) {
             <AvailabilityBanner teaser={teaser} bookHref={`/book?service=${service.slug}`} />
           </div>
 
-          <dl className="mt-8 grid gap-4 sm:grid-cols-2">
-            <div className="border border-border bg-surface-elevated p-4">
-              <dt className="text-xs uppercase tracking-[0.14em] text-muted">Duration</dt>
-              <dd className="mt-2 font-display text-2xl text-foreground">{service.duration}</dd>
-            </div>
-            <div className="border border-border bg-surface-elevated p-4">
-              <dt className="text-xs uppercase tracking-[0.14em] text-muted">From</dt>
-              <dd className="mt-2 font-display text-2xl text-accent">
-                {productPriceLabel(service.amountThb)}
-              </dd>
-            </div>
-          </dl>
+          <div className="mt-8">
+            <p className="text-xs uppercase tracking-[0.14em] text-muted">Duration & pricing</p>
+            <ServicePriceTiers className="mt-3" service={service} />
+            <p className="mt-3 text-sm text-muted">
+              From {productPriceLabel(getServicePriceTiers(service)[60])} · choose length when you book
+            </p>
+          </div>
 
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              href={`/book?service=${service.slug}`}
+              href={`/book?service=${service.slug}&duration=60`}
               className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
             >
               Book {service.name}
@@ -173,6 +172,45 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           </div>
         </div>
       </div>
+
+      {libraryMedia.length > 0 ? (
+        <section className="mt-16 border-t border-border pt-10">
+          <h2 className="font-display text-3xl tracking-tight text-foreground">See how it works</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
+            Short guides for this treatment — preparation, privacy, and what to expect. Content stays
+            professional and discreet.
+          </p>
+          <ul className="mt-8 grid gap-6 md:grid-cols-2">
+            {libraryMedia.map((item) => (
+              <li key={item.id} className="overflow-hidden border border-border bg-surface-elevated">
+                <div className="relative aspect-video bg-surface">
+                  {item.kind === "video" ? (
+                    <AutoplayVideo
+                      src={item.mediaUrl}
+                      poster={item.thumbnailUrl || media.image}
+                      label={item.title}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.mediaUrl}
+                      alt={item.title}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="p-5">
+                  <h3 className="font-display text-xl text-foreground">{item.title}</h3>
+                  {item.description ? (
+                    <p className="mt-2 text-sm leading-relaxed text-muted">{item.description}</p>
+                  ) : null}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="mt-16 border-t border-border pt-10">
         <h2 className="font-display text-3xl tracking-tight text-foreground">

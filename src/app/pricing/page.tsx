@@ -2,33 +2,33 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   catalogProducts,
-  productPriceLabel,
+  getServicePriceTiers,
   serviceCategories,
 } from "@/content/services";
+import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import { whatsappHref } from "@/content/site";
-import { THB_PER_USD } from "@/lib/currency";
-import { formatThb } from "@/lib/currency";
+import { THB_PER_USD, formatThb } from "@/lib/currency";
 
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "RoomSpa mobile massage pricing in THB and approximate USD — classic, therapeutic, couples, Nuru, Yoni, Lingam, and more.",
+    "RoomSpa mobile massage pricing for 60 min, 90 min, and 2 hours — THB with approximate USD.",
 };
 
 export default function PricingPage() {
+  const fromPrice = Math.min(
+    ...catalogProducts.map((p) => getServicePriceTiers(p)[60]),
+  );
+
   return (
     <section className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Pricing</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-        Transparent rates, dual currency
+        60 min · 90 min · 2 hours
       </h1>
       <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
-        You pay in THB. USD is an approximate guide (~{THB_PER_USD} THB = 1 USD). For photos and
-        videos of each treatment, see{" "}
-        <Link href="/services" className="text-accent underline">
-          Services
-        </Link>
-        . Travel fees may apply outside core coverage areas.
+        Pick a length when you book. You pay in THB (USD is a guide at ~{THB_PER_USD} THB = 1 USD).
+        Cash or card. Travel fees may apply outside core coverage.
       </p>
 
       <div className="mt-12 space-y-12">
@@ -41,25 +41,23 @@ export default function PricingPage() {
               <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
                 {category.title}
               </h2>
-              <ul className="mt-5 divide-y divide-border border border-border bg-surface-elevated">
+              <ul className="mt-5 space-y-4">
                 {products.map((product) => (
                   <li
                     key={product.slug}
-                    className="flex flex-col gap-3 px-5 py-5 sm:flex-row sm:items-center sm:justify-between md:px-6"
+                    className="border border-border bg-surface-elevated px-4 py-5 md:px-6"
                   >
-                    <div className="min-w-0">
-                      <p className="font-medium text-foreground">{product.name}</p>
-                      <p className="mt-1 text-sm text-muted">
-                        {product.duration} · cash / card
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-4">
-                      <p className="font-display text-xl text-accent sm:text-2xl">
-                        {productPriceLabel(product.amountThb)}
-                      </p>
+                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                      <div className="min-w-0 lg:max-w-sm">
+                        <p className="font-medium text-foreground">{product.name}</p>
+                        <p className="mt-1 text-sm text-muted">Cash or card · in-room Chiang Mai</p>
+                      </div>
+                      <div className="w-full max-w-xl flex-1">
+                        <ServicePriceTiers service={product} />
+                      </div>
                       <Link
                         href={`/book?service=${product.slug}`}
-                        className="rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+                        className="inline-flex shrink-0 items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition hover:opacity-90"
                       >
                         Book
                       </Link>
@@ -73,8 +71,7 @@ export default function PricingPage() {
       </div>
 
       <p className="mt-10 text-sm text-muted">
-        Starting from {formatThb(Math.min(...catalogProducts.map((p) => p.amountThb)))}. Need a
-        custom length or combo?{" "}
+        Starting from {formatThb(fromPrice)} for 60 minutes. Need a custom length or combo?{" "}
         <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
           WhatsApp us
         </a>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { ReviewForm } from "@/components/reviews/review-form";
 import { ReviewsList } from "@/components/reviews/reviews-list";
 import { getApprovedReviews } from "@/lib/reviews/fetch";
@@ -30,7 +31,9 @@ export default async function ReviewsPage() {
       </div>
 
       <div className="mt-16">
-        <ReviewForm />
+        <Suspense fallback={<p className="text-sm text-muted">Loading review form...</p>}>
+          <ReviewForm />
+        </Suspense>
       </div>
 
       <p className="mt-8 text-sm text-muted">

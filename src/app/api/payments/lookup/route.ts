@@ -79,23 +79,34 @@ export async function POST(request: Request) {
         id: string;
         reference_code: string;
         service_name: string;
+        service_slug?: string;
         scheduled_date: string;
         scheduled_time: string;
         amount_thb: number;
+        status?: string;
         payment_status: string;
         payment_method: string;
-      }) => ({
-        id: row.id,
-        referenceMasked: maskReferenceCode(row.reference_code),
-        serviceName: row.service_name,
-        scheduledDate: row.scheduled_date,
-        scheduledTime: String(row.scheduled_time).slice(0, 5),
-        amountThb: row.amount_thb,
-        paymentStatus: row.payment_status,
-        paymentMethod: row.payment_method,
-        paymentMethodLabel: paymentMethodLabel(row.payment_method),
-        canPay: row.payment_status === "unpaid",
-      }),
+      }) => {
+        const status = row.status || "pending";
+        const unpaid = row.payment_status === "unpaid";
+        const active = status === "pending" || status === "confirmed";
+        return {
+          id: row.id,
+          referenceCode: row.reference_code,
+          referenceMasked: maskReferenceCode(row.reference_code),
+          serviceName: row.service_name,
+          serviceSlug: row.service_slug,
+          scheduledDate: row.scheduled_date,
+          scheduledTime: String(row.scheduled_time).slice(0, 5),
+          amountThb: row.amount_thb,
+          status,
+          paymentStatus: row.payment_status,
+          paymentMethod: row.payment_method,
+          paymentMethodLabel: paymentMethodLabel(row.payment_method),
+          canPay: unpaid && active,
+          canReview: status === "completed",
+        };
+      },
     );
 
     return NextResponse.json({ email, bookings });

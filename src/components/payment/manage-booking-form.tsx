@@ -136,8 +136,8 @@ export function ManageBookingForm() {
         <ul className="space-y-4">
           {bookings.map((booking) => (
             <li key={booking.id} className="border border-border bg-surface-elevated p-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
                   <p className="font-medium text-foreground">{booking.serviceName}</p>
                   <p className="mt-1 text-sm text-muted">
                     {booking.scheduledDate} at {booking.scheduledTime}
@@ -147,24 +147,38 @@ export function ManageBookingForm() {
                     {formatBookingAmount(booking.amountThb)}
                   </p>
                   <p className="mt-2 text-xs text-muted">
+                    Status: {booking.status}
+                    {" · "}
                     Payment: {booking.paymentMethodLabel}
                     {booking.paymentStatus === "paid" ? " · Paid" : " · Unpaid"}
                   </p>
                 </div>
-                {booking.canPay ? (
-                  <button
-                    type="button"
-                    onClick={() => onPay(booking.id)}
-                    disabled={payingId === booking.id}
-                    className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
-                  >
-                    {payingId === booking.id ? "Redirecting..." : "Pay by card"}
-                  </button>
-                ) : (
-                  <span className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm text-muted">
-                    Paid
-                  </span>
-                )}
+                <div className="flex flex-col gap-2 sm:items-end">
+                  {booking.canPay ? (
+                    <button
+                      type="button"
+                      onClick={() => onPay(booking.id)}
+                      disabled={payingId === booking.id}
+                      className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
+                    >
+                      {payingId === booking.id ? "Redirecting..." : "Pay by card"}
+                    </button>
+                  ) : booking.paymentStatus === "paid" ? (
+                    <span className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm text-muted">
+                      Paid
+                    </span>
+                  ) : null}
+                  {booking.canReview ? (
+                    <Link
+                      href={`/reviews?ref=${encodeURIComponent(booking.referenceCode)}&email=${encodeURIComponent(email)}${
+                        booking.serviceSlug ? `&service=${encodeURIComponent(booking.serviceSlug)}` : ""
+                      }`}
+                      className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+                    >
+                      Leave a review
+                    </Link>
+                  ) : null}
+                </div>
               </div>
             </li>
           ))}

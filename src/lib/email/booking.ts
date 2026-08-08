@@ -30,6 +30,15 @@ function manageUrl(input: BookingEmailInput) {
   return `${base}/my-booking?email=${encodeURIComponent(input.customerEmail)}`;
 }
 
+function reviewUrl(input: BookingEmailInput) {
+  const base = input.siteUrl.replace(/\/$/, "");
+  const params = new URLSearchParams({
+    ref: input.referenceCode,
+    email: input.customerEmail,
+  });
+  return `${base}/reviews?${params.toString()}`;
+}
+
 function locationTypeLabel(value?: string) {
   if (value === "hotel") return "Hotel";
   if (value === "condo") return "Condo";
@@ -256,7 +265,7 @@ function statusIntro(status: string) {
     case "cancelled":
       return "Your appointment has been cancelled. If this was unexpected, reply to this email or WhatsApp us.";
     case "completed":
-      return "We hope you enjoyed your session. You can book again anytime.";
+      return "We hope you enjoyed your session. If you have a minute, a short review helps future guests choose with confidence.";
     case "pending":
       return "Your booking is back to pending while we review availability.";
     case "no_show":
@@ -273,7 +282,9 @@ export type BookingStatusEmailInput = BookingEmailInput & {
 
 function statusEmailHtml(input: BookingStatusEmailInput) {
   const manage = manageUrl(input);
+  const review = reviewUrl(input);
   const placeType = locationTypeLabel(input.locationType);
+  const isCompleted = input.status === "completed";
 
   return `<!DOCTYPE html>
 <html>
@@ -303,9 +314,24 @@ function statusEmailHtml(input: BookingStatusEmailInput) {
                   ${placeType ? `${escapeHtml(placeType)} · ` : ""}${escapeHtml(input.locationLabel)}<br />
                   Reference: <strong>${escapeHtml(input.referenceCode)}</strong>
                 </p>
+                ${
+                  isCompleted
+                    ? `<div style="margin:24px 0;padding:20px;border:1px solid #d4b896;background:#f3ebe1;">
+                  <p style="margin:0;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#9a6b3f;">Share your experience</p>
+                  <p style="margin:10px 0 0;font-size:14px;line-height:1.5;color:#57534e;">
+                    A short public review helps travelers find trusted in-room massage in Chiang Mai. Reviews are moderated before they appear.
+                  </p>
+                  <p style="margin:16px 0 0;">
+                    <a href="${escapeHtml(review)}" style="display:inline-block;background:#2f5d50;color:#f7f9f8;text-decoration:none;padding:12px 18px;font-size:14px;">
+                      Leave a review
+                    </a>
+                  </p>
+                </div>`
+                    : ""
+                }
                 <p style="margin:24px 0 0;">
                   <a href="${escapeHtml(manage)}" style="display:inline-block;background:#9a6b3f;color:#fffaf5;text-decoration:none;padding:12px 18px;font-size:14px;">
-                    Manage booking
+                    ${isCompleted ? "Book again" : "Manage booking"}
                   </a>
                 </p>
                 <p style="margin:28px 0 0;font-size:13px;line-height:1.5;color:#78716c;">
@@ -323,7 +349,7 @@ function statusEmailHtml(input: BookingStatusEmailInput) {
 
 function statusEmailText(input: BookingStatusEmailInput) {
   const placeType = locationTypeLabel(input.locationType);
-  return [
+  const lines = [
     `Hi ${input.customerName},`,
     ``,
     statusHeadline(input.status),
@@ -335,11 +361,20 @@ function statusEmailText(input: BookingStatusEmailInput) {
     `Where: ${placeType ? `${placeType} · ` : ""}${input.locationLabel}`,
     `Reference: ${input.referenceCode}`,
     ``,
-    `Manage booking: ${manageUrl(input)}`,
+  ];
+
+  if (input.status === "completed") {
+    lines.push(`Leave a review: ${reviewUrl(input)}`, ``);
+  }
+
+  lines.push(
+    `${input.status === "completed" ? "Book again" : "Manage booking"}: ${manageUrl(input)}`,
     ``,
     `WhatsApp: ${site.contact.whatsapp}`,
     `Email: ${site.contact.email}`,
-  ].join("\n");
+  );
+
+  return lines.join("\n");
 }
 
 /** Emails guest when admin changes booking status. Never throws. */
@@ -349,7 +384,10 @@ export async function sendBookingStatusEmail(input: BookingStatusEmailInput) {
     return { sent: false as const, reason: "not_configured" as const };
   }
 
-  const subject = `RoomSpa booking ${input.referenceCode}: ${statusLabel(input.status)}`;
+  const subject =
+    input.status === "completed"
+      ? `How was your RoomSpa session? (${input.referenceCode})`
+      : `RoomSpa booking ${input.referenceCode}: ${statusLabel(input.status)}`;
   const html = statusEmailHtml(input);
   const text = statusEmailText(input);
   const notify = getBookingNotifyEmails().filter(

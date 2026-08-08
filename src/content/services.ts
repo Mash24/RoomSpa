@@ -1,4 +1,11 @@
 import { dualPriceLabel } from "@/lib/currency";
+import {
+  buildPriceTiers,
+  DURATION_TIER_LABELS,
+  DURATION_TIERS,
+  type DurationMinutes,
+  getServicePriceTiers as resolveTiers,
+} from "@/lib/catalog/prices";
 
 export type ServiceCategoryId =
   | "classic"
@@ -19,8 +26,13 @@ export type CatalogService = {
   details: string;
   duration: string;
   durationMinutes: number;
-  /** Source of truth for display + Stripe Checkout (THB). */
+  /**
+   * Default / 60-minute base price (THB).
+   * Use getServicePriceTiers() for 60 / 90 / 120 columns.
+   */
   amountThb: number;
+  /** Optional overrides for duration tiers */
+  priceTiers?: Partial<Record<DurationMinutes, number>>;
   category: ServiceCategoryId;
   featured?: boolean;
   bookable: boolean;
@@ -52,7 +64,8 @@ export const serviceCategories: ServiceCategory[] = [
 
 /**
  * Full mobile-capable catalog.
- * Prices live here (`amountThb`) and drive the site + Stripe Checkout via dynamic amounts.
+ * `amountThb` is the 60-min base; 90 / 120 tiers are derived unless `priceTiers` overrides.
+ * Admin CMS (Supabase) becomes authoritative once seeded — see /admin/services.
  */
 export const catalogServices: CatalogService[] = [
   {
@@ -323,7 +336,22 @@ export function getServicesByCategory(category: ServiceCategoryId) {
   );
 }
 
-/** Every bookable service can use cash, card later, or card now (Stripe amount from catalog). */
+/** 60 / 90 / 120 THB tiers for pricing tables and booking. */
+export function getServicePriceTiers(service: CatalogService) {
+  return resolveTiers(service);
+}
+
+export function getServiceAmountForDuration(
+  service: CatalogService,
+  minutes: DurationMinutes,
+) {
+  return getServicePriceTiers(service)[minutes];
+}
+
+/** Every bookable service can use cash, card later, or card now. */
 export function serviceAcceptsCardNow(service: CatalogService) {
   return service.bookable && service.amountThb > 0;
 }
+
+export { buildPriceTiers, DURATION_TIERS, DURATION_TIER_LABELS };
+export type { DurationMinutes };

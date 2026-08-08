@@ -5,10 +5,14 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   catalogProducts,
+  getServiceAmountForDuration,
   productPriceLabel,
   serviceAcceptsCardNow,
   serviceCategories,
+  type DurationMinutes,
 } from "@/content/services";
+import { DURATION_TIER_LABELS } from "@/lib/catalog/prices";
+import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import { coverageAreas } from "@/content/coverage";
 import { whatsappHref } from "@/content/site";
 import { PaymentBadges } from "@/components/payment/payment-badges";
@@ -38,10 +42,19 @@ function initialServiceSlug(fromQuery: string | null) {
   return catalogProducts[0]?.slug ?? "swedish";
 }
 
+function initialDuration(fromQuery: string | null): DurationMinutes {
+  const n = Number(fromQuery);
+  if (n === 60 || n === 90 || n === 120) return n;
+  return 60;
+}
+
 export function BookingForm() {
   const searchParams = useSearchParams();
   const [serviceSlug, setServiceSlug] = useState<string>(() =>
     initialServiceSlug(searchParams.get("service")),
+  );
+  const [durationMinutes, setDurationMinutes] = useState<DurationMinutes>(() =>
+    initialDuration(searchParams.get("duration")),
   );
   const [coverageAreaSlug, setCoverageAreaSlug] = useState<string>(coverageAreas[0]?.slug ?? "");
   const [locationType, setLocationType] = useState<LocationType>("hotel");
@@ -137,6 +150,7 @@ export function BookingForm() {
           locationDetails,
           scheduledDate,
           scheduledTime,
+          durationMinutes,
           customerName,
           customerEmail,
           customerPhone,
@@ -251,10 +265,22 @@ export function BookingForm() {
           </select>
         </label>
         {selectedService ? (
-          <div className="border border-border bg-surface-elevated p-4">
+          <div className="space-y-4 border border-border bg-surface-elevated p-4">
             <p className="text-sm leading-relaxed text-muted">{selectedService.summary}</p>
-            <p className="mt-2 text-sm font-medium text-accent">
-              {productPriceLabel(selectedService.amountThb)} · {selectedService.duration}
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">
+                Choose duration
+              </p>
+              <ServicePriceTiers
+                className="mt-3"
+                service={selectedService}
+                selectedMinutes={durationMinutes}
+                onSelect={setDurationMinutes}
+              />
+            </div>
+            <p className="text-sm font-medium text-accent">
+              Selected: {DURATION_TIER_LABELS[durationMinutes]} ·{" "}
+              {productPriceLabel(getServiceAmountForDuration(selectedService, durationMinutes))}
             </p>
           </div>
         ) : null}
@@ -503,7 +529,7 @@ export function BookingForm() {
       <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-muted">
           {selectedService
-            ? `Total: ${productPriceLabel(selectedService.amountThb)}${
+            ? `Total: ${productPriceLabel(getServiceAmountForDuration(selectedService, durationMinutes))} · ${DURATION_TIER_LABELS[durationMinutes]}${
                 payNow ? " — you’ll pay by card next" : " — no payment required now"
               }`
             : null}

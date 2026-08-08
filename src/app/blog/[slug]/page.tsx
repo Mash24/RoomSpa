@@ -74,16 +74,16 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       <div className="mt-12 flex flex-wrap gap-3 border-t border-border pt-8">
         <Link
-          href="/book"
+          href={post.primaryCta?.href ?? "/book"}
           className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
         >
-          Book a session
+          {post.primaryCta?.label ?? "Book a session"}
         </Link>
         <Link
-          href="/services"
+          href={post.secondaryCta?.href ?? "/services"}
           className="inline-flex rounded-sm border border-border px-5 py-3 text-sm transition hover:border-accent hover:text-accent"
         >
-          Browse services
+          {post.secondaryCta?.label ?? "Browse services"}
         </Link>
       </div>
 

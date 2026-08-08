@@ -5,7 +5,8 @@ import type { BookingPayload } from "@/lib/booking/types";
 import { TIME_SLOTS } from "@/lib/booking/types";
 import { getSlotCapacity, normalizeSlotTime } from "@/lib/booking/availability";
 import { site } from "@/content/site";
-import { getCatalogProduct } from "@/content/services";
+import { getCatalogProduct, getServiceAmountForDuration } from "@/content/services";
+import { DURATION_TIERS, type DurationMinutes } from "@/lib/catalog/prices";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
 import { generateBookingPin, mapPaymentPreferenceToMethod } from "@/lib/booking/pin";
 import { sendBookingConfirmationEmail } from "@/lib/email/booking";
@@ -51,12 +52,14 @@ async function insertBooking(
   if (
     error.message?.includes("payment_status") ||
     error.message?.includes("payment_method") ||
-    error.message?.includes("access_pin")
+    error.message?.includes("access_pin") ||
+    error.message?.includes("duration_minutes")
   ) {
-    const { payment_status, payment_method, access_pin, ...fallback } = row;
+    const { payment_status, payment_method, access_pin, duration_minutes, ...fallback } = row;
     void payment_status;
     void payment_method;
     void access_pin;
+    void duration_minutes;
     const { error: retryError } = await supabase.from("bookings").insert(fallback);
     return retryError;
   }
@@ -112,7 +115,27 @@ export async function POST(request: Request) {
     }
 
     const catalog = getCatalogProduct(body.serviceSlug);
-    const amountThb = Number(catalog?.amountThb ?? service.price_thb);
+    const requestedDuration = Number(body.durationMinutes) as DurationMinutes;
+    const durationMinutes = (DURATION_TIERS as readonly number[]).includes(requestedDuration)
+      ? requestedDuration
+      : (60 as DurationMinutes);
+
+    let amountThb = catalog ? getServiceAmountForDuration(catalog, durationMinutes) : 0;
+
+    const { data: tierPrice } = await supabase
+      .from("service_prices")
+      .select("price_thb")
+      .eq("service_id", service.id)
+      .eq("duration_minutes", durationMinutes)
+      .eq("is_active", true)
+      .maybeSingle();
+
+    if (tierPrice?.price_thb != null) {
+      amountThb = Number(tierPrice.price_thb);
+    } else if (!(amountThb > 0)) {
+      amountThb = Number(catalog?.amountThb ?? service.price_thb);
+    }
+
     const serviceName = catalog?.name ?? service.name;
 
     if (!(amountThb > 0)) {
@@ -174,6 +197,7 @@ export async function POST(request: Request) {
       location_details: body.locationDetails?.trim() ?? "",
       scheduled_date: body.scheduledDate,
       scheduled_time: scheduledTime,
+      duration_minutes: durationMinutes,
       amount_thb: amountThb,
       notes: body.notes?.trim() ?? "",
       status: "pending",

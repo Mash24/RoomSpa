@@ -12,6 +12,8 @@ export type BookingPayload = {
   locationDetails?: string;
   scheduledDate: string;
   scheduledTime: string;
+  /** 60 | 90 | 120 */
+  durationMinutes?: number;
   notes?: string;
   paymentPreference?: PaymentPreference;
   payNow?: boolean;
@@ -34,15 +36,19 @@ export type BookingResult = {
 
 export type BookingSummary = {
   id: string;
+  referenceCode: string;
   referenceMasked: string;
   serviceName: string;
+  serviceSlug?: string;
   scheduledDate: string;
   scheduledTime: string;
   amountThb: number;
+  status: string;
   paymentStatus: string;
   paymentMethod: string;
   paymentMethodLabel: string;
   canPay: boolean;
+  canReview: boolean;
 };
 
 export const TIME_SLOTS = [
