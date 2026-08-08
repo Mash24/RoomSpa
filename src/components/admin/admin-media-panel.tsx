@@ -284,8 +284,8 @@ export function AdminMediaPanel() {
         <div className="rounded-sm border border-border px-4 py-5">
           <p className="text-sm font-medium text-foreground">Option B — paste a link</p>
           <p className="mt-1 text-sm text-muted">
-            Paste an X/Twitter post, YouTube, Vimeo, or direct MP4 URL. X posts play on your site via
-            embed — nothing downloads to your phone or Supabase Storage.
+            Paste an X/Twitter post, YouTube, Vimeo, or direct MP4 URL. X videos play on-site from the
+            link (no phone download, no Storage).
           </p>
         </div>
 

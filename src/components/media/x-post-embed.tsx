@@ -1,55 +1,14 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
-import { extractXStatusId, xTweetEmbedSrc } from "@/lib/media/urls";
+import { useEffect, useState } from "react";
+import { AutoplayVideo } from "@/components/media/autoplay-video";
+import { extractXStatusId } from "@/lib/media/urls";
 
-declare global {
-  interface Window {
-    twttr?: {
-      ready: (callback: () => void) => void;
-      widgets: {
-        load: (element?: HTMLElement | null) => void;
-      };
-    };
-  }
-}
-
-let widgetsScriptPromise: Promise<void> | null = null;
-
-function ensureTwitterWidgets(): Promise<void> {
-  if (typeof window === "undefined") return Promise.resolve();
-  if (window.twttr?.widgets) return Promise.resolve();
-
-  if (!widgetsScriptPromise) {
-    widgetsScriptPromise = new Promise((resolve, reject) => {
-      const existing = document.querySelector<HTMLScriptElement>(
-        'script[src="https://platform.twitter.com/widgets.js"]',
-      );
-      if (existing) {
-        const check = () => {
-          if (window.twttr?.widgets) resolve();
-          else setTimeout(check, 40);
-        };
-        existing.addEventListener("load", check);
-        check();
-        return;
-      }
-
-      const script = document.createElement("script");
-      script.src = "https://platform.twitter.com/widgets.js";
-      script.async = true;
-      script.charset = "utf-8";
-      script.onload = () => {
-        if (window.twttr?.ready) window.twttr.ready(() => resolve());
-        else resolve();
-      };
-      script.onerror = () => reject(new Error("Could not load X embed."));
-      document.body.appendChild(script);
-    });
-  }
-
-  return widgetsScriptPromise;
-}
+type Resolved = {
+  videoUrl: string | null;
+  posterUrl: string | null;
+  photoUrls: string[];
+};
 
 type Props = {
   url: string;
@@ -58,21 +17,18 @@ type Props = {
 };
 
 /**
- * Embed an X/Twitter post on-site (no Storage upload).
- * 1) Try official oEmbed HTML via our API (fixes many `/i/status/…` “Not found” cases)
- * 2) Fall back to Tweet.html iframe by status ID
+ * Play X/Twitter post media on-site.
+ * Uses FxEmbed-resolved MP4s instead of official widgets — those often show
+ * "Not found" for sensitive/adult posts that RoomSpa links.
  */
 export function XPostEmbed({ url, title, className = "" }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const reactId = useId();
   const statusId = extractXStatusId(url);
-  const iframeSrc = xTweetEmbedSrc(url);
-  const [html, setHtml] = useState<string | null>(null);
-  const [mode, setMode] = useState<"loading" | "oembed" | "iframe" | "error">("loading");
+  const [resolved, setResolved] = useState<Resolved | null>(null);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (!statusId) {
-      setMode("error");
+      setError(true);
       return;
     }
 
@@ -80,65 +36,42 @@ export function XPostEmbed({ url, title, className = "" }: Props) {
 
     void (async () => {
       try {
-        const res = await fetch(`/api/media/x-oembed?url=${encodeURIComponent(url)}`);
-        const data = (await res.json()) as { html?: string; error?: string };
+        const res = await fetch(`/api/media/x-resolve?url=${encodeURIComponent(url)}`);
+        const data = (await res.json()) as Resolved & { error?: string };
         if (cancelled) return;
 
-        if (res.ok && data.html) {
-          setHtml(data.html);
-          setMode("oembed");
+        if (!res.ok || (!data.videoUrl && !(data.photoUrls?.length > 0))) {
+          setError(true);
           return;
         }
-      } catch {
-        // fall through to iframe
-      }
 
-      if (!cancelled) {
-        setMode(iframeSrc ? "iframe" : "error");
+        setResolved({
+          videoUrl: data.videoUrl ?? null,
+          posterUrl: data.posterUrl ?? null,
+          photoUrls: data.photoUrls ?? [],
+        });
+      } catch {
+        if (!cancelled) setError(true);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [url, statusId, iframeSrc]);
+  }, [url, statusId]);
 
-  useEffect(() => {
-    if (mode !== "oembed" || !html) return;
-    let cancelled = false;
-
-    void (async () => {
-      try {
-        await ensureTwitterWidgets();
-        if (cancelled) return;
-        const el = containerRef.current;
-        if (!el) return;
-        if (window.twttr?.ready) {
-          window.twttr.ready(() => {
-            if (!cancelled) window.twttr?.widgets.load(el);
-          });
-        } else {
-          window.twttr?.widgets.load(el);
-        }
-      } catch {
-        if (!cancelled && iframeSrc) setMode("iframe");
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [mode, html, reactId, iframeSrc]);
-
-  if (!statusId) {
+  if (!statusId || error) {
     return (
       <div className={`rounded-sm border border-border bg-surface px-4 py-8 text-sm text-muted ${className}`}>
-        This X link could not be read.
+        <p>This X video couldn’t be loaded here.</p>
+        <a href={url} target="_blank" rel="noreferrer" className="mt-3 inline-flex font-medium text-accent">
+          Open on X →
+        </a>
       </div>
     );
   }
 
-  if (mode === "loading") {
+  if (!resolved) {
     return (
       <div
         className={`flex min-h-[280px] items-center justify-center rounded-sm border border-border bg-surface text-sm text-muted ${className}`}
@@ -148,28 +81,27 @@ export function XPostEmbed({ url, title, className = "" }: Props) {
     );
   }
 
-  if (mode === "oembed" && html) {
+  if (resolved.videoUrl) {
     return (
-      <div
-        ref={containerRef}
-        className={`x-post-embed overflow-hidden rounded-sm bg-surface [&_.twitter-tweet]:!mx-auto ${className}`}
-        aria-label={title}
-        // oEmbed HTML is from X's publish API
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      <div className={`relative aspect-video overflow-hidden bg-surface ${className}`}>
+        <AutoplayVideo
+          src={resolved.videoUrl}
+          poster={resolved.posterUrl || ""}
+          label={title}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      </div>
     );
   }
 
-  if (mode === "iframe" && iframeSrc) {
+  if (resolved.photoUrls[0]) {
     return (
-      <div className={`overflow-hidden rounded-sm border border-border bg-surface ${className}`}>
-        <iframe
-          title={title}
-          src={iframeSrc}
-          className="h-[520px] w-full border-0"
-          loading="lazy"
-          allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"
-          allowFullScreen
+      <div className={`relative aspect-video overflow-hidden bg-surface ${className}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={resolved.photoUrls[0]}
+          alt={title}
+          className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
     );
@@ -177,7 +109,10 @@ export function XPostEmbed({ url, title, className = "" }: Props) {
 
   return (
     <div className={`rounded-sm border border-border bg-surface px-4 py-8 text-sm text-muted ${className}`}>
-      This post can’t be shown here (private, deleted, or restricted by X).
+      <p>No playable video on this post.</p>
+      <a href={url} target="_blank" rel="noreferrer" className="mt-3 inline-flex font-medium text-accent">
+        Open on X →
+      </a>
     </div>
   );
 }

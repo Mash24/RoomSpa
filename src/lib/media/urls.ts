@@ -51,47 +51,6 @@ export function extractXStatusId(url: string): string | null {
   }
 }
 
-/**
- * Candidate URLs to try with X oEmbed / widgets.
- * Username paths embed more reliably than `/i/status/{id}` alone.
- */
-export function xStatusUrlCandidates(url: string): string[] {
-  const id = extractXStatusId(url);
-  if (!id) return [];
-
-  const candidates: string[] = [];
-  const trimmed = url.trim();
-  candidates.push(trimmed);
-
-  try {
-    const parsed = new URL(trimmed);
-    const user = parsed.pathname.match(/^\/([^/]+)\/status/i)?.[1];
-    if (user && user !== "i") {
-      candidates.push(`https://twitter.com/${user}/status/${id}`);
-      candidates.push(`https://x.com/${user}/status/${id}`);
-    }
-  } catch {
-    // ignore
-  }
-
-  candidates.push(`https://twitter.com/i/status/${id}`);
-  candidates.push(`https://x.com/i/status/${id}`);
-
-  return [...new Set(candidates)];
-}
-
-/** Official Tweet iframe embed by status ID. */
-export function xTweetEmbedSrc(url: string): string | null {
-  const id = extractXStatusId(url);
-  if (!id) return null;
-  return `https://platform.twitter.com/embed/Tweet.html?${new URLSearchParams({
-    id,
-    lang: "en",
-    theme: "light",
-    dnt: "true",
-  }).toString()}`;
-}
-
 export function youtubeEmbedUrl(url: string): string | null {
   try {
     const parsed = new URL(url);
