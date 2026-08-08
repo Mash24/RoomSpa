@@ -1,9 +1,23 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { readApiJson } from "@/lib/admin/api";
 import type { AdminMediaRow } from "@/lib/admin/cms-types";
+import { createClient } from "@/utils/supabase/client";
 
 type ServiceOption = { id: string; slug: string; name?: string };
+
+const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
+const MAX_VIDEO_BYTES = 95 * 1024 * 1024;
+
+function sanitizeFileName(name: string) {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9._-]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "")
+    .slice(0, 80);
+}
 
 export function AdminMediaPanel() {
   const [media, setMedia] = useState<AdminMediaRow[]>([]);
@@ -22,13 +36,24 @@ export function AdminMediaPanel() {
   const [showOnHomepage, setShowOnHomepage] = useState(false);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+
+  const selectedServiceLabels = useMemo(() => {
+    return services
+      .filter((service) => selectedServices.includes(service.id))
+      .map((service) => service.name || service.slug);
+  }, [services, selectedServices]);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/admin/media");
-      const data = await res.json();
+      const data = await readApiJson<{
+        error?: string;
+        media?: AdminMediaRow[];
+        services?: ServiceOption[];
+      }>(res);
       if (!res.ok) throw new Error(data.error || "Could not load media.");
       setMedia(data.media || []);
       setServices(data.services || []);
@@ -46,17 +71,60 @@ export function AdminMediaPanel() {
   async function onUpload(file: File) {
     setUploading(true);
     setError(null);
+    setUploadProgress(null);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      const res = await fetch("/api/admin/media/upload", { method: "POST", body: form });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Upload failed.");
-      setMediaUrl(data.url);
-      if (file.type.startsWith("image/")) setKind("image");
-      if (file.type.startsWith("video/")) setKind("video");
+      const isVideo = file.type.startsWith("video/");
+      const isImage = file.type.startsWith("image/");
+      if (!isVideo && !isImage) {
+        throw new Error("Only video or image files are supported.");
+      }
+      if (isImage && file.size > MAX_IMAGE_BYTES) {
+        throw new Error("Images must be 8 MB or smaller.");
+      }
+      if (isVideo && file.size > MAX_VIDEO_BYTES) {
+        throw new Error(
+          "Videos must be under ~95 MB for Storage upload. Compress the file, or paste an external link (YouTube, Vimeo, X) instead.",
+        );
+      }
+
+      const supabase = createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error("Your admin session expired. Sign in again, then retry the upload.");
+      }
+
+      const primary =
+        services.find((service) => selectedServices.includes(service.id))?.slug || "library";
+      const safeName = sanitizeFileName(file.name) || `upload.${isVideo ? "mp4" : "jpg"}`;
+      const path = `${primary}/${Date.now()}-${safeName}`;
+
+      setUploadProgress(`Uploading ${file.name}…`);
+      const { error: uploadError } = await supabase.storage.from("media-library").upload(path, file, {
+        contentType: file.type || "application/octet-stream",
+        upsert: false,
+      });
+
+      if (uploadError) {
+        throw new Error(
+          uploadError.message.includes("Bucket not found")
+            ? "Storage bucket missing. Run supabase/migrations/20260808_cms_services_media.sql"
+            : uploadError.message.includes("row-level security") ||
+                uploadError.message.toLowerCase().includes("policy")
+              ? "Upload blocked by storage policy. Confirm your profile role is admin and the CMS SQL migration was applied."
+              : uploadError.message,
+        );
+      }
+
+      const { data } = supabase.storage.from("media-library").getPublicUrl(path);
+      setMediaUrl(data.publicUrl);
+      if (isImage) setKind("image");
+      if (isVideo) setKind("video");
+      setUploadProgress("Upload complete — save the media record below.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
+      setUploadProgress(null);
     } finally {
       setUploading(false);
     }
@@ -67,6 +135,13 @@ export function AdminMediaPanel() {
     setSaving(true);
     setError(null);
     try {
+      if (!mediaUrl.trim()) {
+        throw new Error("Add a media URL (upload a file or paste a link).");
+      }
+      if (selectedServices.length === 0) {
+        throw new Error("Select at least one related service so Gallery can label this item.");
+      }
+
       const res = await fetch("/api/admin/media", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -74,8 +149,8 @@ export function AdminMediaPanel() {
           title,
           description,
           kind,
-          mediaUrl,
-          thumbnailUrl: thumbnailUrl || null,
+          mediaUrl: mediaUrl.trim(),
+          thumbnailUrl: thumbnailUrl.trim() || null,
           status,
           featured,
           showOnHomepage,
@@ -83,13 +158,14 @@ export function AdminMediaPanel() {
           locationSlugs: ["chiang-mai"],
         }),
       });
-      const data = await res.json();
+      const data = await readApiJson<{ error?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Could not save media.");
       setTitle("");
       setDescription("");
       setMediaUrl("");
       setThumbnailUrl("");
       setSelectedServices([]);
+      setUploadProgress(null);
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save media.");
@@ -100,13 +176,14 @@ export function AdminMediaPanel() {
 
   async function onDelete(id: string) {
     if (!confirm("Delete this media item?")) return;
-    const res = await fetch(`/api/admin/media/${id}`, { method: "DELETE" });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(data.error || "Delete failed.");
-      return;
+    try {
+      const res = await fetch(`/api/admin/media/${id}`, { method: "DELETE" });
+      const data = await readApiJson<{ error?: string }>(res);
+      if (!res.ok) throw new Error(data.error || "Delete failed.");
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed.");
     }
-    await load();
   }
 
   function toggleService(id: string) {
@@ -122,13 +199,15 @@ export function AdminMediaPanel() {
           Media library
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
-          Upload or link videos and photos, then attach them to services (Nuru, Yoni, Thai…). Published
-          items can appear on matching service pages.
+          Upload files directly to Storage, or paste a public link (MP4, YouTube, Vimeo, or X). Attach
+          only the services this clip belongs to — labels show on Gallery and service pages.
         </p>
       </div>
 
       {error ? (
-        <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>
+        <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
+          {error}
+        </div>
       ) : null}
 
       <form onSubmit={onCreate} className="space-y-4 border border-border bg-surface-elevated p-5 md:p-6">
@@ -140,7 +219,7 @@ export function AdminMediaPanel() {
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="What to expect from a Nuru session"
+              placeholder="Tantric session overview"
               className="mt-1 w-full border border-border bg-background px-3 py-2.5"
             />
           </label>
@@ -150,7 +229,7 @@ export function AdminMediaPanel() {
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Professional, non-graphic education about preparation, privacy, and boundaries."
+              placeholder="Short, professional note about what guests see."
               className="mt-1 w-full border border-border bg-background px-3 py-2.5"
             />
           </label>
@@ -179,18 +258,38 @@ export function AdminMediaPanel() {
           </label>
         </div>
 
-        <div className="rounded-sm border border-dashed border-border px-4 py-6 text-center">
-          <p className="text-sm text-muted">Upload to Supabase Storage, or paste a URL below</p>
+        <div className="rounded-sm border border-dashed border-border px-4 py-6">
+          <p className="text-sm font-medium text-foreground">Option A — upload a file</p>
+          <p className="mt-1 text-sm text-muted">
+            Uploads go straight to Supabase Storage (not through the Next.js server). Videos up to ~95
+            MB.
+          </p>
           <input
             type="file"
             accept="video/*,image/*"
+            disabled={uploading}
             className="mt-3 block w-full text-sm"
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) void onUpload(file);
+              e.target.value = "";
             }}
           />
           {uploading ? <p className="mt-2 text-xs text-muted">Uploading…</p> : null}
+          {uploadProgress && !uploading ? (
+            <p className="mt-2 text-xs text-accent">{uploadProgress}</p>
+          ) : null}
+        </div>
+
+        <div className="rounded-sm border border-border px-4 py-5">
+          <p className="text-sm font-medium text-foreground">Option B — paste a link</p>
+          <p className="mt-1 text-sm text-muted">
+            Works with direct MP4/image URLs, YouTube, Vimeo, or posts like{" "}
+            <span className="break-all text-foreground/80">
+              https://x.com/i/status/…
+            </span>
+            . X links open as an external card (X does not allow full embed playback).
+          </p>
         </div>
 
         <label className="block text-sm">
@@ -199,7 +298,7 @@ export function AdminMediaPanel() {
             required
             value={mediaUrl}
             onChange={(e) => setMediaUrl(e.target.value)}
-            placeholder="/media/services/… or https://…"
+            placeholder="https://… or Storage URL after upload"
             className="mt-1 w-full border border-border bg-background px-3 py-2.5"
           />
         </label>
@@ -208,12 +307,22 @@ export function AdminMediaPanel() {
           <input
             value={thumbnailUrl}
             onChange={(e) => setThumbnailUrl(e.target.value)}
+            placeholder="Useful for X / external links"
             className="mt-1 w-full border border-border bg-background px-3 py-2.5"
           />
         </label>
 
         <fieldset>
-          <legend className="text-sm text-muted">Related services</legend>
+          <legend className="text-sm text-muted">
+            Related services <span className="text-foreground">(required — pick only relevant ones)</span>
+          </legend>
+          {selectedServiceLabels.length ? (
+            <p className="mt-2 text-xs text-accent">
+              Gallery label: {selectedServiceLabels.join(" · ")}
+            </p>
+          ) : (
+            <p className="mt-2 text-xs text-muted">Select the service(s) this media is about.</p>
+          )}
           <div className="mt-2 grid max-h-48 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
             {services.map((service) => (
               <label key={service.id} className="flex items-center gap-2 text-sm">
@@ -245,7 +354,7 @@ export function AdminMediaPanel() {
 
         <button
           type="submit"
-          disabled={saving || !mediaUrl}
+          disabled={saving || uploading || !mediaUrl}
           className="rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-60"
         >
           {saving ? "Saving…" : "Save media"}
@@ -259,7 +368,10 @@ export function AdminMediaPanel() {
         ) : (
           <ul className="mt-4 divide-y divide-border border border-border bg-surface-elevated">
             {media.map((item) => (
-              <li key={item.id} className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <li
+                key={item.id}
+                className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+              >
                 <div className="min-w-0">
                   <p className="font-medium text-foreground">
                     {item.title}{" "}

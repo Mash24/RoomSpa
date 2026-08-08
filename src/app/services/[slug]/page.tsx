@@ -11,6 +11,7 @@ import {
   FaqJsonLd,
   ServiceJsonLd,
 } from "@/components/seo/json-ld";
+import { MediaEmbed } from "@/components/media/media-embed";
 import { getServiceFaqs } from "@/content/service-faqs";
 import { getServiceMedia } from "@/content/service-media";
 import { ServicePriceTiers } from "@/components/services/service-price-tiers";
@@ -22,6 +23,7 @@ import {
 } from "@/content/services";
 import { whatsappHref } from "@/content/site";
 import { getPublicCatalog, getPublicCatalogProduct } from "@/lib/catalog/public";
+import { getPublishedMediaForServiceSlug } from "@/lib/media/public";
 import { aggregateRating, getApprovedReviews, getApprovedReviewsForService } from "@/lib/reviews/fetch";
 import { getTodayAvailabilityTeaser } from "@/lib/seo/availability-teaser";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -55,6 +57,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   if (!service || !service.bookable) notFound();
 
   const media = getServiceMedia(service.slug);
+  const libraryMedia = await getPublishedMediaForServiceSlug(service.slug);
   const category = serviceCategories.find((item) => item.id === service.category);
   const faqs = getServiceFaqs(service.slug).slice(0, 5);
   const serviceReviews = await getApprovedReviewsForService(service.slug, 6);
@@ -151,6 +154,36 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           WhatsApp
         </a>
       </div>
+
+      {libraryMedia.length > 0 ? (
+        <section className="mt-14 border-t border-border pt-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
+              Videos & photos
+            </h2>
+            <Link href="/gallery" className="text-sm font-medium text-accent">
+              Full gallery →
+            </Link>
+          </div>
+          <ul className="mt-6 grid gap-6 sm:grid-cols-2">
+            {libraryMedia.slice(0, 4).map((item) => (
+              <li key={item.id}>
+                <MediaEmbed
+                  url={item.mediaUrl}
+                  kind={item.kind}
+                  title={item.title}
+                  description={item.description}
+                  thumbnailUrl={item.thumbnailUrl}
+                />
+                <p className="mt-3 font-display text-lg text-foreground">{item.title}</p>
+                {item.description ? (
+                  <p className="mt-1 text-sm text-muted line-clamp-2">{item.description}</p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className="mt-14 border-t border-border pt-8">
         <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">

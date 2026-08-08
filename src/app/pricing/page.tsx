@@ -31,7 +31,7 @@ export default async function PricingPage() {
         Clear prices, three lengths
       </h1>
       <p className="mt-4 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-        60 min, 90 min, or 2 hours. Pay in THB (USD guide ~{THB_PER_USD}:1). Cash or card.
+        60 min, 90 min, or 2 hours. Cash or card.
       </p>
 
       <div className="mt-10 space-y-12 md:mt-14">

@@ -11,6 +11,7 @@ const bookLinks = [
 
 const exploreLinks = [
   { label: "Reviews", href: "/reviews" },
+  { label: "Gallery", href: "/gallery" },
   { label: "Locations", href: "/city" },
   { label: "FAQ", href: "/faq" },
   { label: "About", href: "/about" },

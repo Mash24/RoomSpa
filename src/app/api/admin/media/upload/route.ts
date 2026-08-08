@@ -1,21 +1,46 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
 
-/** Upload a file to Supabase Storage bucket `media-library` and return a public URL. */
+/**
+ * Legacy proxy upload — kept as a small-file fallback.
+ * Prefer browser → Supabase Storage direct upload from the admin media panel.
+ */
 export async function POST(request: Request) {
   const { supabase, error } = await requireAdminSession();
   if (error || !supabase) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const form = await request.formData();
+  let form: FormData;
+  try {
+    form = await request.formData();
+  } catch {
+    return NextResponse.json(
+      {
+        error:
+          "Could not read upload body (often because the file is too large for the server). Upload from the admin panel uses direct Storage instead — refresh and try again, or paste an external link.",
+      },
+      { status: 413 },
+    );
+  }
+
   const file = form.get("file");
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "file is required" }, { status: 400 });
   }
 
+  if (file.size > 4.5 * 1024 * 1024) {
+    return NextResponse.json(
+      {
+        error:
+          "This API path only accepts files under ~4.5 MB. Use the admin panel’s direct Storage upload (or paste a link).",
+      },
+      { status: 413 },
+    );
+  }
+
   const ext = file.name.split(".").pop()?.toLowerCase() || "bin";
-  const path = `${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+  const path = `library/${Date.now()}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
   const bytes = new Uint8Array(await file.arrayBuffer());
 
   const { error: uploadError } = await supabase.storage.from("media-library").upload(path, bytes, {

@@ -1,0 +1,70 @@
+export type MediaSourceKind =
+  | "direct-video"
+  | "direct-image"
+  | "youtube"
+  | "vimeo"
+  | "external";
+
+const VIDEO_EXT = /\.(mp4|webm|ogg|mov)(\?|$)/i;
+const IMAGE_EXT = /\.(jpe?g|png|gif|webp|avif)(\?|$)/i;
+
+export function classifyMediaUrl(url: string, declaredKind?: "image" | "video"): MediaSourceKind {
+  const trimmed = url.trim();
+  if (!trimmed) return declaredKind === "image" ? "direct-image" : "external";
+
+  try {
+    const parsed = new URL(trimmed, "https://example.com");
+    const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
+    const path = parsed.pathname;
+
+    if (host.includes("youtube.com") || host === "youtu.be") return "youtube";
+    if (host.includes("vimeo.com")) return "vimeo";
+    if (VIDEO_EXT.test(path) || VIDEO_EXT.test(trimmed)) return "direct-video";
+    if (IMAGE_EXT.test(path) || IMAGE_EXT.test(trimmed)) return "direct-image";
+    if (declaredKind === "image") return "direct-image";
+    if (declaredKind === "video" && !host.includes("x.com") && !host.includes("twitter.com")) {
+      // Relative site paths like /media/...mp4
+      if (trimmed.startsWith("/") && VIDEO_EXT.test(trimmed)) return "direct-video";
+    }
+    return "external";
+  } catch {
+    if (VIDEO_EXT.test(trimmed)) return "direct-video";
+    if (IMAGE_EXT.test(trimmed)) return "direct-image";
+    return declaredKind === "image" ? "direct-image" : "external";
+  }
+}
+
+export function youtubeEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+    if (host === "youtu.be") {
+      const id = parsed.pathname.replace(/^\//, "");
+      return id ? `https://www.youtube.com/embed/${id}` : null;
+    }
+    if (host.includes("youtube.com")) {
+      const id = parsed.searchParams.get("v");
+      if (id) return `https://www.youtube.com/embed/${id}`;
+      const short = parsed.pathname.match(/\/shorts\/([^/]+)/)?.[1];
+      if (short) return `https://www.youtube.com/embed/${short}`;
+    }
+  } catch {
+    return null;
+  }
+  return null;
+}
+
+export function vimeoEmbedUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.includes("vimeo.com")) return null;
+    const id = parsed.pathname.split("/").filter(Boolean).pop();
+    return id && /^\d+$/.test(id) ? `https://player.vimeo.com/video/${id}` : null;
+  } catch {
+    return null;
+  }
+}
+
+export function isHttpUrl(url: string) {
+  return /^https?:\/\//i.test(url.trim());
+}

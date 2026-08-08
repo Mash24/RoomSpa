@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/coverage",
     "/city",
     "/reviews",
+    "/gallery",
     "/faq",
     "/contact",
     "/blog",
