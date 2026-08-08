@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { FaqAccordion } from "@/components/faq/faq-accordion";
 import { faqItems } from "@/content/pages";
 import { whatsappHref } from "@/content/site";
 import { FaqJsonLd } from "@/components/seo/json-ld";
@@ -21,17 +22,10 @@ export default function FaqPage() {
         Common questions
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Booking, payments, and privacy — answered plainly.
+        Tap a question to read the answer.
       </p>
 
-      <dl className="mt-12 space-y-8">
-        {faqItems.map((item) => (
-          <div key={item.question} className="border-t border-border pt-6">
-            <dt className="font-display text-xl text-foreground md:text-2xl">{item.question}</dt>
-            <dd className="mt-3 text-sm leading-relaxed text-muted md:text-base">{item.answer}</dd>
-          </div>
-        ))}
-      </dl>
+      <FaqAccordion items={faqItems} />
 
       <div className="mt-12 flex flex-wrap gap-3">
         <Link

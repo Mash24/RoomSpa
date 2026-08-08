@@ -1,11 +1,11 @@
 import type { MetadataRoute } from "next";
-import { getAllBlogPosts } from "@/content/blog";
 import { cities } from "@/content/cities";
 import { catalogServices } from "@/content/services";
 import { site } from "@/content/site";
+import { getPublishedBlogPosts } from "@/lib/blog/public";
 import { getServiceLocationParams } from "@/lib/seo/locations";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = site.url.replace(/\/$/, "");
   const now = new Date();
 
@@ -66,7 +66,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   ]);
 
-  const blogRoutes: MetadataRoute.Sitemap = getAllBlogPosts().map((post) => ({
+  const blogPosts = await getPublishedBlogPosts();
+  const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${base}/blog/${post.slug}`,
     lastModified: new Date(post.datePublished),
     changeFrequency: "monthly" as const,

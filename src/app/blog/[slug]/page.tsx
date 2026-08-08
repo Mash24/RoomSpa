@@ -3,20 +3,27 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { BlogPostingJsonLd, BreadcrumbJsonLd } from "@/components/seo/json-ld";
-import { getAllBlogPosts, getBlogPost } from "@/content/blog";
+import {
+  getPublishedBlogPost,
+  getPublishedBlogPosts,
+  getPublishedBlogSlugs,
+} from "@/lib/blog/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+
+export const dynamic = "force-dynamic";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export function generateStaticParams() {
-  return getAllBlogPosts().map((post) => ({ slug: post.slug }));
+export async function generateStaticParams() {
+  const slugs = await getPublishedBlogSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getPublishedBlogPost(slug);
   if (!post) return {};
   return buildPageMetadata({
     title: post.title,
@@ -27,11 +34,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function BlogPostPage({ params }: PageProps) {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const post = await getPublishedBlogPost(slug);
   if (!post) notFound();
 
-  const related = getAllBlogPosts()
-    .filter((item) => item.slug !== post.slug)
+  const related = (await getPublishedBlogPosts())
+    .filter((item) => item.slug !== post.slug && item.category === post.category)
     .slice(0, 3);
 
   return (
@@ -59,7 +66,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       />
 
       <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">
-        {post.datePublished} · {post.tags.join(" · ")}
+        {post.categoryName} · {post.datePublished}
       </p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         {post.title}
@@ -89,7 +96,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
       {related.length > 0 ? (
         <section className="mt-16">
-          <h2 className="font-display text-2xl text-foreground">More guides</h2>
+          <h2 className="font-display text-2xl text-foreground">More in {post.categoryName}</h2>
           <ul className="mt-4 space-y-3">
             {related.map((item) => (
               <li key={item.slug}>
@@ -101,6 +108,12 @@ export default async function BlogPostPage({ params }: PageProps) {
           </ul>
         </section>
       ) : null}
+
+      <p className="mt-10">
+        <Link href="/blog" className="text-sm font-medium text-accent">
+          ← All guides
+        </Link>
+      </p>
     </article>
   );
 }

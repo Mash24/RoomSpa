@@ -1,19 +1,21 @@
+import { joinBlogBody, type BlogCategorySlug } from "@/lib/blog/categories";
+
 export type BlogPost = {
   slug: string;
   title: string;
   description: string;
+  category: BlogCategorySlug;
   datePublished: string;
   tags: string[];
-  /** Simple paragraphs for Phase 1 — CMS later */
+  /** Paragraphs — educational body copy */
   body: string[];
-  /** Primary conversion link at the end of the article */
   primaryCta?: { label: string; href: string };
   secondaryCta?: { label: string; href: string };
 };
 
 /**
- * Commercial-intent guides first (hotel / outcall questions), then supporting content.
- * Goal: answer the query, then route to book / city / WhatsApp — not keyword stuffing.
+ * Static educational guides — used as fallback when CMS table is empty.
+ * Prefer Supabase `blog_posts` when migrated.
  */
 export const blogPosts: BlogPost[] = [
   {
@@ -21,6 +23,7 @@ export const blogPosts: BlogPost[] = [
     title: "Can a massage therapist come to my hotel in Chiang Mai?",
     description:
       "Yes — outcall / in-room massage brings a therapist to your Chiang Mai hotel, condo, or Airbnb. How it works, what to tell the front desk, and how to book RoomSpa.",
+    category: "booking-hotels",
     datePublished: "2026-08-08",
     tags: ["hotel massage", "outcall", "Chiang Mai"],
     body: [
@@ -38,6 +41,7 @@ export const blogPosts: BlogPost[] = [
     title: "Is hotel massage more expensive in Chiang Mai?",
     description:
       "How in-room hotel massage pricing compares to spa walk-ins in Chiang Mai — what you pay for, travel fees, and transparent RoomSpa rates in THB.",
+    category: "booking-hotels",
     datePublished: "2026-08-08",
     tags: ["pricing", "hotel massage", "Chiang Mai"],
     body: [
@@ -55,6 +59,7 @@ export const blogPosts: BlogPost[] = [
     title: "How does outcall massage work in Chiang Mai?",
     description:
       "Step-by-step: booking outcall / mobile massage in Chiang Mai — choosing a service, sharing your hotel details, arrival, payment, and PIN access.",
+    category: "booking-hotels",
     datePublished: "2026-08-08",
     tags: ["outcall", "how it works", "Chiang Mai"],
     body: [
@@ -72,6 +77,7 @@ export const blogPosts: BlogPost[] = [
     title: "Can I book a massage after midnight in Chiang Mai?",
     description:
       "Late-night and after-midnight massage options in Chiang Mai — what RoomSpa covers, how same-day late slots work, and when to WhatsApp for last-minute requests.",
+    category: "booking-hotels",
     datePublished: "2026-08-08",
     tags: ["late night", "booking", "Chiang Mai"],
     body: [
@@ -89,6 +95,7 @@ export const blogPosts: BlogPost[] = [
     title: "Does my Chiang Mai hotel allow outside massage therapists?",
     description:
       "How hotel policies affect outcall massage in Chiang Mai — what to ask the front desk, how RoomSpa handles discreet arrival, and what to do if outside therapists are restricted.",
+    category: "booking-hotels",
     datePublished: "2026-08-08",
     tags: ["hotel policy", "outcall", "Chiang Mai"],
     body: [
@@ -106,6 +113,7 @@ export const blogPosts: BlogPost[] = [
     title: "Best areas in Chiang Mai for hotel massage",
     description:
       "Old City, Nimman, and Airport / Hang Dong — where in-room hotel massage works best in Chiang Mai and how RoomSpa coverage maps to each area.",
+    category: "areas",
     datePublished: "2026-08-08",
     tags: ["locations", "Nimman", "Old City"],
     body: [
@@ -123,6 +131,7 @@ export const blogPosts: BlogPost[] = [
     title: "Hotel massage in Chiang Mai: how in-room booking works",
     description:
       "How RoomSpa brings a therapist to your Chiang Mai hotel room — what to prepare, pricing basics, and how to book with a PIN.",
+    category: "booking-hotels",
     datePublished: "2026-08-07",
     tags: ["Chiang Mai", "hotel massage", "booking"],
     body: [
@@ -140,6 +149,7 @@ export const blogPosts: BlogPost[] = [
     title: "Best couples massage in Chiang Mai — in your room",
     description:
       "Side-by-side or dual-therapist couples massage at your Chiang Mai hotel or condo. How RoomSpa sessions work and what to expect.",
+    category: "treatments",
     datePublished: "2026-08-07",
     tags: ["couples", "Chiang Mai", "hotel"],
     body: [
@@ -156,6 +166,7 @@ export const blogPosts: BlogPost[] = [
     title: "Thai massage vs oil massage: which should you book?",
     description:
       "A clear comparison of Thai (dry, stretch-focused) and oil-based massage — and when to choose deep tissue or Swedish instead.",
+    category: "treatments",
     datePublished: "2026-08-07",
     tags: ["Thai massage", "oil massage", "guide"],
     body: [
@@ -172,6 +183,7 @@ export const blogPosts: BlogPost[] = [
     title: "Deep tissue massage after hiking in Chiang Mai",
     description:
       "Recover from Doi Suthep, Doi Inthanon, or city walking tours with in-room deep tissue or sports massage in Chiang Mai.",
+    category: "treatments",
     datePublished: "2026-08-07",
     tags: ["deep tissue", "hiking", "Chiang Mai"],
     body: [
@@ -188,6 +200,7 @@ export const blogPosts: BlogPost[] = [
     title: "Nuru massage in Chiang Mai: what to expect",
     description:
       "A clear, professional overview of consent-led Nuru bodywork with RoomSpa — boundaries, hygiene, and how to book discreetly.",
+    category: "sensual-consent",
     datePublished: "2026-08-07",
     tags: ["Nuru", "sensual", "Chiang Mai"],
     body: [
@@ -203,6 +216,7 @@ export const blogPosts: BlogPost[] = [
     title: "How often should you get a massage when traveling?",
     description:
       "Practical guidance on massage frequency for tourists and digital nomads in Thailand — recovery, budget, and booking tips.",
+    category: "wellness-travel",
     datePublished: "2026-08-07",
     tags: ["travel", "wellness", "tips"],
     body: [
@@ -222,4 +236,11 @@ export function getBlogPost(slug: string) {
 
 export function getAllBlogPosts() {
   return [...blogPosts].sort((a, b) => b.datePublished.localeCompare(a.datePublished));
+}
+
+export function staticPostsAsBodyText() {
+  return blogPosts.map((post) => ({
+    ...post,
+    bodyText: joinBlogBody(post.body),
+  }));
 }

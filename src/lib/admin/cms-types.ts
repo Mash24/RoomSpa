@@ -42,3 +42,19 @@ export type AdminMediaRow = {
   serviceSlugs: string[];
   locationSlugs: string[];
 };
+
+export type AdminBlogPost = {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  body: string;
+  status: "draft" | "published" | "hidden";
+  publishedAt: string;
+  primaryCtaLabel: string;
+  primaryCtaHref: string;
+  secondaryCtaLabel: string;
+  secondaryCtaHref: string;
+  sortOrder: number;
+};

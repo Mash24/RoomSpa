@@ -1,19 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { getAllBlogPosts } from "@/content/blog";
-import { buildPageMetadata } from "@/lib/seo/metadata";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
+import { BLOG_CATEGORIES } from "@/lib/blog/categories";
+import { getPublishedBlogPosts } from "@/lib/blog/public";
+import { buildPageMetadata } from "@/lib/seo/metadata";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Blog | Hotel & outcall massage Chiang Mai",
+  title: "Blog | Educational massage guides Chiang Mai",
   description:
-    "Answers to real booking questions: hotel outcall, pricing, late-night sessions, hotel policies, and best areas for in-room massage in Chiang Mai.",
+    "Educational guides on hotel outcall massage, treatments, wellness travel, Chiang Mai areas, and consent-led sensual bodywork.",
   path: "/blog",
 });
 
-export default function BlogPage() {
-  const posts = getAllBlogPosts();
+export default async function BlogPage() {
+  const posts = await getPublishedBlogPosts();
+  const byCategory = BLOG_CATEGORIES.map((category) => ({
+    ...category,
+    posts: posts.filter((post) => post.category === category.slug),
+  })).filter((category) => category.posts.length > 0);
 
   return (
     <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
@@ -27,31 +34,44 @@ export default function BlogPage() {
 
       <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">Blog</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-        Guides & tips
+        Educational guides
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Helpful answers for booking in-room massage in Chiang Mai.
+        Clear answers about in-room massage in Chiang Mai — pick a category, then open a title to
+        read the full guide.
       </p>
 
-      <ul className="mt-12 space-y-6">
-        {posts.map((post) => (
-          <li key={post.slug} className="border-t border-border pt-6">
-            <p className="text-xs uppercase tracking-[0.14em] text-muted">{post.datePublished}</p>
-            <h2 className="mt-2 font-display text-2xl text-foreground md:text-3xl">
-              <Link href={`/blog/${post.slug}`} className="transition hover:text-accent">
-                {post.title}
-              </Link>
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">{post.description}</p>
-            <Link
-              href={`/blog/${post.slug}`}
-              className="mt-4 inline-flex text-sm font-medium text-accent"
-            >
-              Read guide
-            </Link>
-          </li>
-        ))}
-      </ul>
+      {byCategory.length === 0 ? (
+        <p className="mt-12 text-sm text-muted">Guides coming soon.</p>
+      ) : (
+        <div className="mt-12 space-y-14">
+          {byCategory.map((category) => (
+            <section key={category.slug}>
+              <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
+                {category.name}
+              </h2>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{category.description}</p>
+              <ul className="mt-5 divide-y divide-border border-y border-border">
+                {category.posts.map((post) => (
+                  <li key={post.slug}>
+                    <Link
+                      href={`/blog/${post.slug}`}
+                      className="flex items-center justify-between gap-4 py-4 transition hover:text-accent"
+                    >
+                      <span className="font-display text-xl tracking-tight text-foreground md:text-2xl">
+                        {post.title}
+                      </span>
+                      <span aria-hidden className="shrink-0 text-muted">
+                        →
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
