@@ -165,9 +165,9 @@ export default async function ServiceDetailPage({ params }: PageProps) {
               Full gallery →
             </Link>
           </div>
-          <ul className="mt-6 grid gap-6 sm:grid-cols-2">
+          <ul className="mt-6 grid gap-8 sm:grid-cols-2">
             {libraryMedia.slice(0, 4).map((item) => (
-              <li key={item.id}>
+              <li key={item.id} className="min-w-0">
                 <MediaEmbed
                   url={item.mediaUrl}
                   kind={item.kind}
@@ -175,10 +175,6 @@ export default async function ServiceDetailPage({ params }: PageProps) {
                   description={item.description}
                   thumbnailUrl={item.thumbnailUrl}
                 />
-                <p className="mt-3 font-display text-lg text-foreground">{item.title}</p>
-                {item.description ? (
-                  <p className="mt-1 text-sm text-muted line-clamp-2">{item.description}</p>
-                ) : null}
               </li>
             ))}
           </ul>

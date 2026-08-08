@@ -99,9 +99,16 @@ export function XPostEmbed({ url, title, className = "" }: Props) {
     <div
       ref={containerRef}
       className={`x-post-embed overflow-hidden rounded-sm bg-surface [&_.twitter-tweet]:!mx-auto ${className}`}
+      aria-label={title}
     >
-      <blockquote className="twitter-tweet" data-conversation="none" data-dnt="true" data-media-max-width="560">
-        <a href={embedUrl}>{title}</a>
+      <blockquote
+        className="twitter-tweet"
+        data-conversation="none"
+        data-dnt="true"
+        data-media-max-width="560"
+        data-theme="light"
+      >
+        <a href={embedUrl}>Watch</a>
       </blockquote>
     </div>
   );
