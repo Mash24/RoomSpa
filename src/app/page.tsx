@@ -1,4 +1,3 @@
-import { HomeCta } from "@/components/home/home-cta";
 import { HomeHero } from "@/components/home/home-hero";
 import { HomeHowItWorks } from "@/components/home/home-how-it-works";
 import { HomeServices } from "@/components/home/home-services";
@@ -10,7 +9,7 @@ import { aggregateRating, getApprovedReviews } from "@/lib/reviews/fetch";
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const approved = await getApprovedReviews(6);
+  const approved = await getApprovedReviews(4);
   const allForRating = await getApprovedReviews(50);
   const aggregate = aggregateRating(allForRating);
   const fromGuests = approved.length > 0;
@@ -20,7 +19,7 @@ export default async function HomePage() {
         name: review.authorName,
         detail: review.serviceName || "Guest review",
       }))
-    : testimonials.map((item) => ({
+    : testimonials.slice(0, 4).map((item) => ({
         quote: item.quote,
         name: item.name,
         detail: item.detail,
@@ -35,7 +34,6 @@ export default async function HomePage() {
       <HomeServices />
       <HomeHowItWorks />
       <HomeTestimonials items={items} fromGuests={fromGuests} />
-      <HomeCta />
     </>
   );
 }

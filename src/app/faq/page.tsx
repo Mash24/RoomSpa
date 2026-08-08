@@ -6,22 +6,22 @@ import { FaqJsonLd } from "@/components/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "FAQ | Booking, PIN, payments & sensual sessions",
+  title: "FAQ | Booking, payments & coverage",
   description:
-    "Questions about RoomSpa mobile massage — booking, PIN, payments, Nuru, Yoni, Lingam, discretion, and Chiang Mai coverage.",
+    "Questions about RoomSpa mobile massage — booking, PIN, payments, privacy, and Chiang Mai coverage.",
   path: "/faq",
 });
 
 export default function FaqPage() {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <FaqJsonLd />
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">FAQ</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         Common questions
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Booking, payments, privacy, and sensual sessions — answered plainly.
+        Booking, payments, and privacy — answered plainly.
       </p>
 
       <dl className="mt-12 space-y-8">

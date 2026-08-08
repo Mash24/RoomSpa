@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function ContactPage() {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Contact</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         Talk to us
@@ -41,7 +41,7 @@ export default function ContactPage() {
             {site.contact.email}
           </a>
           <p className="mt-2 text-sm text-muted">
-            Partnerships and non-urgent notes. Confirmation emails go live once our domain is set up.
+            Partnerships and non-urgent notes. We reply as soon as we can.
           </p>
         </li>
       </ul>

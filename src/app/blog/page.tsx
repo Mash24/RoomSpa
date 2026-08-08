@@ -30,8 +30,7 @@ export default function BlogPage() {
         Questions travelers actually ask
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Commercial guides for hotel and outcall massage in Chiang Mai — then a clear path to book,
-        not filler posts.
+        Practical answers for hotel and in-room massage in Chiang Mai — then a clear path to book.
       </p>
 
       <ul className="mt-12 space-y-6">

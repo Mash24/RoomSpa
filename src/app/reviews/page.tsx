@@ -17,7 +17,7 @@ export default async function ReviewsPage() {
   const reviews = await getApprovedReviews();
 
   return (
-    <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Reviews</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         What guests say

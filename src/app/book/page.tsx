@@ -6,24 +6,24 @@ import { whatsappHref } from "@/content/site";
 export const metadata: Metadata = {
   title: "Book Appointment",
   description:
-    "Book a RoomSpa massage at your hotel, condo, or home. No payment required — pay cash on arrival or by card later.",
+    "Book a RoomSpa massage at your hotel, condo, or home in Chiang Mai. Pay by card, pay later, or cash on arrival.",
 };
 
 export default function BookPage() {
   return (
-    <section className="mx-auto max-w-3xl px-4 py-14 xs:px-5 xs:py-16 md:px-8 md:py-28">
+    <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Book</p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         Book your in-room massage
       </h1>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted xs:mt-4 xs:text-base md:text-lg">
-        No payment required to book. Pay cash on arrival, or{" "}
+      <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted xs:mt-4 xs:text-base md:text-lg">
+        Pick a service, time, and place. Pay by card now,{" "}
         <a href="/my-booking" className="text-accent underline">
-          pay by card later
+          pay later
         </a>
-        . Prefer chat?{" "}
+        , or cash on arrival. Prefer chat?{" "}
         <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
-          WhatsApp us
+          WhatsApp
         </a>
         .
       </p>

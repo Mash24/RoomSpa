@@ -21,17 +21,16 @@ export default function PricingPage() {
   );
 
   return (
-    <section className="mx-auto max-w-6xl px-5 py-20 md:px-8 md:py-28">
+    <section className="mx-auto max-w-6xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Pricing</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-        60 min · 90 min · 2 hours
+        Clear prices, three lengths
       </h1>
-      <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted md:text-lg">
-        Pick a length when you book. You pay in THB (USD is a guide at ~{THB_PER_USD} THB = 1 USD).
-        Cash or card. Travel fees may apply outside core coverage.
+      <p className="mt-4 max-w-xl text-base leading-relaxed text-muted md:text-lg">
+        60 min, 90 min, or 2 hours. Pay in THB (USD guide ~{THB_PER_USD}:1). Cash or card.
       </p>
 
-      <div className="mt-12 space-y-12">
+      <div className="mt-10 space-y-12 md:mt-14">
         {serviceCategories.map((category) => {
           const products = catalogProducts.filter((p) => p.category === category.id);
           if (products.length === 0) return null;
@@ -41,23 +40,20 @@ export default function PricingPage() {
               <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
                 {category.title}
               </h2>
-              <ul className="mt-5 space-y-4">
+              <ul className="mt-4 divide-y divide-border border-y border-border">
                 {products.map((product) => (
-                  <li
-                    key={product.slug}
-                    className="border border-border bg-surface-elevated px-4 py-5 md:px-6"
-                  >
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                      <div className="min-w-0 lg:max-w-sm">
+                  <li key={product.slug} className="py-5">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0 sm:max-w-xs">
                         <p className="font-medium text-foreground">{product.name}</p>
-                        <p className="mt-1 text-sm text-muted">Cash or card · in-room Chiang Mai</p>
+                        <p className="mt-1 text-sm text-muted">In-room · Chiang Mai</p>
                       </div>
-                      <div className="w-full max-w-xl flex-1">
+                      <div className="w-full flex-1 sm:max-w-md">
                         <ServicePriceTiers service={product} />
                       </div>
                       <Link
                         href={`/book?service=${product.slug}`}
-                        className="inline-flex shrink-0 items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+                        className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground"
                       >
                         Book
                       </Link>
@@ -71,7 +67,7 @@ export default function PricingPage() {
       </div>
 
       <p className="mt-10 text-sm text-muted">
-        Starting from {formatThb(fromPrice)} for 60 minutes. Need a custom length or combo?{" "}
+        From {formatThb(fromPrice)} for 60 minutes. Custom length?{" "}
         <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
           WhatsApp us
         </a>

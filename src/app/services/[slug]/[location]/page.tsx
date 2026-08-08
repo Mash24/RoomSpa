@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { AvailabilityBanner } from "@/components/seo/availability-banner";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { RelatedLinks } from "@/components/seo/related-links";
-import { ReviewSnapshot } from "@/components/seo/review-snapshot";
 import { BreadcrumbJsonLd, FaqJsonLd, ServiceJsonLd } from "@/components/seo/json-ld";
 import { getServiceFaqs } from "@/content/service-faqs";
 import { getServiceMedia } from "@/content/service-media";
@@ -16,9 +15,7 @@ import { getTodayAvailabilityTeaser } from "@/lib/seo/availability-teaser";
 import {
   getServiceLocationParams,
   getSeoLocation,
-  relatedBlogLinks,
   relatedServices,
-  seoLocations,
 } from "@/lib/seo/locations";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -40,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return buildPageMetadata({
     title: `${service.name} ${location.inPhrase} | In-room massage`,
-    description: `Book ${service.name} ${location.inPhrase}. ${location.summary} ${service.duration} from ${productPriceLabel(service.amountThb)}.`,
+    description: `Book ${service.name} ${location.inPhrase}. ${location.summary} From ${productPriceLabel(service.amountThb)}.`,
     path: `/services/${service.slug}/${location.slug}`,
   });
 }
@@ -56,20 +53,21 @@ export default async function ServiceLocationPage({ params }: PageProps) {
     {
       question: `Can I book ${service.name} ${location.inPhrase}?`,
       answer: location.bookable
-        ? `Yes. Choose ${service.name} on the booking form and select the matching Chiang Mai coverage for ${location.name}.`
-        : `${location.cityName} coverage is coming soon. Book Chiang Mai today or join the WhatsApp waitlist.`,
+        ? `Yes. Choose ${service.name} on the booking form and select coverage for ${location.name}.`
+        : `${location.cityName} coverage is coming soon. Book Chiang Mai today or WhatsApp the waitlist.`,
     },
-    ...getServiceFaqs(service.slug).slice(0, 4),
+    ...getServiceFaqs(service.slug).slice(0, 3),
   ];
-  const serviceReviews = await getApprovedReviewsForService(service.slug, 6);
+  const serviceReviews = await getApprovedReviewsForService(service.slug, 4);
   const displayReviews =
-    serviceReviews.length > 0 ? serviceReviews : await getApprovedReviews(4);
+    serviceReviews.length > 0 ? serviceReviews : await getApprovedReviews(3);
   const aggregate = aggregateRating(displayReviews);
   const teaser = location.bookable ? await getTodayAvailabilityTeaser() : null;
   const pagePath = `/services/${service.slug}/${location.slug}`;
+  const related = relatedServices(service, 3);
 
   return (
-    <article className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <ServiceJsonLd
         name={`${service.name} ${location.inPhrase}`}
         description={`${service.details} Available ${location.inPhrase}.`}
@@ -102,8 +100,8 @@ export default async function ServiceLocationPage({ params }: PageProps) {
         ]}
       />
 
-      <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">
-        {location.bookable ? "Bookable area" : "Coming soon"} · {location.cityName}
+      <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">
+        {location.bookable ? "Available" : "Coming soon"} · {location.cityName}
       </p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         {service.name} {location.inPhrase}
@@ -125,29 +123,42 @@ export default async function ServiceLocationPage({ params }: PageProps) {
 
       {teaser ? (
         <div className="mt-8">
-          <AvailabilityBanner
-            teaser={teaser}
-            bookHref={`/book?service=${service.slug}`}
-          />
+          <AvailabilityBanner teaser={teaser} bookHref={`/book?service=${service.slug}`} />
         </div>
       ) : null}
 
-      <p className="mt-6 font-display text-3xl text-accent">
-        {productPriceLabel(service.amountThb)}
-        <span className="ml-2 text-base text-muted">· {service.duration}</span>
+      <p className="mt-6 text-sm text-muted">
+        From {productPriceLabel(service.amountThb)} · choose length when you book
       </p>
 
-      <section className="mt-10">
-        <h2 className="font-display text-2xl text-foreground">Nearby stays we often visit</h2>
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-muted">
-          {location.nearbyHotels.map((hotel) => (
-            <li key={hotel}>{hotel}</li>
-          ))}
-        </ul>
-      </section>
+      <div className="mt-8 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap">
+        {location.bookable ? (
+          <Link
+            href={`/book?service=${service.slug}`}
+            className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
+          >
+            Book {service.name}
+          </Link>
+        ) : (
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
+          >
+            WhatsApp waitlist
+          </a>
+        )}
+        <Link
+          href={`/services/${service.slug}`}
+          className="inline-flex min-h-12 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm"
+        >
+          Full details
+        </Link>
+      </div>
 
-      <section className="mt-10 border-t border-border pt-8">
-        <h2 className="font-display text-2xl text-foreground">FAQ</h2>
+      <section className="mt-12 border-t border-border pt-8">
+        <h2 className="font-display text-2xl text-foreground">Questions</h2>
         <dl className="mt-5 space-y-5">
           {faqs.map((item) => (
             <div key={item.question}>
@@ -158,67 +169,17 @@ export default async function ServiceLocationPage({ params }: PageProps) {
         </dl>
       </section>
 
-      <div className="mt-10">
-        <ReviewSnapshot reviews={displayReviews} />
-      </div>
-
-      <div className="mt-10 flex flex-wrap gap-3">
-        {location.bookable ? (
-          <Link
-            href={`/book?service=${service.slug}`}
-            className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
-          >
-            Book {service.name}
-          </Link>
-        ) : (
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
-          >
-            WhatsApp waitlist
-          </a>
-        )}
-        <Link
-          href={`/services/${service.slug}`}
-          className="inline-flex rounded-sm border border-border px-5 py-3 text-sm"
-        >
-          Service details
-        </Link>
-        <Link
-          href={`/city/${location.citySlug}`}
-          className="inline-flex rounded-sm border border-border px-5 py-3 text-sm"
-        >
-          {location.cityName} guide
-        </Link>
-      </div>
-
-      <div className="mt-12 space-y-10">
-        <RelatedLinks
-          title="More areas"
-          links={seoLocations
-            .filter((loc) => loc.slug !== location.slug && loc.citySlug === location.citySlug)
-            .map((loc) => ({
-              href: `/services/${service.slug}/${loc.slug}`,
-              label: `${service.name} ${loc.inPhrase}`,
+      {related.length > 0 ? (
+        <div className="mt-10">
+          <RelatedLinks
+            title="Related services"
+            links={related.map((item) => ({
+              href: `/services/${item.slug}`,
+              label: item.name,
             }))}
-        />
-        <RelatedLinks
-          title="Related services"
-          links={relatedServices(service, 4).map((item) => ({
-            href: `/services/${item.slug}/${location.slug}`,
-            label: `${item.name} ${location.inPhrase}`,
-          }))}
-        />
-        <RelatedLinks
-          title="Guides"
-          links={relatedBlogLinks([service.name, location.name, "hotel"], 3).map((post) => ({
-            href: `/blog/${post.slug}`,
-            label: post.title,
-          }))}
-        />
-      </div>
+          />
+        </div>
+      ) : null}
     </article>
   );
 }

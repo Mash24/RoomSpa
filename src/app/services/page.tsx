@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
-import { AutoplayVideo } from "@/components/media/autoplay-video";
 import {
-  categoryMedia,
-  getServiceMedia,
-  servicesIntroVideo,
-} from "@/content/service-media";
-import {
+  getServicePriceTiers,
   getServicesByCategory,
   productPriceLabel,
   serviceCategories,
@@ -16,44 +10,36 @@ import { whatsappHref } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Services | Mobile massage menu Chiang Mai",
+  title: "Services | In-room massage Chiang Mai",
   description:
-    "Mobile massage with video guides — Swedish, Thai, deep tissue, couples, Nuru, Yoni, Lingam, and more at your hotel, condo, or home in Chiang Mai.",
+    "Mobile massage menu for hotels, condos, and homes in Chiang Mai — classic, therapeutic, couples, and private sessions.",
   path: "/services",
 });
 
 export default function ServicesPage() {
   return (
     <div>
-      <section className="relative min-h-[52vh] overflow-hidden bg-[#121816] text-white md:min-h-[62vh]">
-        <AutoplayVideo
-          src={servicesIntroVideo.src}
-          poster={servicesIntroVideo.poster}
-          label="RoomSpa massage atmosphere"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/25" />
-        <div className="relative mx-auto flex min-h-[52vh] max-w-6xl flex-col justify-end px-5 pb-12 pt-28 md:min-h-[62vh] md:px-8 md:pb-16">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-white/70">Services</p>
-          <h1 className="mt-3 max-w-2xl font-display text-4xl tracking-tight md:text-6xl">
+      <section className="border-b border-border bg-surface px-4 py-14 xs:px-5 md:px-8 md:py-20">
+        <div className="mx-auto max-w-6xl">
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Services</p>
+          <h1 className="mt-3 max-w-2xl font-display text-4xl tracking-tight text-foreground md:text-5xl">
             Massage that comes to your room
           </h1>
-          <p className="mt-4 max-w-xl text-base leading-relaxed text-white/80 md:text-lg">
-            Classic, therapeutic, couples, and consent-led sensual sessions — watch the feel of each
-            category, then book the treatment you want.
+          <p className="mt-4 max-w-xl text-base leading-relaxed text-muted md:text-lg">
+            Choose a treatment, pick a length, and we come to you in Chiang Mai.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link
               href="/book"
-              className="inline-flex rounded-sm bg-white px-5 py-3 text-sm font-medium text-[#1a221c] transition hover:bg-white/90"
+              className="inline-flex min-h-11 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
             >
-              Book an appointment
+              Book now
             </Link>
             <Link
               href="/pricing"
-              className="inline-flex rounded-sm border border-white/35 px-5 py-3 text-sm font-medium text-white transition hover:border-white hover:bg-white/10"
+              className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
             >
-              View pricing
+              Pricing
             </Link>
           </div>
         </div>
@@ -61,9 +47,9 @@ export default function ServicesPage() {
 
       <nav
         aria-label="Service categories"
-        className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur-md"
+        className="sticky top-[3.75rem] z-30 border-b border-border bg-background/95 backdrop-blur-md md:top-[4.25rem]"
       >
-        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-5 py-3 md:px-8">
+        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 xs:px-5 md:px-8">
           {serviceCategories.map((category) => (
             <a
               key={category.id}
@@ -76,94 +62,57 @@ export default function ServicesPage() {
         </div>
       </nav>
 
-      <div className="mx-auto max-w-6xl space-y-24 px-5 py-16 md:px-8 md:py-24">
+      <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 xs:px-5 md:space-y-20 md:px-8 md:py-16">
         {serviceCategories.map((category) => {
           const services = getServicesByCategory(category.id);
-          const media = categoryMedia[category.id];
           if (services.length === 0) return null;
 
           return (
             <section key={category.id} id={category.id} className="scroll-mt-24">
-              <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
-                <div className="relative aspect-[16/10] overflow-hidden bg-surface">
-                  <AutoplayVideo
-                    src={media.video}
-                    poster={media.poster}
-                    label={media.caption}
-                    className="absolute inset-0 h-full w-full object-cover"
-                  />
-                </div>
-                <div>
-                  <h2 className="font-display text-3xl tracking-tight text-foreground md:text-4xl">
-                    {category.title}
-                  </h2>
-                  <p className="mt-3 text-base leading-relaxed text-muted md:text-lg">
-                    {category.summary}
-                  </p>
-                  {category.id === "sensual" ? (
-                    <p className="mt-4 text-sm leading-relaxed text-muted">
-                      Consent first. These are professional bodywork sessions — not escort services.
-                      You can pause or stop anytime.
-                    </p>
-                  ) : null}
-                </div>
-              </div>
+              <h2 className="font-display text-3xl tracking-tight text-foreground md:text-4xl">
+                {category.title}
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
+                {category.summary}
+              </p>
+              {category.id === "sensual" ? (
+                <p className="mt-3 max-w-2xl text-sm text-muted">
+                  Consent first — professional bodywork, not escort services. Pause or stop anytime.
+                </p>
+              ) : null}
 
-              <ul className="mt-10 grid gap-8 sm:grid-cols-2">
+              <ul className="mt-6 divide-y divide-border border-y border-border">
                 {services.map((service) => {
-                  const media = getServiceMedia(service.slug);
+                  const from = getServicePriceTiers(service)[60];
                   return (
                     <li
                       key={service.slug}
                       id={service.slug}
-                      className="scroll-mt-28 overflow-hidden border border-border bg-surface-elevated"
+                      className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
                     >
-                      <div className="relative aspect-[16/10]">
-                        <Image
-                          src={media.image}
-                          alt={media.imageAlt}
-                          fill
-                          sizes="(max-width: 640px) 100vw, 50vw"
-                          className="object-cover"
-                        />
+                      <div className="min-w-0">
+                        <Link
+                          href={`/services/${service.slug}`}
+                          className="font-display text-xl tracking-tight text-foreground transition hover:text-accent md:text-2xl"
+                        >
+                          {service.name}
+                        </Link>
+                        <p className="mt-1 text-sm text-muted line-clamp-2">{service.summary}</p>
+                        <p className="mt-2 text-sm text-accent">From {productPriceLabel(from)}</p>
                       </div>
-                      <div className="relative aspect-[21/9] border-t border-border bg-surface">
-                        <AutoplayVideo
-                          src={media.video}
-                          poster={media.image}
-                          label={`${service.name} video`}
-                          className="absolute inset-0 h-full w-full object-cover"
-                        />
-                      </div>
-                      <div className="p-5 md:p-6">
-                        <div className="flex items-start justify-between gap-3">
-                          <h3 className="font-display text-2xl tracking-tight text-foreground">
-                          <Link href={`/services/${service.slug}`} className="transition hover:text-accent">
-                            {service.name}
-                          </Link>
-                        </h3>
-                          <span className="shrink-0 text-xs uppercase tracking-[0.14em] text-muted">
-                            {service.duration}
-                          </span>
-                        </div>
-                        <p className="mt-3 text-sm leading-relaxed text-muted">{service.summary}</p>
-                        <p className="mt-4 font-display text-2xl text-accent">
-                          {productPriceLabel(service.amountThb)}
-                        </p>
-                        <div className="mt-5 flex flex-wrap gap-4">
-                          <Link
-                            href={`/services/${service.slug}`}
-                            className="inline-flex text-sm font-medium text-foreground/80 transition hover:text-accent"
-                          >
-                            Details
-                          </Link>
-                          <Link
-                            href={`/book?service=${service.slug}`}
-                            className="inline-flex text-sm font-medium text-accent transition hover:opacity-80"
-                          >
-                            Book {service.name}
-                          </Link>
-                        </div>
+                      <div className="flex shrink-0 gap-2">
+                        <Link
+                          href={`/book?service=${service.slug}`}
+                          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground sm:flex-none"
+                        >
+                          Book
+                        </Link>
+                        <Link
+                          href={`/services/${service.slug}`}
+                          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm transition hover:border-accent hover:text-accent sm:flex-none"
+                        >
+                          Details
+                        </Link>
                       </div>
                     </li>
                   );
@@ -173,27 +122,16 @@ export default function ServicesPage() {
           );
         })}
 
-        <div className="flex flex-col gap-4 border-t border-border pt-10 sm:flex-row sm:items-center sm:justify-between">
-          <p className="max-w-xl text-sm leading-relaxed text-muted">
-            Full rate list lives on Pricing. Questions about a sensual or therapeutic session?
-            Message us before you book.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/pricing"
-              className="inline-flex rounded-sm border border-border px-4 py-2.5 text-sm transition hover:border-accent hover:text-accent"
-            >
-              Pricing
-            </Link>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground"
-            >
-              WhatsApp
-            </a>
-          </div>
+        <div className="flex flex-col gap-3 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted">Questions before you book?</p>
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium transition hover:border-accent hover:text-accent"
+          >
+            WhatsApp us
+          </a>
         </div>
       </div>
     </div>

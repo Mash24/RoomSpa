@@ -2,8 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { site, whatsappHref } from "@/content/site";
 
-const HERO_IMAGE =
-  "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=2400&q=80";
+const HERO_IMAGE = "/media/services/stills/v-spa.jpg";
 
 export function HomeHero() {
   const { hero } = site;
@@ -13,11 +12,11 @@ export function HomeHero() {
       <div className="absolute inset-0">
         <Image
           src={HERO_IMAGE}
-          alt="Calm massage setting with soft natural light"
+          alt="Calm spa setting prepared for in-room massage"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-[center_30%] animate-slow-zoom sm:object-center"
+          className="object-cover object-[center_35%] animate-slow-zoom sm:object-center"
         />
         <div className="absolute inset-0" style={{ background: "var(--hero-overlay)" }} />
         <div
@@ -50,7 +49,7 @@ export function HomeHero() {
             rel="noreferrer"
             className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm border border-white/35 px-5 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10 sm:flex-none"
           >
-            WhatsApp now
+            WhatsApp
           </a>
         </div>
         <p className="animate-fade-up delay-4 mt-4 text-xs text-white/65 xs:text-sm">

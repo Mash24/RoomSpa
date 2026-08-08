@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { coverageAreas } from "@/content/coverage";
 import { formatThb } from "@/lib/currency";
-import { site, whatsappHref } from "@/content/site";
+import { whatsappHref } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
@@ -20,10 +20,9 @@ export default function CoveragePage() {
         Where we come to you
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        {site.coverageNote} Hotels, condos, and private homes in these zones are our standard reach.
-        For SEO landing pages by neighborhood, see{" "}
+        Hotels, condos, and homes in these Chiang Mai zones are our standard reach. See also the{" "}
         <Link href="/city/chiang-mai" className="text-accent underline">
-          Chiang Mai city guide
+          Chiang Mai guide
         </Link>
         .
       </p>

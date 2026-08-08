@@ -14,28 +14,25 @@ export const site = {
   name: "RoomSpa",
   tagline: "Premium massage, wherever you are",
   description:
-    "Book professional in-room massage at your hotel, condo, or home — classic, therapeutic, couples, and consent-led sensual or tantric sessions including Nuru, Yoni, and Lingam.",
+    "Book professional in-room massage at your hotel, condo, or home in Chiang Mai — classic, therapeutic, and couples sessions.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en",
   contact: {
     email: "hello@getroomspa.com",
     whatsapp: "+66984712237",
   },
+  /** Primary chrome — keep short; secondary links live in the footer */
   nav: [
     { label: "Services", href: "/services" },
-    { label: "Locations", href: "/city" },
     { label: "Pricing", href: "/pricing" },
     { label: "Reviews", href: "/reviews" },
-    { label: "Blog", href: "/blog" },
-    { label: "About", href: "/about" },
-    { label: "FAQ", href: "/faq" },
   ],
   hero: {
     brand: "RoomSpa",
     headline: "Spa-quality massage at your door",
     support:
-      "Professional therapists travel to your hotel, condo, or home — classic to tantric, book in minutes.",
-    primaryCta: { label: "Book an appointment", href: "/book" },
+      "A professional therapist comes to your hotel, condo, or home in Chiang Mai. Book online in minutes.",
+    primaryCta: { label: "Book now", href: "/book" },
     secondaryCta: { label: "View services", href: "/services" },
   },
   services: homeServicePicks.map((service) => ({
@@ -47,13 +44,13 @@ export const site = {
   howItWorks: [
     {
       step: "01",
-      title: "Choose your service",
-      body: "From Swedish and Thai to Nuru, Yoni, Lingam, and couples — pick what you need.",
+      title: "Choose a service",
+      body: "Pick the treatment and length that fits you.",
     },
     {
       step: "02",
-      title: "Pick a time & place",
-      body: "Hotel, condo, or home. Multiple therapists mean overlapping times are fine.",
+      title: "Pick time & place",
+      body: "Hotel, condo, or home — same-day when slots are open.",
     },
     {
       step: "03",

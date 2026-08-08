@@ -6,6 +6,15 @@ import { useEffect, useState } from "react";
 import { site, whatsappHref } from "@/content/site";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 
+const secondaryLinks = [
+  { label: "Locations", href: "/city" },
+  { label: "FAQ", href: "/faq" },
+  { label: "About", href: "/about" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
+  { label: "My booking", href: "/my-booking" },
+];
+
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -44,6 +53,10 @@ export function SiteHeader() {
     ? "inline-flex h-11 w-11 items-center justify-center rounded-sm border border-white/30 text-white"
     : "inline-flex h-11 w-11 items-center justify-center rounded-sm border border-border text-foreground";
 
+  const mobileLink = onHero
+    ? "min-h-11 rounded-sm px-1 py-2.5 text-base text-white/90"
+    : "min-h-11 rounded-sm px-1 py-2.5 text-base text-foreground";
+
   return (
     <header className={shell}>
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 xs:px-5 xs:py-4 md:gap-4 md:px-8 md:py-5">
@@ -57,9 +70,6 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <Link href="/my-booking" className={link}>
-            My booking
-          </Link>
           <a href={whatsappHref} target="_blank" rel="noreferrer" className={link}>
             WhatsApp
           </a>
@@ -94,82 +104,39 @@ export function SiteHeader() {
           id="mobile-nav"
           className={
             onHero
-              ? "animate-fade-in max-h-[min(80vh,32rem)] overflow-y-auto border-t border-white/15 bg-[rgba(18,28,24,0.96)] px-4 py-5 backdrop-blur-md xs:px-5 lg:hidden"
-              : "animate-fade-in max-h-[min(80vh,32rem)] overflow-y-auto border-t border-border bg-background px-4 py-5 xs:px-5 lg:hidden"
+              ? "animate-fade-in max-h-[min(80vh,28rem)] overflow-y-auto border-t border-white/15 bg-[rgba(18,28,24,0.96)] px-4 py-4 backdrop-blur-md xs:px-5 lg:hidden"
+              : "animate-fade-in max-h-[min(80vh,28rem)] overflow-y-auto border-t border-border bg-background px-4 py-4 xs:px-5 lg:hidden"
           }
         >
-          <nav className="flex flex-col gap-1" aria-label="Mobile">
+          <nav className="flex flex-col" aria-label="Mobile">
             {site.nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={
-                  onHero
-                    ? "min-h-11 rounded-sm px-1 py-2.5 text-base text-white/90"
-                    : "min-h-11 rounded-sm px-1 py-2.5 text-base text-foreground"
-                }
-                onClick={() => setOpen(false)}
-              >
+              <Link key={item.href} href={item.href} className={mobileLink} onClick={() => setOpen(false)}>
                 {item.label}
               </Link>
             ))}
-            <Link
-              href="/my-booking"
-              className={
-                onHero
-                  ? "min-h-11 rounded-sm px-1 py-2.5 text-base text-white/90"
-                  : "min-h-11 rounded-sm px-1 py-2.5 text-base text-foreground"
-              }
-              onClick={() => setOpen(false)}
-            >
-              My booking
-            </Link>
-            <Link
-              href="/coverage"
-              className={
-                onHero
-                  ? "min-h-11 rounded-sm px-1 py-2.5 text-base text-white/90"
-                  : "min-h-11 rounded-sm px-1 py-2.5 text-base text-foreground"
-              }
-              onClick={() => setOpen(false)}
-            >
-              Coverage
-            </Link>
-            <Link
-              href="/contact"
-              className={
-                onHero
-                  ? "min-h-11 rounded-sm px-1 py-2.5 text-base text-white/90"
-                  : "min-h-11 rounded-sm px-1 py-2.5 text-base text-foreground"
-              }
-              onClick={() => setOpen(false)}
-            >
-              Contact
-            </Link>
             <a
               href={whatsappHref}
               target="_blank"
               rel="noreferrer"
-              className={
-                onHero
-                  ? "min-h-11 rounded-sm px-1 py-2.5 text-base text-white/90"
-                  : "min-h-11 rounded-sm px-1 py-2.5 text-base text-foreground"
-              }
+              className={mobileLink}
               onClick={() => setOpen(false)}
             >
-              WhatsApp us
+              WhatsApp
             </a>
-            <Link
-              href="/book"
+            <p
               className={
                 onHero
-                  ? "mt-3 inline-flex min-h-12 items-center justify-center rounded-sm bg-white px-4 py-3 text-sm font-medium text-[#1a221c]"
-                  : "mt-3 inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-4 py-3 text-sm font-medium text-accent-foreground"
+                  ? "mt-3 mb-1 text-[0.65rem] uppercase tracking-[0.16em] text-white/40"
+                  : "mt-3 mb-1 text-[0.65rem] uppercase tracking-[0.16em] text-muted"
               }
-              onClick={() => setOpen(false)}
             >
-              Book an appointment
-            </Link>
+              More
+            </p>
+            {secondaryLinks.map((item) => (
+              <Link key={item.href} href={item.href} className={mobileLink} onClick={() => setOpen(false)}>
+                {item.label}
+              </Link>
+            ))}
           </nav>
         </div>
       ) : null}

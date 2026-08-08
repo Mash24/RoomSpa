@@ -9,13 +9,13 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = buildPageMetadata({
   title: "Locations | In-room massage Thailand",
   description:
-    "RoomSpa mobile massage by location — live in Chiang Mai (Old City, Nimman, Airport). Bangkok and Phuket coming soon.",
+    "RoomSpa mobile massage by location — live in Chiang Mai. Bangkok and Phuket coming soon.",
   path: "/city",
 });
 
 export default function CitiesIndexPage() {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "/" },
@@ -24,30 +24,29 @@ export default function CitiesIndexPage() {
       />
       <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Locations" }]} />
 
-      <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">Coverage</p>
+      <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">Locations</p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-        Locations we serve
+        Where we come to you
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Start with Chiang Mai — hotel, condo, and home massage with live booking. Bangkok and Phuket
-        are next on the roadmap.
+        Live booking in Chiang Mai. Bangkok and Phuket are next.
       </p>
 
-      <ul className="mt-12 space-y-4">
+      <ul className="mt-10 divide-y divide-border border-y border-border">
         {cities.map((city) => (
-          <li key={city.slug} className="border border-border bg-surface-elevated p-5 md:p-6">
-            <div className="flex flex-wrap items-center gap-3">
+          <li key={city.slug} className="py-5">
+            <div className="flex flex-wrap items-baseline gap-2">
               <h2 className="font-display text-2xl text-foreground">{city.name}</h2>
               <span className="text-xs uppercase tracking-[0.14em] text-muted">
-                {city.status === "active" ? "Live booking" : "Coming soon"}
+                {city.status === "active" ? "Live" : "Soon"}
               </span>
             </div>
-            <p className="mt-3 text-sm leading-relaxed text-muted">{city.summary}</p>
+            <p className="mt-2 text-sm leading-relaxed text-muted">{city.summary}</p>
             <Link
               href={`/city/${city.slug}`}
-              className="mt-5 inline-flex text-sm font-medium text-accent transition hover:opacity-80"
+              className="mt-3 inline-flex text-sm font-medium text-accent"
             >
-              {city.status === "active" ? `Explore ${city.name}` : `View ${city.name} plans`}
+              {city.status === "active" ? `View ${city.name}` : `See plans`} →
             </Link>
           </li>
         ))}
@@ -57,7 +56,7 @@ export default function CitiesIndexPage() {
         href={whatsappHref}
         target="_blank"
         rel="noreferrer"
-        className="mt-10 inline-flex text-sm text-accent underline"
+        className="mt-8 inline-flex text-sm text-accent underline"
       >
         Request a city on WhatsApp
       </a>

@@ -6,12 +6,12 @@ import { whatsappHref } from "@/content/site";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "RoomSpa brings professional mobile massage to hotels, condos, and homes — classic to tantric, privacy first.",
+    "RoomSpa brings professional mobile massage to hotels, condos, and homes in Chiang Mai — private, simple booking.",
 };
 
 export default function AboutPage() {
   return (
-    <section className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
         {aboutContent.eyebrow}
       </p>

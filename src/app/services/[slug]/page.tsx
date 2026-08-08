@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPublishedMediaForServiceSlug } from "@/lib/media/public";
-import { AutoplayVideo } from "@/components/media/autoplay-video";
 import { AvailabilityBanner } from "@/components/seo/availability-banner";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { RelatedLinks } from "@/components/seo/related-links";
@@ -26,11 +24,7 @@ import {
 import { whatsappHref } from "@/content/site";
 import { aggregateRating, getApprovedReviews, getApprovedReviewsForService } from "@/lib/reviews/fetch";
 import { getTodayAvailabilityTeaser } from "@/lib/seo/availability-teaser";
-import {
-  relatedBlogLinks,
-  relatedServices,
-  seoLocations,
-} from "@/lib/seo/locations";
+import { relatedServices } from "@/lib/seo/locations";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
@@ -50,7 +44,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return buildPageMetadata({
     title: `${service.name} Chiang Mai | In-room mobile massage`,
-    description: `${service.summary} Book ${service.name} at your hotel, condo, or home in Chiang Mai. ${service.duration} from ${productPriceLabel(service.amountThb)}.`,
+    description: `${service.summary} Book ${service.name} at your hotel, condo, or home in Chiang Mai. From ${productPriceLabel(service.amountThb)}.`,
     path: `/services/${service.slug}`,
   });
 }
@@ -61,27 +55,17 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   if (!service || !service.bookable) notFound();
 
   const media = getServiceMedia(service.slug);
-  const libraryMedia = await getPublishedMediaForServiceSlug(service.slug);
   const category = serviceCategories.find((item) => item.id === service.category);
-  const faqs = getServiceFaqs(service.slug);
-  const serviceReviews = await getApprovedReviewsForService(service.slug, 8);
+  const faqs = getServiceFaqs(service.slug).slice(0, 5);
+  const serviceReviews = await getApprovedReviewsForService(service.slug, 6);
   const displayReviews =
-    serviceReviews.length > 0 ? serviceReviews : await getApprovedReviews(4);
+    serviceReviews.length > 0 ? serviceReviews : await getApprovedReviews(3);
   const aggregate = aggregateRating(displayReviews);
   const teaser = await getTodayAvailabilityTeaser();
-  const related = relatedServices(service, 4);
-  const blogs = relatedBlogLinks([service.name, service.category, "Chiang Mai", "hotel"], 3);
-  const areaLinks = seoLocations
-    .filter((loc) => loc.bookable)
-    .slice(0, 6)
-    .map((loc) => ({
-      href: `/services/${service.slug}/${loc.slug}`,
-      label: `${service.name} ${loc.inPhrase}`,
-      hint: loc.bookable ? "Bookable coverage" : "Coming soon",
-    }));
+  const related = relatedServices(service, 3);
 
   return (
-    <article className="mx-auto max-w-6xl px-5 py-16 md:px-8 md:py-24">
+    <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <ServiceJsonLd
         name={service.name}
         description={service.details}
@@ -110,147 +94,94 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         ]}
       />
 
-      <div className="mt-8 grid gap-10 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
-            {category?.title ?? "Service"} · Chiang Mai
-          </p>
-          <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-            {service.name}
-          </h1>
-          <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">{service.summary}</p>
-          <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">{service.details}</p>
+      <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">
+        {category?.title ?? "Service"} · Chiang Mai
+      </p>
+      <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
+        {service.name}
+      </h1>
+      <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">{service.summary}</p>
 
-          <div className="mt-6">
-            <AvailabilityBanner teaser={teaser} bookHref={`/book?service=${service.slug}`} />
-          </div>
-
-          <div className="mt-8">
-            <p className="text-xs uppercase tracking-[0.14em] text-muted">Duration & pricing</p>
-            <ServicePriceTiers className="mt-3" service={service} />
-            <p className="mt-3 text-sm text-muted">
-              From {productPriceLabel(getServicePriceTiers(service)[60])} · choose length when you book
-            </p>
-          </div>
-
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              href={`/book?service=${service.slug}&duration=60`}
-              className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
-            >
-              Book {service.name}
-            </Link>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
-            >
-              WhatsApp questions
-            </a>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div className="relative aspect-[4/3] overflow-hidden bg-surface">
-            <Image
-              src={media.image}
-              alt={media.imageAlt}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 45vw"
-              className="object-cover"
-            />
-          </div>
-          <div className="relative aspect-video overflow-hidden bg-surface">
-            <AutoplayVideo
-              src={media.video}
-              poster={media.image}
-              label={`${service.name} preview`}
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-          </div>
-        </div>
+      <div className="relative mt-8 aspect-[16/10] overflow-hidden bg-surface">
+        <Image
+          src={media.image}
+          alt={media.imageAlt}
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, 720px"
+          className="object-cover"
+        />
       </div>
 
-      {libraryMedia.length > 0 ? (
-        <section className="mt-16 border-t border-border pt-10">
-          <h2 className="font-display text-3xl tracking-tight text-foreground">See how it works</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-            Short guides for this treatment — preparation, privacy, and what to expect. Content stays
-            professional and discreet.
-          </p>
-          <ul className="mt-8 grid gap-6 md:grid-cols-2">
-            {libraryMedia.map((item) => (
-              <li key={item.id} className="overflow-hidden border border-border bg-surface-elevated">
-                <div className="relative aspect-video bg-surface">
-                  {item.kind === "video" ? (
-                    <AutoplayVideo
-                      src={item.mediaUrl}
-                      poster={item.thumbnailUrl || media.image}
-                      label={item.title}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  ) : (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={item.mediaUrl}
-                      alt={item.title}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  )}
-                </div>
-                <div className="p-5">
-                  <h3 className="font-display text-xl text-foreground">{item.title}</h3>
-                  {item.description ? (
-                    <p className="mt-2 text-sm leading-relaxed text-muted">{item.description}</p>
-                  ) : null}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
+      <p className="mt-6 text-sm leading-relaxed text-muted md:text-base">{service.details}</p>
+
+      {service.category === "sensual" ? (
+        <p className="mt-4 text-sm text-muted">
+          Consent-led professional bodywork — not escort services. You can pause or stop anytime.
+        </p>
       ) : null}
 
-      <section className="mt-16 border-t border-border pt-10">
-        <h2 className="font-display text-3xl tracking-tight text-foreground">
-          Frequently asked questions
+      <div className="mt-8">
+        <AvailabilityBanner teaser={teaser} bookHref={`/book?service=${service.slug}`} />
+      </div>
+
+      <div className="mt-8">
+        <p className="text-xs uppercase tracking-[0.14em] text-muted">Duration & pricing</p>
+        <ServicePriceTiers className="mt-3" service={service} />
+        <p className="mt-3 text-sm text-muted">
+          From {productPriceLabel(getServicePriceTiers(service)[60])} · choose length when you book
+        </p>
+      </div>
+
+      <div className="mt-8 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap">
+        <Link
+          href={`/book?service=${service.slug}&duration=60`}
+          className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
+        >
+          Book {service.name}
+        </Link>
+        <a
+          href={whatsappHref}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex min-h-12 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
+        >
+          WhatsApp
+        </a>
+      </div>
+
+      <section className="mt-14 border-t border-border pt-8">
+        <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
+          Questions
         </h2>
-        <dl className="mt-6 space-y-6">
+        <dl className="mt-5 space-y-5">
           {faqs.map((item) => (
             <div key={item.question}>
-              <dt className="font-display text-xl text-foreground">{item.question}</dt>
-              <dd className="mt-2 text-sm leading-relaxed text-muted md:text-base">{item.answer}</dd>
+              <dt className="font-medium text-foreground">{item.question}</dt>
+              <dd className="mt-2 text-sm leading-relaxed text-muted">{item.answer}</dd>
             </div>
           ))}
         </dl>
       </section>
 
-      <div className="mt-10">
-        <ReviewSnapshot reviews={displayReviews} heading={`${service.name} reviews`} />
-      </div>
+      {displayReviews.length > 0 ? (
+        <div className="mt-10">
+          <ReviewSnapshot reviews={displayReviews} heading={`${service.name} reviews`} />
+        </div>
+      ) : null}
 
-      <div className="mt-10 space-y-10">
-        <RelatedLinks
-          title="Book this service by area"
-          links={areaLinks}
-        />
-        <RelatedLinks
-          title="Related services"
-          links={related.map((item) => ({
-            href: `/services/${item.slug}`,
-            label: item.name,
-            hint: productPriceLabel(item.amountThb),
-          }))}
-        />
-        <RelatedLinks
-          title="Guides"
-          links={blogs.map((post) => ({
-            href: `/blog/${post.slug}`,
-            label: post.title,
-          }))}
-        />
-      </div>
+      {related.length > 0 ? (
+        <div className="mt-10">
+          <RelatedLinks
+            title="You may also like"
+            links={related.map((item) => ({
+              href: `/services/${item.slug}`,
+              label: item.name,
+              hint: productPriceLabel(item.amountThb),
+            }))}
+          />
+        </div>
+      ) : null}
     </article>
   );
 }

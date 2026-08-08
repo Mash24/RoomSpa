@@ -12,7 +12,7 @@ export const faqItems = [
   {
     question: "How do payments work?",
     answer:
-      "You can pay cash on arrival, pay by card later from My booking, or pay by card now for services that have online checkout enabled. Card-now is currently available for Swedish and Couples; other services use cash or card-later until more Stripe products are connected.",
+      "Pay by card when you book, pay by card later from My booking, or pay cash on arrival. All prices are in Thai Baht.",
   },
   {
     question: "What is the booking PIN?",
@@ -63,8 +63,8 @@ export const aboutContent = {
     "RoomSpa brings professional massage to hotels, condos, and homes — for travelers who just landed, expats who want a reset, and anyone who prefers privacy over a crowded spa lobby.",
   story: [
     "We started with a simple idea: the best massage is the one you do not have to commute for. No traffic, no waiting room, no finding your way back afterward.",
-    "Our catalog covers classic relaxation, therapeutic work, couples sessions, and consent-led sensual or tantric bodywork — including Nuru, Yoni, and Lingam — all delivered where you already are.",
-    "The brand is city-agnostic on purpose. Chiang Mai is our launch home; the same RoomSpa experience can expand to new cities without a rebrand.",
+    "Our menu covers relaxation, therapeutic work, couples sessions, and private consent-led bodywork — all delivered where you already are.",
+    "Chiang Mai is our home base. The same RoomSpa experience is built to expand to new cities without a rebrand.",
   ],
   values: [
     {
@@ -73,11 +73,11 @@ export const aboutContent = {
     },
     {
       title: "Clear consent",
-      body: "Especially for sensual and tantric sessions — boundaries first, then touch.",
+      body: "Boundaries first — especially for intimate sessions — then touch.",
     },
     {
       title: "Straightforward booking",
-      body: "Pick a service, time, and place. Pay cash, card later, or card now when available.",
+      body: "Pick a service, time, and place. Pay by card, pay later, or cash on arrival.",
     },
   ],
 } as const;

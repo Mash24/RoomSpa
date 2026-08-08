@@ -1,67 +1,53 @@
-import Image from "next/image";
 import Link from "next/link";
-import { site } from "@/content/site";
-import { catalogProducts, productPriceLabel } from "@/content/services";
-import { getServiceMedia } from "@/content/service-media";
+import {
+  featuredServices,
+  getServicePriceTiers,
+  productPriceLabel,
+} from "@/content/services";
 
-const pricesBySlug = Object.fromEntries(
-  catalogProducts.map((product) => [product.slug, product.amountThb]),
-);
+const picks = featuredServices.slice(0, 4);
 
 export function HomeServices() {
   return (
-    <section className="bg-background px-4 py-14 xs:px-5 xs:py-16 md:px-8 md:py-28">
+    <section className="bg-background px-4 py-12 xs:px-5 xs:py-14 md:px-8 md:py-20">
       <div className="mx-auto max-w-6xl">
-        <div className="max-w-2xl">
+        <div className="max-w-xl">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Services</p>
           <h2 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-            Treatments that travel with you
+            Popular treatments
           </h2>
-          <p className="mt-3 text-sm leading-relaxed text-muted xs:mt-4 xs:text-base md:text-lg">
-            A short look at popular sessions. Full menu with videos lives on the Services page.
+          <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
+            Delivered to your hotel, condo, or home. Full menu on Services.
           </p>
         </div>
 
-        <ul className="mt-8 grid gap-5 xs:mt-10 xs:gap-6 sm:mt-12 sm:grid-cols-2 sm:gap-8">
-          {site.services.map((service, index) => {
-            const price = pricesBySlug[service.slug];
-            const media = getServiceMedia(service.slug);
-
+        <ul className="mt-8 divide-y divide-border border-y border-border">
+          {picks.map((service) => {
+            const from = getServicePriceTiers(service)[60];
             return (
               <li
                 key={service.slug}
-                className="animate-fade-up overflow-hidden border border-border bg-surface-elevated"
-                style={{ animationDelay: `${0.08 * index}s` }}
+                className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
               >
-                <div className="relative aspect-[16/10]">
-                  <Image
-                    src={media.image}
-                    alt={media.imageAlt}
-                    fill
-                    sizes="(max-width: 640px) 100vw, 50vw"
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-5 md:p-6">
-                  <div className="flex items-baseline justify-between gap-4">
-                    <h3 className="font-display text-2xl tracking-tight text-foreground">
-                      {service.title}
-                    </h3>
-                    <span className="shrink-0 text-xs uppercase tracking-[0.14em] text-muted">
-                      {service.duration}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
-                    {service.summary}
+                <div className="min-w-0">
+                  <p className="font-display text-xl tracking-tight text-foreground md:text-2xl">
+                    {service.name}
                   </p>
-                  {price ? (
-                    <p className="mt-4 text-sm font-medium text-accent">{productPriceLabel(price)}</p>
-                  ) : null}
+                  <p className="mt-1 text-sm text-muted line-clamp-2">{service.summary}</p>
+                  <p className="mt-2 text-sm text-accent">From {productPriceLabel(from)}</p>
+                </div>
+                <div className="flex shrink-0 gap-2">
+                  <Link
+                    href={`/book?service=${service.slug}`}
+                    className="inline-flex min-h-11 flex-1 items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground sm:flex-none"
+                  >
+                    Book
+                  </Link>
                   <Link
                     href={`/services/${service.slug}`}
-                    className="mt-5 inline-flex text-sm font-medium text-accent transition hover:opacity-80"
+                    className="inline-flex min-h-11 flex-1 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm text-foreground transition hover:border-accent hover:text-accent sm:flex-none"
                   >
-                    View details
+                    Details
                   </Link>
                 </div>
               </li>
@@ -69,18 +55,12 @@ export function HomeServices() {
           })}
         </ul>
 
-        <div className="mt-10 flex flex-wrap gap-4">
+        <div className="mt-8">
           <Link
             href="/services"
-            className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+            className="inline-flex text-sm font-medium text-accent transition hover:opacity-80"
           >
-            All services & videos
-          </Link>
-          <Link
-            href="/pricing"
-            className="inline-flex rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
-          >
-            Full pricing
+            See all services →
           </Link>
         </div>
       </div>
