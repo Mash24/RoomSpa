@@ -20,9 +20,9 @@ export default function CoveragePage() {
         Where we come to you
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Hotels, condos, and homes in these Chiang Mai zones are our standard reach. See also the{" "}
+        Hotels, condos, and homes across these Chiang Mai areas. See also{" "}
         <Link href="/city/chiang-mai" className="text-accent underline">
-          Chiang Mai guide
+          Chiang Mai
         </Link>
         .
       </p>
@@ -35,21 +35,20 @@ export default function CoveragePage() {
               <span className="text-sm text-muted">{area.city}</span>
             </div>
             <p className="mt-3 text-sm text-muted">
-              Travel fee:{" "}
               {area.travelFeeThb === 0
-                ? "Included — no extra travel fee"
-                : `${formatThb(area.travelFeeThb)} (may vary by exact distance)`}
+                ? "No extra travel fee"
+                : `Travel fee from ${formatThb(area.travelFeeThb)}`}
             </p>
           </li>
         ))}
       </ul>
 
       <p className="mt-8 text-sm leading-relaxed text-muted">
-        Outside these zones? We often still can help —{" "}
+        Outside these areas?{" "}
         <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
-          message us on WhatsApp
+          WhatsApp us
         </a>{" "}
-        with your hotel or area.
+        with your hotel or neighborhood.
       </p>
 
       <div className="mt-8 flex flex-wrap gap-3">
@@ -57,7 +56,7 @@ export default function CoveragePage() {
           href="/book"
           className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
         >
-          Book in coverage
+          Book now
         </Link>
         <Link
           href="/city"

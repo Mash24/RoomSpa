@@ -8,7 +8,6 @@ import {
   REVIEW_MAX_NAME,
   REVIEW_MAX_TITLE,
   REVIEW_MIN_BODY,
-  reviewGuidelines,
 } from "@/lib/reviews/rules";
 
 export function ReviewForm() {
@@ -51,7 +50,7 @@ export function ReviewForm() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Could not submit review.");
 
-      setSuccess(data.message || "Review submitted for moderation.");
+      setSuccess(data.message || "Thanks — your review was submitted.");
       setAuthorName("");
       setAuthorEmail("");
       setRating(5);
@@ -71,9 +70,7 @@ export function ReviewForm() {
     <form onSubmit={onSubmit} className="space-y-5 border border-border bg-surface-elevated p-6 md:p-8">
       <div>
         <h2 className="font-display text-2xl text-foreground md:text-3xl">Write a review</h2>
-        <p className="mt-2 text-sm text-muted">
-          Reviews are moderated before they appear. Please follow the guidelines below.
-        </p>
+        <p className="mt-2 text-sm text-muted">Share what stood out about your visit.</p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -143,7 +140,7 @@ export function ReviewForm() {
           className="mt-1 w-full border border-border bg-background px-3 py-2.5 text-foreground outline-none focus:border-accent"
         />
         <span className="mt-1 block text-xs text-muted">
-          {body.length}/{REVIEW_MAX_BODY} · minimum {REVIEW_MIN_BODY} characters
+          {body.length}/{REVIEW_MAX_BODY}
         </span>
       </label>
 
@@ -174,21 +171,6 @@ export function ReviewForm() {
         </label>
       </div>
 
-      <div className="border border-border bg-surface p-4 text-sm">
-        <p className="font-medium text-foreground">What you can post</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
-          {reviewGuidelines.allowed.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-        <p className="mt-4 font-medium text-foreground">What you cannot post</p>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
-          {reviewGuidelines.notAllowed.map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </div>
-
       <label className="flex items-start gap-3 text-sm text-foreground">
         <input
           type="checkbox"
@@ -197,7 +179,7 @@ export function ReviewForm() {
           className="mt-1"
           required
         />
-        <span>I confirm this review follows the guidelines and is about my RoomSpa experience.</span>
+        <span>This is an honest review of my RoomSpa visit.</span>
       </label>
 
       {error ? (
@@ -216,7 +198,7 @@ export function ReviewForm() {
         disabled={submitting}
         className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
       >
-        {submitting ? "Submitting..." : "Submit for moderation"}
+        {submitting ? "Submitting..." : "Submit review"}
       </button>
     </form>
   );

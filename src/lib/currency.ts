@@ -1,4 +1,4 @@
-/** Display FX for dual-currency UI. Stripe charges in THB. Update as needed. */
+/** Display helpers. Stripe charges in THB. */
 export const THB_PER_USD = 36;
 
 export function formatThb(amount: number) {
@@ -18,6 +18,7 @@ export function formatUsdFromThb(amountThb: number) {
   }).format(usd);
 }
 
+/** Guest-facing price label — THB only (no USD conversion clutter). */
 export function dualPriceLabel(amountThb: number) {
-  return `${formatThb(amountThb)} · ~${formatUsdFromThb(amountThb)}`;
+  return formatThb(amountThb);
 }

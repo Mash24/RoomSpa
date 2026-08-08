@@ -2,20 +2,18 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   getServicePriceTiers,
-  productPriceLabel,
   serviceCategories,
 } from "@/content/services";
 import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import { whatsappHref } from "@/content/site";
 import { getPublicCatalog } from "@/lib/catalog/public";
-import { THB_PER_USD, formatThb } from "@/lib/currency";
+import { formatThb } from "@/lib/currency";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Pricing",
-  description:
-    "RoomSpa mobile massage pricing for 60 min, 90 min, and 2 hours — THB with approximate USD.",
+  description: "RoomSpa in-room massage pricing for 60 min, 90 min, and 2 hours in Chiang Mai.",
 };
 
 export default async function PricingPage() {
@@ -50,7 +48,6 @@ export default async function PricingPage() {
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                       <div className="min-w-0 sm:max-w-xs">
                         <p className="font-medium text-foreground">{product.name}</p>
-                        <p className="mt-1 text-sm text-muted">In-room · Chiang Mai</p>
                       </div>
                       <div className="w-full flex-1 sm:max-w-md">
                         <ServicePriceTiers service={product} />
@@ -72,7 +69,7 @@ export default async function PricingPage() {
 
       {fromPrice > 0 ? (
         <p className="mt-10 text-sm text-muted">
-          From {formatThb(fromPrice)} for 60 minutes. Custom length?{" "}
+          From {formatThb(fromPrice)}. Need something custom?{" "}
           <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
             WhatsApp us
           </a>

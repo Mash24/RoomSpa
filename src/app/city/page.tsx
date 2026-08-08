@@ -29,7 +29,7 @@ export default function CitiesIndexPage() {
         Where we come to you
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Live booking in Chiang Mai. Bangkok and Phuket are next.
+        Booking now in Chiang Mai. Bangkok and Phuket coming soon.
       </p>
 
       <ul className="mt-10 divide-y divide-border border-y border-border">
@@ -38,7 +38,7 @@ export default function CitiesIndexPage() {
             <div className="flex flex-wrap items-baseline gap-2">
               <h2 className="font-display text-2xl text-foreground">{city.name}</h2>
               <span className="text-xs uppercase tracking-[0.14em] text-muted">
-                {city.status === "active" ? "Live" : "Soon"}
+                {city.status === "active" ? "Available" : "Coming soon"}
               </span>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-muted">{city.summary}</p>
@@ -46,7 +46,7 @@ export default function CitiesIndexPage() {
               href={`/city/${city.slug}`}
               className="mt-3 inline-flex text-sm font-medium text-accent"
             >
-              {city.status === "active" ? `View ${city.name}` : `See plans`} →
+              {city.status === "active" ? `View ${city.name}` : `Learn more`} →
             </Link>
           </li>
         ))}
@@ -58,7 +58,7 @@ export default function CitiesIndexPage() {
         rel="noreferrer"
         className="mt-8 inline-flex text-sm text-accent underline"
       >
-        Request a city on WhatsApp
+        Ask about another city
       </a>
     </section>
   );

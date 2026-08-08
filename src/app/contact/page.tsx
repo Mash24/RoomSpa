@@ -15,8 +15,7 @@ export default function ContactPage() {
         Talk to us
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Fastest reply is WhatsApp. For booking changes, use My booking with your email and PIN, or
-        message us with your reference code.
+        WhatsApp is fastest. For an existing booking, use My booking or message us with your reference.
       </p>
 
       <ul className="mt-12 space-y-6">
@@ -30,7 +29,7 @@ export default function ContactPage() {
           >
             {site.contact.whatsapp}
           </a>
-          <p className="mt-2 text-sm text-muted">Bookings, last-minute requests, coverage questions.</p>
+          <p className="mt-2 text-sm text-muted">Bookings and same-day requests.</p>
         </li>
         <li className="border border-border bg-surface-elevated p-6">
           <p className="text-xs uppercase tracking-[0.14em] text-muted">Email</p>
@@ -40,9 +39,7 @@ export default function ContactPage() {
           >
             {site.contact.email}
           </a>
-          <p className="mt-2 text-sm text-muted">
-            Partnerships and non-urgent notes. We reply as soon as we can.
-          </p>
+          <p className="mt-2 text-sm text-muted">Partnerships and general questions.</p>
         </li>
       </ul>
 

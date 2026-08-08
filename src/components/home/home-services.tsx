@@ -21,7 +21,7 @@ export function HomeServices({ services }: Props) {
             Popular treatments
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
-            Delivered to your hotel, condo, or home. Full menu on Services.
+            Delivered to your hotel, condo, or home.
           </p>
         </div>
 

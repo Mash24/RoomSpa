@@ -16,8 +16,7 @@ export default function ManageBookingPage() {
         Manage your booking
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Enter the email and 4-digit PIN from your booking confirmation. Pay by card, check payment
-        status, or contact us about changes.
+        Enter the email and PIN from your confirmation.
       </p>
 
       <div className="mt-10">

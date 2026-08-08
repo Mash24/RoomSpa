@@ -154,7 +154,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       ok: true,
       message:
-        "Thanks — your review was submitted and is pending moderation. Approved reviews appear on this page.",
+        "Thanks — your review was submitted.",
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Could not submit review.";

@@ -51,7 +51,7 @@ export default async function CityPage({ params }: PageProps) {
       question: `Do you offer in-room massage in ${city.name}?`,
       answer: live
         ? `Yes. We come to hotels, condos, and homes across ${city.neighborhoods.map((n) => n.name).join(", ")}.`
-        : `Not yet live — ${city.name} is on our roadmap. WhatsApp the waitlist or book Chiang Mai today.`,
+        : `Coming soon in ${city.name}. WhatsApp us for updates, or book Chiang Mai today.`,
     },
     ...faqItems.slice(0, 3),
   ];
@@ -126,7 +126,7 @@ export default async function CityPage({ params }: PageProps) {
             rel="noreferrer"
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
           >
-            WhatsApp waitlist
+            WhatsApp us
           </a>
         )}
         <Link

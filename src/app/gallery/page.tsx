@@ -7,9 +7,8 @@ import { buildPageMetadata } from "@/lib/seo/metadata";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Gallery | In-room massage videos Chiang Mai",
-  description:
-    "Watch RoomSpa treatment videos and photos — each clip labeled by service for hotels, condos, and homes in Chiang Mai.",
+  title: "Gallery | In-room massage Chiang Mai",
+  description: "Videos and photos of RoomSpa treatments for hotels, condos, and homes in Chiang Mai.",
   path: "/gallery",
 });
 
@@ -23,13 +22,11 @@ export default async function GalleryPage() {
         See our treatments
       </h1>
       <p className="mt-4 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-        Short clips and photos from admin — each labeled with the service it belongs to.
+        A closer look at the massages we bring to your room.
       </p>
 
       {items.length === 0 ? (
-        <p className="mt-12 text-sm text-muted">
-          No published media yet. Add videos in the admin Media library.
-        </p>
+        <p className="mt-12 text-sm text-muted">New videos coming soon.</p>
       ) : (
         <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {

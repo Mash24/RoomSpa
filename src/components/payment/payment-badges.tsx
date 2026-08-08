@@ -1,4 +1,4 @@
-import { dualPriceLabel } from "@/lib/currency";
+import { formatThb } from "@/lib/currency";
 
 type PaymentBadgesProps = {
   compact?: boolean;
@@ -7,9 +7,7 @@ type PaymentBadgesProps = {
 export function PaymentBadges({ compact = false }: PaymentBadgesProps) {
   return (
     <div className={compact ? "space-y-2" : "space-y-3"}>
-      <p className={`text-muted ${compact ? "text-xs" : "text-sm"}`}>
-        Cash or card accepted · Secure online booking
-      </p>
+      <p className={`text-muted ${compact ? "text-xs" : "text-sm"}`}>Cash or card</p>
       <div className="flex flex-wrap items-center gap-2">
         <span className="inline-flex h-7 items-center rounded-sm border border-border bg-surface-elevated px-2 text-[10px] font-semibold tracking-wider text-foreground">
           VISA
@@ -20,14 +18,11 @@ export function PaymentBadges({ compact = false }: PaymentBadgesProps) {
         <span className="inline-flex h-7 items-center rounded-sm border border-border bg-surface-elevated px-2 text-[10px] font-semibold tracking-wider text-foreground">
           AMEX
         </span>
-        {!compact ? (
-          <span className="text-xs text-muted">Pay now or later — no account needed</span>
-        ) : null}
       </div>
     </div>
   );
 }
 
 export function formatBookingAmount(amountThb: number) {
-  return dualPriceLabel(amountThb);
+  return formatThb(amountThb);
 }

@@ -55,7 +55,7 @@ export default async function ServiceLocationPage({ params }: PageProps) {
       question: `Can I book ${service.name} ${location.inPhrase}?`,
       answer: location.bookable
         ? `Yes. Choose ${service.name} on the booking form and select coverage for ${location.name}.`
-        : `${location.cityName} coverage is coming soon. Book Chiang Mai today or WhatsApp the waitlist.`,
+        : `${location.cityName} coverage is coming soon. Book Chiang Mai today, or WhatsApp us to hear when we launch.`,
     },
     ...getServiceFaqs(service.slug).slice(0, 3),
   ];
@@ -131,7 +131,7 @@ export default async function ServiceLocationPage({ params }: PageProps) {
       ) : null}
 
       <p className="mt-6 text-sm text-muted">
-        From {productPriceLabel(service.amountThb)} · choose length when you book
+        From {productPriceLabel(service.amountThb)}
       </p>
 
       <div className="mt-8 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap">
@@ -149,7 +149,7 @@ export default async function ServiceLocationPage({ params }: PageProps) {
             rel="noreferrer"
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
           >
-            WhatsApp waitlist
+            WhatsApp us
           </a>
         )}
         <Link

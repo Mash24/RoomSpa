@@ -43,7 +43,7 @@ export const blogPosts: BlogPost[] = [
     body: [
       "In-room massage in Chiang Mai is often similar to a mid-range spa visit, sometimes a little higher — and for good reason. You are paying for a therapist who travels to you, brings equipment, and works around your schedule so you skip tuk-tuks and waiting rooms.",
       "Hotel spa menus can look cheaper on paper until you add travel time, waitlists, and tip expectations. Outcall rates usually include the convenience of setup in your room.",
-      "RoomSpa publishes clear THB prices on the site (with an approximate USD guide). Core coverage in Old City and Nimman typically has no travel fee; the Airport / Hang Dong corridor may add a small travel fee depending on distance.",
+      "RoomSpa publishes clear prices on the site. Core coverage in Old City and Nimman typically has no travel fee; the Airport / Hang Dong corridor may add a small travel fee depending on distance.",
       "You can pay cash on arrival, card later from My booking, or card now at checkout. No surprise add-ons for standard sessions — extras are only what you choose.",
       "Compare the full menu on Pricing, then book the service that matches your pressure and duration needs.",
     ],
@@ -113,7 +113,7 @@ export const blogPosts: BlogPost[] = [
       "Old City / Center: guesthouses and heritage hotels inside and around the moat. Ideal after temple days and night markets. RoomSpa covers this as a core zone.",
       "Nimman / University area: boutiques, condos, and digital-nomad stays near Nimmanhaemin and Maya. Fast to reach for therapists; popular for evening couples and recovery sessions.",
       "Airport / Hang Dong corridor: convenient after landing or for residences south of the center. A light travel fee may apply depending on distance — shown when you book.",
-      "Bangkok and Phuket are on the roadmap; Chiang Mai is live today. Open the Chiang Mai page for neighborhood detail, then book with your hotel name so we route correctly.",
+      "Bangkok and Phuket are coming soon; Chiang Mai is available today. Open the Chiang Mai page for neighborhoods, then book with your hotel name.",
     ],
     primaryCta: { label: "Explore Chiang Mai", href: "/city/chiang-mai" },
     secondaryCta: { label: "Book now", href: "/book" },

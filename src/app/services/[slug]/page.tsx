@@ -134,7 +134,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         <p className="text-xs uppercase tracking-[0.14em] text-muted">Duration & pricing</p>
         <ServicePriceTiers className="mt-3" service={service} />
         <p className="mt-3 text-sm text-muted">
-          From {productPriceLabel(getServicePriceTiers(service)[60])} · choose length when you book
+          From {productPriceLabel(getServicePriceTiers(service)[60])}
         </p>
       </div>
 

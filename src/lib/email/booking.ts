@@ -319,7 +319,7 @@ function statusEmailHtml(input: BookingStatusEmailInput) {
                     ? `<div style="margin:24px 0;padding:20px;border:1px solid #d4b896;background:#f3ebe1;">
                   <p style="margin:0;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#9a6b3f;">Share your experience</p>
                   <p style="margin:10px 0 0;font-size:14px;line-height:1.5;color:#57534e;">
-                    A short public review helps travelers find trusted in-room massage in Chiang Mai. Reviews are moderated before they appear.
+                    Share a short public review of your visit. Thanks for helping other travelers.
                   </p>
                   <p style="margin:16px 0 0;">
                     <a href="${escapeHtml(review)}" style="display:inline-block;background:#2f5d50;color:#f7f9f8;text-decoration:none;padding:12px 18px;font-size:14px;">

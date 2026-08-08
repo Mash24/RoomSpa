@@ -59,8 +59,7 @@ export const site = {
       body: "Your therapist arrives prepared. You stay where you are.",
     },
   ],
-  coverageNote:
-    "Launching in Chiang Mai. City-flexible by design — expand without renaming the brand.",
+  coverageNote: "Serving Chiang Mai — hotel, condo, and home.",
 } as const;
 
 const whatsappNumber = site.contact.whatsapp.replace(/\D/g, "");

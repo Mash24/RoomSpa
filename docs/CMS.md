@@ -20,6 +20,8 @@
 - Do **not** send large MP4s through the Next.js API (Vercel ~4.5 MB body limit → `Request Entity Too Large`)
 - Admin panel uploads with the browser Supabase client into bucket `media-library`
 - External links are first-class: paste into Media URL and Save
+- **X/Twitter** post URLs render with the official on-page embed (no Storage, no phone download)
+- YouTube / Vimeo use iframe embeds; `.mp4` uses the native player
 
 ## Notes
 - Soft-delete / hide services — do not hard-delete rows with booking history

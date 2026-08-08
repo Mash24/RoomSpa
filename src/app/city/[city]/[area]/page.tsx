@@ -103,7 +103,7 @@ export default async function NeighborhoodPage({ params }: PageProps) {
             rel="noreferrer"
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
           >
-            WhatsApp waitlist
+            WhatsApp us
           </a>
         )}
         <Link

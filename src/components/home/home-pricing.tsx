@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { featuredServices, productPriceLabel } from "@/content/services";
 import { whatsappHref } from "@/content/site";
-import { THB_PER_USD } from "@/lib/currency";
 
 export function HomePricing() {
   return (
@@ -10,11 +9,10 @@ export function HomePricing() {
         <div className="max-w-2xl">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Pricing</p>
           <h2 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
-            Clear rates in THB and USD
+            Clear rates
           </h2>
           <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-            Charged in Thai Baht. USD shown as an approximate guide (~{THB_PER_USD} THB = 1 USD). Full
-            menu from classic Swedish to Nuru, Yoni, and Lingam.
+            Pick a treatment and length. Pay cash or card.
           </p>
         </div>
 
@@ -44,7 +42,7 @@ export function HomePricing() {
                   rel="noreferrer"
                   className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent"
                 >
-                  Ask on WhatsApp
+                  WhatsApp
                 </a>
               </div>
             </li>
@@ -52,15 +50,13 @@ export function HomePricing() {
         </ul>
 
         <p className="mt-8 text-sm text-muted">
-          Looking for Thai, deep tissue, four-hands, or tantric?{" "}
           <Link href="/pricing" className="text-accent underline">
-            See full pricing
+            Full pricing
           </Link>{" "}
-          or{" "}
+          ·{" "}
           <Link href="/services" className="text-accent underline">
-            browse all services
+            All services
           </Link>
-          .
         </p>
       </div>
     </section>

@@ -39,10 +39,7 @@ export function ServicePriceTiers({
               {DURATION_TIER_LABELS[minutes]}
             </p>
             <p className="mt-1.5 font-display text-lg tracking-tight text-accent sm:text-xl md:text-2xl">
-              {productPriceLabel(amount).split(" · ")[0]}
-            </p>
-            <p className="mt-0.5 hidden text-[0.65rem] text-muted sm:block">
-              ~{productPriceLabel(amount).split(" · ")[1]?.replace("~", "")}
+              {productPriceLabel(amount)}
             </p>
           </>
         );
@@ -87,7 +84,7 @@ export function ServicePriceTiersCompact({ service }: { service: CatalogService 
         <span key={minutes}>
           {index > 0 ? " · " : ""}
           <span className="text-foreground/80">{DURATION_TIER_LABELS[minutes]}</span>{" "}
-          {productPriceLabel(tiers[minutes]).split(" · ")[0]}
+          {productPriceLabel(tiers[minutes])}
         </span>
       ))}
     </p>

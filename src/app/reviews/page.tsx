@@ -7,8 +7,7 @@ import { getApprovedReviews } from "@/lib/reviews/fetch";
 
 export const metadata: Metadata = {
   title: "Reviews",
-  description:
-    "Read guest reviews of RoomSpa mobile massage and share your experience. All reviews are moderated before publishing.",
+  description: "Guest reviews of RoomSpa in-room massage in Chiang Mai.",
 };
 
 export const dynamic = "force-dynamic";
@@ -23,7 +22,7 @@ export default async function ReviewsPage() {
         What guests say
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Honest feedback from guests. New reviews are checked by our team before they appear here.
+        Real feedback from guests who booked at their hotel, condo, or home.
       </p>
 
       <div className="mt-12">
@@ -37,11 +36,9 @@ export default async function ReviewsPage() {
       </div>
 
       <p className="mt-8 text-sm text-muted">
-        Prefer to book again first?{" "}
         <Link href="/book" className="text-accent underline">
-          Book an appointment
+          Book again
         </Link>
-        .
       </p>
     </section>
   );

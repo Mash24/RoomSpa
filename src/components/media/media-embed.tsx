@@ -6,6 +6,7 @@ import {
   youtubeEmbedUrl,
 } from "@/lib/media/urls";
 import { AutoplayVideo } from "@/components/media/autoplay-video";
+import { XPostEmbed } from "@/components/media/x-post-embed";
 
 type Props = {
   url: string;
@@ -75,6 +76,10 @@ export function MediaEmbed({
     }
   }
 
+  if (source === "x") {
+    return <XPostEmbed url={url} title={title} className={className} />;
+  }
+
   if (source === "direct-image") {
     return (
       <div className={`relative aspect-video overflow-hidden bg-surface ${className}`}>
@@ -89,7 +94,7 @@ export function MediaEmbed({
       href={url}
       target="_blank"
       rel="noreferrer"
-      className={`group relative flex aspect-video flex-col justify-end overflow-hidden bg-surface p-5 transition hover:bg-surface-elevated ${className}`}
+      className={`group relative flex min-h-[12rem] flex-col justify-end overflow-hidden bg-surface p-5 transition hover:bg-surface-elevated ${className}`}
     >
       {thumbnailUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
@@ -109,12 +114,11 @@ export function MediaEmbed({
         />
       )}
       <div className="relative">
-        <p className="text-xs uppercase tracking-[0.16em] text-white/60">External video</p>
-        <p className="mt-2 font-display text-xl text-white">{title}</p>
+        <p className="font-display text-xl text-white">{title}</p>
         {description ? (
           <p className="mt-1 line-clamp-2 text-sm text-white/70">{description}</p>
         ) : null}
-        <p className="mt-3 text-sm font-medium text-[#7eb8a4]">Open link →</p>
+        <p className="mt-3 text-sm font-medium text-[#7eb8a4]">Open →</p>
       </div>
     </a>
   );

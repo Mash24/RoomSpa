@@ -46,7 +46,7 @@ export default function FaqPage() {
           rel="noreferrer"
           className="inline-flex rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
         >
-          Still unsure? WhatsApp us
+          WhatsApp us
         </a>
       </div>
     </section>

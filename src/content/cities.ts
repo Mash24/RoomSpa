@@ -61,13 +61,13 @@ export const cities: CityDefinition[] = [
     status: "coming_soon",
     headline: "In-room massage in Bangkok — coming soon",
     summary:
-      "We’re preparing Bangkok hotel and condo coverage. Join the waitlist via WhatsApp, or book us today in Chiang Mai.",
+      "Bangkok hotel and condo coverage is coming soon. Message us on WhatsApp, or book Chiang Mai today.",
     seoTitle: "In-room massage Bangkok — coming soon | RoomSpa",
     seoDescription:
-      "RoomSpa mobile massage is expanding to Bangkok hotels and condos. Message WhatsApp to join the waitlist, or book Chiang Mai now.",
+      "RoomSpa mobile massage is expanding to Bangkok. Message WhatsApp for updates, or book Chiang Mai now.",
     neighborhoods: [
-      { slug: "sukhumvit", name: "Sukhumvit", summary: "Planned hotel & condo coverage." },
-      { slug: "silom", name: "Silom / Sathorn", summary: "Planned business-district coverage." },
+      { slug: "sukhumvit", name: "Sukhumvit", summary: "Hotel & condo coverage coming soon." },
+      { slug: "silom", name: "Silom / Sathorn", summary: "Business-district coverage coming soon." },
     ],
   },
   {
@@ -76,13 +76,13 @@ export const cities: CityDefinition[] = [
     status: "coming_soon",
     headline: "In-room massage in Phuket — coming soon",
     summary:
-      "Beach-resort and villa in-room massage is on our roadmap. WhatsApp us for early interest, or book Chiang Mai today.",
+      "Resort and villa in-room massage is coming soon. WhatsApp us for updates, or book Chiang Mai today.",
     seoTitle: "In-room massage Phuket — coming soon | RoomSpa",
     seoDescription:
-      "RoomSpa is expanding mobile massage to Phuket resorts and villas. Join the waitlist on WhatsApp.",
+      "RoomSpa is expanding mobile massage to Phuket. Message WhatsApp for updates.",
     neighborhoods: [
-      { slug: "patong", name: "Patong", summary: "Planned resort coverage." },
-      { slug: "rawai", name: "Rawai / Nai Harn", summary: "Planned villa coverage." },
+      { slug: "patong", name: "Patong", summary: "Resort coverage coming soon." },
+      { slug: "rawai", name: "Rawai / Nai Harn", summary: "Villa coverage coming soon." },
     ],
   },
 ];

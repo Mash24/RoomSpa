@@ -3,10 +3,15 @@ export type MediaSourceKind =
   | "direct-image"
   | "youtube"
   | "vimeo"
+  | "x"
   | "external";
 
 const VIDEO_EXT = /\.(mp4|webm|ogg|mov)(\?|$)/i;
 const IMAGE_EXT = /\.(jpe?g|png|gif|webp|avif)(\?|$)/i;
+
+function isXHost(host: string) {
+  return host === "x.com" || host === "twitter.com" || host === "mobile.twitter.com" || host === "mobile.x.com";
+}
 
 export function classifyMediaUrl(url: string, declaredKind?: "image" | "video"): MediaSourceKind {
   const trimmed = url.trim();
@@ -19,18 +24,32 @@ export function classifyMediaUrl(url: string, declaredKind?: "image" | "video"):
 
     if (host.includes("youtube.com") || host === "youtu.be") return "youtube";
     if (host.includes("vimeo.com")) return "vimeo";
+    if (isXHost(host) && /\/status(?:es)?\/\d+/i.test(path)) return "x";
     if (VIDEO_EXT.test(path) || VIDEO_EXT.test(trimmed)) return "direct-video";
     if (IMAGE_EXT.test(path) || IMAGE_EXT.test(trimmed)) return "direct-image";
     if (declaredKind === "image") return "direct-image";
-    if (declaredKind === "video" && !host.includes("x.com") && !host.includes("twitter.com")) {
-      // Relative site paths like /media/...mp4
-      if (trimmed.startsWith("/") && VIDEO_EXT.test(trimmed)) return "direct-video";
+    if (declaredKind === "video" && trimmed.startsWith("/") && VIDEO_EXT.test(trimmed)) {
+      return "direct-video";
     }
     return "external";
   } catch {
     if (VIDEO_EXT.test(trimmed)) return "direct-video";
     if (IMAGE_EXT.test(trimmed)) return "direct-image";
     return declaredKind === "image" ? "direct-image" : "external";
+  }
+}
+
+/** Canonical status URL for X embed widgets (`twitter.com/i/status/{id}`). */
+export function normalizeXStatusUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url.trim());
+    const host = parsed.hostname.replace(/^www\./, "").toLowerCase();
+    if (!isXHost(host)) return null;
+    const id = parsed.pathname.match(/\/status(?:es)?\/(\d+)/i)?.[1];
+    if (!id) return null;
+    return `https://twitter.com/i/status/${id}`;
+  } catch {
+    return null;
   }
 }
 
