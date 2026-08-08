@@ -3,19 +3,23 @@ import { cities } from "@/content/cities";
 import { site, whatsappHref } from "@/content/site";
 
 const bookLinks = [
-  { label: "Book", href: "/book" },
+  { label: "Book a massage", href: "/book" },
   { label: "My booking", href: "/my-booking" },
   { label: "Services", href: "/services" },
   { label: "Pricing", href: "/pricing" },
 ] as const;
 
 const exploreLinks = [
+  { label: "Locations", href: "/city" },
   { label: "Reviews", href: "/reviews" },
   { label: "Gallery", href: "/gallery" },
-  { label: "Locations", href: "/city" },
   { label: "FAQ", href: "/faq" },
-  { label: "About", href: "/about" },
   { label: "Blog", href: "/blog" },
+] as const;
+
+const companyLinks = [
+  { label: "About", href: "/about" },
+  { label: "Contact", href: "/contact" },
 ] as const;
 
 function formatWhatsAppDisplay(raw: string) {
@@ -76,11 +80,16 @@ export function FooterMenus() {
         </nav>
       </Column>
 
-      <Column title="Contact">
-        <div className="flex flex-col gap-1.5">
+      <Column title="Company">
+        <nav aria-label="Company" className="flex flex-col">
+          {companyLinks.map((item) => (
+            <MenuLink key={item.href} href={item.href} label={item.label} />
+          ))}
+        </nav>
+        <div className="mt-3 space-y-1.5 border-t border-white/10 pt-3">
           <a
             href={`mailto:${site.contact.email}`}
-            className="break-all text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
+            className="block break-all text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
           >
             <span className="sm:hidden">Email</span>
             <span className="hidden sm:inline">{site.contact.email}</span>
@@ -89,7 +98,7 @@ export function FooterMenus() {
             href={whatsappHref}
             target="_blank"
             rel="noreferrer"
-            className="text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
+            className="block text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
           >
             <span className="sm:hidden">WhatsApp</span>
             <span className="hidden sm:inline">WhatsApp {whatsappDisplay}</span>
@@ -97,18 +106,12 @@ export function FooterMenus() {
           <p className="text-[0.65rem] leading-snug text-white/40 sm:text-xs">
             Chiang Mai · 24/7
           </p>
-          <Link
-            href="/contact"
-            className="text-xs text-[#7eb8a4] transition hover:text-white sm:text-sm"
-          >
-            Contact page
-          </Link>
           {soonCities.length > 0 ? (
-            <p className="mt-2 border-t border-white/10 pt-2 text-[0.65rem] leading-snug text-white/40 sm:text-xs">
+            <p className="pt-1 text-[0.65rem] leading-snug text-white/40 sm:text-xs">
               Coming soon:{" "}
               {soonCities.map((city, index) => (
                 <span key={city.slug}>
-                  {index > 0 ? ", " : ""}
+                  {index > 0 ? " · " : ""}
                   <Link href={`/city/${city.slug}`} className="text-white/55 transition hover:text-white">
                     {city.name}
                   </Link>

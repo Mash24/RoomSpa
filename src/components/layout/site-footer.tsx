@@ -60,11 +60,7 @@ export function SiteFooter() {
       <div className="relative border-t border-white/10">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs leading-relaxed text-white/40 xs:px-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 md:px-8">
           <p>
-            © {year} GetRoomSpa
-            <span className="mx-1.5 text-white/20" aria-hidden>
-              ·
-            </span>
-            Chiang Mai
+            © {year} GetRoomSpa · Chiang Mai
           </p>
           <nav aria-label="Legal" className="flex flex-wrap items-center gap-x-1 gap-y-1">
             {legalLinks.map((item, index) => (

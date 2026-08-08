@@ -12,9 +12,9 @@ const homeServicePicks = (() => {
 
 export const site = {
   name: "RoomSpa",
-  tagline: "Premium massage, wherever you are",
+  tagline: "We come to you",
   description:
-    "Book professional in-room massage at your hotel, condo, or home in Chiang Mai — classic, therapeutic, and couples sessions.",
+    "Book professional in-room massage at your hotel, condo, or home in Chiang Mai. We come to you — classic, therapeutic, and couples sessions.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en",
   contact: {
@@ -30,10 +30,10 @@ export const site = {
   ],
   hero: {
     brand: "RoomSpa",
-    headline: "Spa-quality massage at your door",
+    headline: "Professional massage, delivered to your door",
     support:
-      "A professional therapist comes to your hotel, condo, or home in Chiang Mai. Book online in minutes.",
-    primaryCta: { label: "Book now", href: "/book" },
+      "Enjoy a private massage in your Chiang Mai hotel, condo, or home. Choose your treatment, pick a time, and we’ll come to you — no spa commute.",
+    primaryCta: { label: "Book a massage", href: "/book" },
     secondaryCta: { label: "View services", href: "/services" },
   },
   services: homeServicePicks.map((service) => ({

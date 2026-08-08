@@ -16,7 +16,7 @@ type Props = {
 
 export function HomeTestimonials({ items, fromGuests = false }: Props) {
   const scrollerRef = useRef<HTMLDivElement>(null);
-  const shown = items.slice(0, 4);
+  const shown = items.slice(0, 6);
 
   const scrollBy = (dir: -1 | 1) => {
     const el = scrollerRef.current;
@@ -35,7 +35,7 @@ export function HomeTestimonials({ items, fromGuests = false }: Props) {
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
               {fromGuests
-                ? "Recent guests who booked at their hotel, condo, or home."
+                ? "Real guest feedback — including convenience after long travel days in Chiang Mai."
                 : "Calm, private, and easy to book — without leaving your room."}
             </p>
           </div>
