@@ -4,13 +4,15 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { BreadcrumbJsonLd, JsonLd } from "@/components/seo/json-ld";
 import { cities, coverageForNeighborhood, getNeighborhood } from "@/content/cities";
-import { catalogServices } from "@/content/services";
 import { site, whatsappHref } from "@/content/site";
+import { getPublicCatalog } from "@/lib/catalog/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
   params: Promise<{ city: string; area: string }>;
 };
+
+export const dynamic = "force-dynamic";
 
 export function generateStaticParams() {
   return cities.flatMap((city) =>
@@ -38,7 +40,7 @@ export default async function NeighborhoodPage({ params }: PageProps) {
   const { city, area } = match;
   const coverage = coverageForNeighborhood(area.coverageSlug);
   const live = city.status === "active";
-  const picks = catalogServices.filter((s) => s.bookable).slice(0, 8);
+  const picks = (await getPublicCatalog()).slice(0, 5);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
@@ -116,7 +118,7 @@ export default async function NeighborhoodPage({ params }: PageProps) {
         <section className="mt-12">
           <h2 className="font-display text-2xl text-foreground">Popular services</h2>
           <ul className="mt-4 divide-y divide-border border-y border-border">
-            {picks.slice(0, 5).map((service) => (
+            {picks.map((service) => (
               <li key={service.slug}>
                 <Link
                   href={`/services/${service.slug}`}

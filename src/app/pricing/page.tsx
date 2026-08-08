@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  catalogProducts,
   getServicePriceTiers,
+  productPriceLabel,
   serviceCategories,
 } from "@/content/services";
 import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import { whatsappHref } from "@/content/site";
+import { getPublicCatalog } from "@/lib/catalog/public";
 import { THB_PER_USD, formatThb } from "@/lib/currency";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -15,10 +18,11 @@ export const metadata: Metadata = {
     "RoomSpa mobile massage pricing for 60 min, 90 min, and 2 hours — THB with approximate USD.",
 };
 
-export default function PricingPage() {
-  const fromPrice = Math.min(
-    ...catalogProducts.map((p) => getServicePriceTiers(p)[60]),
-  );
+export default async function PricingPage() {
+  const catalog = await getPublicCatalog();
+  const fromPrice = catalog.length
+    ? Math.min(...catalog.map((p) => getServicePriceTiers(p)[60]))
+    : 0;
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
@@ -32,7 +36,7 @@ export default function PricingPage() {
 
       <div className="mt-10 space-y-12 md:mt-14">
         {serviceCategories.map((category) => {
-          const products = catalogProducts.filter((p) => p.category === category.id);
+          const products = catalog.filter((p) => p.category === category.id);
           if (products.length === 0) return null;
 
           return (
@@ -66,13 +70,15 @@ export default function PricingPage() {
         })}
       </div>
 
-      <p className="mt-10 text-sm text-muted">
-        From {formatThb(fromPrice)} for 60 minutes. Custom length?{" "}
-        <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
-          WhatsApp us
-        </a>
-        .
-      </p>
+      {fromPrice > 0 ? (
+        <p className="mt-10 text-sm text-muted">
+          From {formatThb(fromPrice)} for 60 minutes. Custom length?{" "}
+          <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
+            WhatsApp us
+          </a>
+          .
+        </p>
+      ) : null}
     </section>
   );
 }

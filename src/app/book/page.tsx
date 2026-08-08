@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { BookingForm } from "@/components/booking/booking-form";
 import { whatsappHref } from "@/content/site";
+import { getPublicCatalog } from "@/lib/catalog/public";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Book Appointment",
@@ -9,7 +12,9 @@ export const metadata: Metadata = {
     "Book a RoomSpa massage at your hotel, condo, or home in Chiang Mai. Pay by card, pay later, or cash on arrival.",
 };
 
-export default function BookPage() {
+export default async function BookPage() {
+  const products = await getPublicCatalog();
+
   return (
     <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Book</p>
@@ -30,7 +35,7 @@ export default function BookPage() {
 
       <div className="mt-8 xs:mt-10">
         <Suspense fallback={<p className="text-sm text-muted">Loading booking form...</p>}>
-          <BookingForm />
+          <BookingForm products={products} />
         </Suspense>
       </div>
     </section>

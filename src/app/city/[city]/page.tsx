@@ -9,9 +9,9 @@ import { cities, getCity } from "@/content/cities";
 import { faqItems } from "@/content/pages";
 import { productPriceLabel } from "@/content/services";
 import { site, whatsappHref } from "@/content/site";
+import { getPublicCatalog } from "@/lib/catalog/public";
 import { aggregateRating, getApprovedReviews } from "@/lib/reviews/fetch";
 import { getTodayAvailabilityTeaser } from "@/lib/seo/availability-teaser";
-import { topServicesForCity } from "@/lib/seo/locations";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
@@ -41,7 +41,8 @@ export default async function CityPage({ params }: PageProps) {
   if (!city) notFound();
 
   const live = city.status === "active";
-  const topServices = topServicesForCity(6);
+  const catalog = await getPublicCatalog();
+  const topServices = catalog.slice(0, 6);
   const reviews = await getApprovedReviews(4);
   const aggregate = aggregateRating(reviews);
   const teaser = live ? await getTodayAvailabilityTeaser() : null;

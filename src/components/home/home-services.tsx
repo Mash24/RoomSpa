@@ -1,13 +1,17 @@
 import Link from "next/link";
 import {
-  featuredServices,
   getServicePriceTiers,
   productPriceLabel,
+  type CatalogService,
 } from "@/content/services";
 
-const picks = featuredServices.slice(0, 4);
+type Props = {
+  services: CatalogService[];
+};
 
-export function HomeServices() {
+export function HomeServices({ services }: Props) {
+  const picks = services.slice(0, 4);
+
   return (
     <section className="bg-background px-4 py-12 xs:px-5 xs:py-14 md:px-8 md:py-20">
       <div className="mx-auto max-w-6xl">

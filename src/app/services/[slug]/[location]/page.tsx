@@ -10,12 +10,12 @@ import { getServiceFaqs } from "@/content/service-faqs";
 import { getServiceMedia } from "@/content/service-media";
 import { getCatalogProduct, productPriceLabel } from "@/content/services";
 import { site, whatsappHref } from "@/content/site";
+import { getPublicCatalog, getPublicCatalogProduct } from "@/lib/catalog/public";
 import { aggregateRating, getApprovedReviews, getApprovedReviewsForService } from "@/lib/reviews/fetch";
 import { getTodayAvailabilityTeaser } from "@/lib/seo/availability-teaser";
 import {
   getServiceLocationParams,
   getSeoLocation,
-  relatedServices,
 } from "@/lib/seo/locations";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -31,7 +31,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug, location: locationSlug } = await params;
-  const service = getCatalogProduct(slug);
+  const service = (await getPublicCatalogProduct(slug)) ?? getCatalogProduct(slug);
   const location = getSeoLocation(locationSlug);
   if (!service || !location) return {};
 
@@ -44,7 +44,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function ServiceLocationPage({ params }: PageProps) {
   const { slug, location: locationSlug } = await params;
-  const service = getCatalogProduct(slug);
+  const catalog = await getPublicCatalog();
+  const service = catalog.find((item) => item.slug === slug) ?? getCatalogProduct(slug);
   const location = getSeoLocation(locationSlug);
   if (!service?.bookable || !location) notFound();
 
@@ -64,7 +65,9 @@ export default async function ServiceLocationPage({ params }: PageProps) {
   const aggregate = aggregateRating(displayReviews);
   const teaser = location.bookable ? await getTodayAvailabilityTeaser() : null;
   const pagePath = `/services/${service.slug}/${location.slug}`;
-  const related = relatedServices(service, 3);
+  const related = catalog
+    .filter((item) => item.category === service.category && item.slug !== service.slug)
+    .slice(0, 3);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">

@@ -76,8 +76,7 @@ export function AdminServicesPanel() {
             Services
           </h1>
           <p className="mt-2 text-sm text-muted">
-            Manage treatments and 60 / 90 / 2-hour pricing. Changes sync to booking once SQL migrations
-            are applied.
+            Manage treatments and 60 / 90 / 2-hour pricing. Edits update the public site and booking.
           </p>
         </div>
         <Link

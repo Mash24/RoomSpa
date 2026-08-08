@@ -9,11 +9,11 @@
 - `/admin/media` — upload or paste URL, attach to services, publish
 
 ## Public
-- Pricing + service pages show three duration columns
-- Booking form lets guests pick duration; Checkout charges that tier
-- Service pages load published media linked in the Media Library (“See how it works”)
+- Home, Services, Pricing, Book, and city pages load **active** services + prices from Supabase
+- Hidden services (`is_active = false`) stay off the public site
+- Booking Checkout charges the selected duration tier from `service_prices`
+- Static TypeScript catalog is only a fallback if the DB is empty
 
 ## Notes
-- Until SQL is run, the site still works from the TypeScript catalog with derived tiers
-- After SQL, DB `service_prices` wins at booking time when present
-- Soft-delete services (archive/hide) — do not hard-delete rows with booking history
+- Soft-delete / hide services — do not hard-delete rows with booking history
+- Run the CMS SQL migrations before relying on admin edits live

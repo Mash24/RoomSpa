@@ -9,6 +9,7 @@ import {
   productPriceLabel,
   serviceAcceptsCardNow,
   serviceCategories,
+  type CatalogService,
   type DurationMinutes,
 } from "@/content/services";
 import { DURATION_TIER_LABELS } from "@/lib/catalog/prices";
@@ -35,11 +36,11 @@ function todayInBangkok() {
   }).format(new Date());
 }
 
-function initialServiceSlug(fromQuery: string | null) {
-  if (fromQuery && catalogProducts.some((product) => product.slug === fromQuery)) {
+function pickServiceSlug(list: CatalogService[], fromQuery: string | null) {
+  if (fromQuery && list.some((product) => product.slug === fromQuery)) {
     return fromQuery;
   }
-  return catalogProducts[0]?.slug ?? "swedish";
+  return list[0]?.slug ?? "swedish";
 }
 
 function initialDuration(fromQuery: string | null): DurationMinutes {
@@ -48,10 +49,20 @@ function initialDuration(fromQuery: string | null): DurationMinutes {
   return 60;
 }
 
-export function BookingForm() {
+type Props = {
+  products?: CatalogService[];
+};
+
+export function BookingForm({ products: initialProducts }: Props) {
   const searchParams = useSearchParams();
+  const [products, setProducts] = useState<CatalogService[]>(
+    initialProducts?.length ? initialProducts : catalogProducts,
+  );
   const [serviceSlug, setServiceSlug] = useState<string>(() =>
-    initialServiceSlug(searchParams.get("service")),
+    pickServiceSlug(
+      initialProducts?.length ? initialProducts : catalogProducts,
+      searchParams.get("service"),
+    ),
   );
   const [durationMinutes, setDurationMinutes] = useState<DurationMinutes>(() =>
     initialDuration(searchParams.get("duration")),
@@ -73,9 +84,33 @@ export function BookingForm() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<BookingResult | null>(null);
 
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/catalog");
+        const data = await res.json();
+        if (!res.ok || cancelled) return;
+        const next = (data.services as CatalogService[]) || [];
+        if (!next.length) return;
+        setProducts(next);
+        setServiceSlug((current) =>
+          next.some((product) => product.slug === current)
+            ? current
+            : pickServiceSlug(next, searchParams.get("service")),
+        );
+      } catch {
+        // Keep server-provided / static catalog.
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [searchParams]);
+
   const selectedService = useMemo(
-    () => catalogProducts.find((product) => product.slug === serviceSlug),
-    [serviceSlug],
+    () => products.find((product) => product.slug === serviceSlug),
+    [products, serviceSlug],
   );
 
   const canPayNow = selectedService ? serviceAcceptsCardNow(selectedService) : false;
@@ -250,7 +285,7 @@ export function BookingForm() {
             className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
           >
             {serviceCategories.map((category) => {
-              const options = catalogProducts.filter((product) => product.category === category.id);
+              const options = products.filter((product) => product.category === category.id);
               if (options.length === 0) return null;
               return (
                 <optgroup key={category.id} label={category.title}>

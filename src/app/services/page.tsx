@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   getServicePriceTiers,
-  getServicesByCategory,
   productPriceLabel,
   serviceCategories,
 } from "@/content/services";
 import { whatsappHref } from "@/content/site";
+import { getPublicCatalog } from "@/lib/catalog/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Services | In-room massage Chiang Mai",
@@ -16,7 +18,12 @@ export const metadata: Metadata = buildPageMetadata({
   path: "/services",
 });
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const catalog = await getPublicCatalog();
+  const visibleCategories = serviceCategories.filter((category) =>
+    catalog.some((service) => service.category === category.id),
+  );
+
   return (
     <div>
       <section className="border-b border-border bg-surface px-4 py-14 xs:px-5 md:px-8 md:py-20">
@@ -50,7 +57,7 @@ export default function ServicesPage() {
         className="sticky top-[3.75rem] z-30 border-b border-border bg-background/95 backdrop-blur-md md:top-[4.25rem]"
       >
         <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 xs:px-5 md:px-8">
-          {serviceCategories.map((category) => (
+          {visibleCategories.map((category) => (
             <a
               key={category.id}
               href={`#${category.id}`}
@@ -63,9 +70,8 @@ export default function ServicesPage() {
       </nav>
 
       <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 xs:px-5 md:space-y-20 md:px-8 md:py-16">
-        {serviceCategories.map((category) => {
-          const services = getServicesByCategory(category.id);
-          if (services.length === 0) return null;
+        {visibleCategories.map((category) => {
+          const services = catalog.filter((service) => service.category === category.id);
 
           return (
             <section key={category.id} id={category.id} className="scroll-mt-24">
