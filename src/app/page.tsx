@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const featured = await getPublicFeaturedServices(4);
-  const approved = await getApprovedReviews(8);
+  const approved = await getApprovedReviews(12);
   const allForRating = await getApprovedReviews(50);
   const aggregate = aggregateRating(allForRating);
 
@@ -22,14 +22,15 @@ export default async function HomePage() {
     detail: review.serviceName || "Guest review",
   }));
 
-  // Keep every real guest review (including candid ones), and pad with
-  // convenience-focused quotes so one review never defines the homepage alone.
-  const filler = testimonials.map((item) => ({
-    quote: item.quote,
-    name: item.name,
-    detail: item.detail,
-  }));
-  const items = [...guestItems, ...filler].slice(0, 6);
+  // Only show placeholder quotes when there are no approved guest reviews yet.
+  const items =
+    guestItems.length > 0
+      ? guestItems
+      : testimonials.map((item) => ({
+          quote: item.quote,
+          name: item.name,
+          detail: item.detail,
+        }));
   const fromGuests = guestItems.length > 0;
 
   return (

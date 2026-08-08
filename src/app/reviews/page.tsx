@@ -29,7 +29,7 @@ export default async function ReviewsPage() {
         <ReviewsList reviews={reviews} />
       </div>
 
-      <div className="mt-16">
+      <div id="write-review" className="mt-16 scroll-mt-24">
         <Suspense fallback={<p className="text-sm text-muted">Loading review form...</p>}>
           <ReviewForm />
         </Suspense>
