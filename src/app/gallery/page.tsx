@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { MediaEmbed } from "@/components/media/media-embed";
-import { classifyMediaUrl } from "@/lib/media/urls";
 import { getPublishedGalleryMedia } from "@/lib/media/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -29,41 +28,39 @@ export default async function GalleryPage() {
       {items.length === 0 ? (
         <p className="mt-12 text-sm text-muted">New videos coming soon.</p>
       ) : (
-        <ul className="mt-10 grid gap-10 sm:grid-cols-2">
+        <ul className="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((item) => {
-            const serviceName = item.serviceNames[0] || "RoomSpa";
+            const label =
+              item.serviceNames.length > 0 ? item.serviceNames.join(" · ") : "RoomSpa";
             const primarySlug = item.serviceSlugs[0];
-            const source = classifyMediaUrl(item.mediaUrl, item.kind);
-            // X / YouTube / Vimeo embeds already carry their own captions — don't repeat CMS title.
-            const showCaption = source === "direct-video" || source === "direct-image";
 
             return (
               <li key={item.id} className="min-w-0">
+                <MediaEmbed
+                  url={item.mediaUrl}
+                  kind={item.kind}
+                  title={item.title}
+                  description={item.description}
+                  thumbnailUrl={item.thumbnailUrl}
+                />
+                <p className="mt-3 text-xs font-medium uppercase tracking-[0.16em] text-accent">
+                  {label}
+                </p>
+                <h2 className="mt-1 font-display text-xl tracking-tight text-foreground">
+                  {item.title}
+                </h2>
+                {item.description ? (
+                  <p className="mt-1 text-sm leading-relaxed text-muted line-clamp-3">
+                    {item.description}
+                  </p>
+                ) : null}
                 {primarySlug ? (
                   <Link
                     href={`/services/${primarySlug}`}
-                    className="text-xs font-medium uppercase tracking-[0.16em] text-accent transition hover:opacity-80"
+                    className="mt-3 inline-flex text-sm font-medium text-accent"
                   >
-                    {serviceName}
+                    View service →
                   </Link>
-                ) : (
-                  <p className="text-xs font-medium uppercase tracking-[0.16em] text-accent">
-                    {serviceName}
-                  </p>
-                )}
-                <div className="mt-3">
-                  <MediaEmbed
-                    url={item.mediaUrl}
-                    kind={item.kind}
-                    title={item.title}
-                    description={item.description}
-                    thumbnailUrl={item.thumbnailUrl}
-                  />
-                </div>
-                {showCaption && item.title ? (
-                  <p className="mt-3 font-display text-xl tracking-tight text-foreground">
-                    {item.title}
-                  </p>
                 ) : null}
               </li>
             );
