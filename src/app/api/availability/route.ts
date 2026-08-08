@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 import {
   buildSlotAvailability,
+  filterBookableSlots,
   getSlotCapacity,
   normalizeSlotTime,
 } from "@/lib/booking/availability";
@@ -48,7 +49,11 @@ export async function GET(request: Request) {
     }
 
     const capacity = getSlotCapacity();
-    const slots = buildSlotAvailability(countsByTime, capacity);
+    const slots = filterBookableSlots(
+      buildSlotAvailability(countsByTime, capacity),
+      date,
+      todayStr,
+    );
 
     return NextResponse.json({
       date,

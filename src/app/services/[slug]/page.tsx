@@ -61,13 +61,17 @@ export default async function ServiceDetailPage({ params }: PageProps) {
   const category = serviceCategories.find((item) => item.id === service.category);
   const faqs = getServiceFaqs(service.slug).slice(0, 5);
   const serviceReviews = await getApprovedReviewsForService(service.slug, 6);
-  const displayReviews =
-    serviceReviews.length > 0 ? serviceReviews : await getApprovedReviews(3);
-  const aggregate = aggregateRating(displayReviews);
+  const hasServiceReviews = serviceReviews.length > 0;
+  const generalReviews = hasServiceReviews ? [] : await getApprovedReviews(4);
+  const displayReviews = hasServiceReviews ? serviceReviews : generalReviews;
+  const overallReviews = hasServiceReviews ? serviceReviews : await getApprovedReviews(50);
+  const aggregate = aggregateRating(overallReviews);
   const teaser = await getTodayAvailabilityTeaser();
   const related = catalog
     .filter((item) => item.category === service.category && item.slug !== service.slug)
     .slice(0, 3);
+  const bookHref = `/book?service=${service.slug}&duration=60`;
+  const bookLabel = `Book ${service.name}`;
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
@@ -77,8 +81,8 @@ export default async function ServiceDetailPage({ params }: PageProps) {
         slug={service.slug}
         amountThb={service.amountThb}
         duration={service.duration}
-        aggregate={aggregate}
-        reviews={displayReviews}
+        aggregate={hasServiceReviews ? aggregate : null}
+        reviews={hasServiceReviews ? serviceReviews : undefined}
         videoUrl={media.video}
         videoPoster={media.image}
       />
@@ -100,12 +104,19 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       />
 
       <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">
-        {category?.title ?? "Service"} · Chiang Mai
+        {category?.title ?? "Service"} · Chiang Mai · In-room
       </p>
       <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
         {service.name}
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">{service.summary}</p>
+
+      {aggregate ? (
+        <p className="mt-3 text-sm text-muted">
+          <span className="text-accent">★★★★★</span> {aggregate.ratingValue}
+          {hasServiceReviews ? ` · ${aggregate.reviewCount} ${service.name} review${aggregate.reviewCount === 1 ? "" : "s"}` : ` · ${aggregate.reviewCount} RoomSpa review${aggregate.reviewCount === 1 ? "" : "s"}`}
+        </p>
+      ) : null}
 
       <div className="relative mt-8 aspect-[16/10] overflow-hidden bg-surface">
         <Image
@@ -119,31 +130,40 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       </div>
 
       <p className="mt-6 text-sm leading-relaxed text-muted md:text-base">{service.details}</p>
+      <p className="mt-3 text-sm font-medium leading-relaxed text-foreground md:text-base">
+        No taxi. No waiting room. No trip across Chiang Mai — your therapist comes to your hotel,
+        condo, or home.
+      </p>
 
       {service.category === "sensual" ? (
         <p className="mt-4 text-sm text-muted">
-          Consent-led professional bodywork — not escort services. You can pause or stop anytime.
+          Consent-led professional bodywork with clear boundaries. You can pause or stop anytime.
         </p>
       ) : null}
 
       <div className="mt-8">
-        <AvailabilityBanner teaser={teaser} bookHref={`/book?service=${service.slug}`} />
+        <AvailabilityBanner
+          teaser={teaser}
+          bookHref={bookHref}
+          bookLabel={bookLabel}
+        />
       </div>
 
       <div className="mt-8">
         <p className="text-xs uppercase tracking-[0.14em] text-muted">Duration & pricing</p>
         <ServicePriceTiers className="mt-3" service={service} />
         <p className="mt-3 text-sm text-muted">
-          From {productPriceLabel(getServicePriceTiers(service)[60])}
+          From {productPriceLabel(getServicePriceTiers(service)[60])} · Oils, towels, and equipment
+          provided
         </p>
       </div>
 
       <div className="mt-8 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap">
         <Link
-          href={`/book?service=${service.slug}&duration=60`}
+          href={bookHref}
           className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
         >
-          Book {service.name}
+          {bookLabel}
         </Link>
         <a
           href={whatsappHref}
@@ -154,6 +174,20 @@ export default async function ServiceDetailPage({ params }: PageProps) {
           WhatsApp
         </a>
       </div>
+      <p className="mt-2 text-xs text-muted">Same-day availability · Instant confirmation</p>
+
+      <section className="mt-10 border-t border-border pt-8">
+        <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
+          What to expect
+        </h2>
+        <ul className="mt-4 space-y-2 text-sm leading-relaxed text-muted md:text-base">
+          <li>Professional massage therapist at your place</li>
+          <li>Hotel, condo, or home — we come to you</li>
+          <li>Oils, towels, and setup provided</li>
+          <li>Same-day booking when slots are open</li>
+          <li>Instant email confirmation with reference + PIN</li>
+        </ul>
+      </section>
 
       {libraryMedia.length > 0 ? (
         <section className="mt-14 border-t border-border pt-8">
@@ -201,7 +235,12 @@ export default async function ServiceDetailPage({ params }: PageProps) {
 
       {displayReviews.length > 0 ? (
         <div className="mt-10">
-          <ReviewSnapshot reviews={displayReviews} heading={`${service.name} reviews`} />
+          <ReviewSnapshot
+            reviews={displayReviews}
+            heading={
+              hasServiceReviews ? `${service.name} reviews` : "What guests say about RoomSpa"
+            }
+          />
         </div>
       ) : null}
 

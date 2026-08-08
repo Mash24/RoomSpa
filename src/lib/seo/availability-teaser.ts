@@ -1,7 +1,9 @@
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 import {
   buildSlotAvailability,
+  filterBookableSlots,
   getSlotCapacity,
+  isPastSlotToday,
   normalizeSlotTime,
 } from "@/lib/booking/availability";
 
@@ -22,11 +24,10 @@ export type AvailabilityTeaser = {
   capacity: number;
 };
 
-/** Server-side same-day availability for SEO “available today” signals. */
+/** Server-side same-day availability — remaining future slots only. */
 export async function getTodayAvailabilityTeaser(): Promise<AvailabilityTeaser> {
   const date = todayInBangkok();
   const capacity = getSlotCapacity();
-  const totalSlots = buildSlotAvailability({}, capacity).length;
 
   try {
     const supabase = createAdminishAnonClient();
@@ -34,27 +35,35 @@ export async function getTodayAvailabilityTeaser(): Promise<AvailabilityTeaser> 
       p_date: date,
     });
 
-    if (error) {
-      return { date, openSlots: totalSlots, totalSlots, nextOpenTime: null, capacity };
-    }
-
     const countsByTime: Record<string, number> = {};
-    for (const row of data ?? []) {
-      const time = normalizeSlotTime(String((row as { scheduled_time: string }).scheduled_time));
-      countsByTime[time] = Number((row as { booking_count: number }).booking_count);
+    if (!error) {
+      for (const row of data ?? []) {
+        const time = normalizeSlotTime(String((row as { scheduled_time: string }).scheduled_time));
+        countsByTime[time] = Number((row as { booking_count: number }).booking_count);
+      }
     }
 
-    const slots = buildSlotAvailability(countsByTime, capacity);
-    const open = slots.filter((slot) => slot.available);
-
-    return {
-      date,
-      openSlots: open.length,
-      totalSlots,
-      nextOpenTime: open[0]?.time ?? null,
-      capacity,
-    };
+    return summarizeTeaser(date, countsByTime, capacity);
   } catch {
-    return { date, openSlots: totalSlots, totalSlots, nextOpenTime: null, capacity };
+    return summarizeTeaser(date, {}, capacity);
   }
+}
+
+function summarizeTeaser(
+  date: string,
+  countsByTime: Record<string, number>,
+  capacity: number,
+): AvailabilityTeaser {
+  const all = buildSlotAvailability(countsByTime, capacity);
+  const withPastClosed = filterBookableSlots(all, date, date);
+  const upcoming = all.filter((slot) => !isPastSlotToday(slot.time, date, date));
+  const open = withPastClosed.filter((slot) => slot.available);
+
+  return {
+    date,
+    openSlots: open.length,
+    totalSlots: upcoming.length,
+    nextOpenTime: open[0]?.time ?? null,
+    capacity,
+  };
 }

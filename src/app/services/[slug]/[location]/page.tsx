@@ -60,14 +60,17 @@ export default async function ServiceLocationPage({ params }: PageProps) {
     ...getServiceFaqs(service.slug).slice(0, 3),
   ];
   const serviceReviews = await getApprovedReviewsForService(service.slug, 4);
-  const displayReviews =
-    serviceReviews.length > 0 ? serviceReviews : await getApprovedReviews(3);
-  const aggregate = aggregateRating(displayReviews);
+  const hasServiceReviews = serviceReviews.length > 0;
+  const aggregate = hasServiceReviews
+    ? aggregateRating(serviceReviews)
+    : aggregateRating(await getApprovedReviews(50));
   const teaser = location.bookable ? await getTodayAvailabilityTeaser() : null;
   const pagePath = `/services/${service.slug}/${location.slug}`;
   const related = catalog
     .filter((item) => item.category === service.category && item.slug !== service.slug)
     .slice(0, 3);
+  const bookHref = `/book?service=${service.slug}`;
+  const bookLabel = `Book ${service.name}`;
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
@@ -79,8 +82,8 @@ export default async function ServiceLocationPage({ params }: PageProps) {
         duration={service.duration}
         url={`${site.url}${pagePath}`}
         areaServed={`${location.name}, ${location.cityName}`}
-        aggregate={aggregate}
-        reviews={displayReviews}
+        aggregate={hasServiceReviews ? aggregate : null}
+        reviews={hasServiceReviews ? serviceReviews : undefined}
         videoUrl={media.video}
         videoPoster={media.image}
       />
@@ -116,7 +119,7 @@ export default async function ServiceLocationPage({ params }: PageProps) {
       <div className="relative mt-8 aspect-[16/10] overflow-hidden bg-surface">
         <Image
           src={media.image}
-          alt={`${media.imageAlt} — ${location.name}`}
+          alt={`${service.name} ${location.inPhrase}`}
           fill
           sizes="(max-width: 768px) 100vw, 720px"
           className="object-cover"
@@ -126,9 +129,20 @@ export default async function ServiceLocationPage({ params }: PageProps) {
 
       {teaser ? (
         <div className="mt-8">
-          <AvailabilityBanner teaser={teaser} bookHref={`/book?service=${service.slug}`} />
+          <AvailabilityBanner
+            teaser={teaser}
+            bookHref={bookHref}
+            bookLabel={bookLabel}
+          />
         </div>
       ) : null}
+
+      <p className="mt-6 text-sm leading-relaxed text-muted">
+        {service.details}
+      </p>
+      <p className="mt-3 text-sm font-medium text-foreground">
+        No taxi. No waiting room. Your therapist comes to you {location.inPhrase}.
+      </p>
 
       <p className="mt-6 text-sm text-muted">
         From {productPriceLabel(service.amountThb)}
@@ -137,10 +151,10 @@ export default async function ServiceLocationPage({ params }: PageProps) {
       <div className="mt-8 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap">
         {location.bookable ? (
           <Link
-            href={`/book?service=${service.slug}`}
+            href={bookHref}
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
           >
-            Book {service.name}
+            {bookLabel}
           </Link>
         ) : (
           <a
@@ -159,6 +173,9 @@ export default async function ServiceLocationPage({ params }: PageProps) {
           Full details
         </Link>
       </div>
+      {location.bookable ? (
+        <p className="mt-2 text-xs text-muted">Same-day availability · Instant confirmation</p>
+      ) : null}
 
       <section className="mt-12 border-t border-border pt-8">
         <h2 className="font-display text-2xl text-foreground">Questions</h2>

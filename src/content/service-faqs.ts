@@ -4,7 +4,7 @@ const sharedFaqs: ServiceFaq[] = [
   {
     question: "Is hotel / in-room massage legal in Thailand?",
     answer:
-      "Yes. RoomSpa provides professional mobile massage at hotels, condos, and homes. Therapists arrive discreetly and work as wellness practitioners — not escort services.",
+      "Yes. RoomSpa provides professional mobile massage services at hotels, condos, and homes in Chiang Mai. Our services are wellness and massage treatments, and therapists operate professionally within the scope of their services.",
   },
   {
     question: "Can couples book together?",
@@ -19,7 +19,7 @@ const sharedFaqs: ServiceFaq[] = [
   {
     question: "How much should I tip?",
     answer:
-      "Tipping is optional and appreciated for great service. Many guests tip 10–20% in cash; there is no required amount.",
+      "Tipping is optional and appreciated for great service. There is no required amount.",
   },
   {
     question: "How fast can someone arrive?",
@@ -60,9 +60,9 @@ const bySlug: Record<string, ServiceFaq[]> = {
   ],
   nuru: [
     {
-      question: "Is Nuru an escort service?",
+      question: "Is Nuru professional bodywork?",
       answer:
-        "No. Nuru with RoomSpa is consent-led professional bodywork with clear boundaries. You can pause or stop anytime.",
+        "Yes. Nuru with RoomSpa is consent-led professional bodywork with clear boundaries. You can pause or stop anytime.",
     },
   ],
   yoni: [

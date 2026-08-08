@@ -35,3 +35,36 @@ export function buildSlotAvailability(
 export function normalizeSlotTime(value: string) {
   return value.slice(0, 5);
 }
+
+/** Current HH:mm in Asia/Bangkok (24h). */
+export function bangkokNowHhMm() {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Bangkok",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date());
+}
+
+/**
+ * For today, mark slots that have already started as unavailable.
+ * Keeps teaser + booking form honest about what guests can still book.
+ */
+export function filterBookableSlots(
+  slots: SlotAvailability[],
+  dateYmd: string,
+  todayYmd: string,
+  nowHhMm = bangkokNowHhMm(),
+): SlotAvailability[] {
+  if (dateYmd !== todayYmd) return slots;
+  return slots.map((slot) => {
+    if (slot.time <= nowHhMm) {
+      return { ...slot, available: false, remaining: 0 };
+    }
+    return slot;
+  });
+}
+
+export function isPastSlotToday(time: string, dateYmd: string, todayYmd: string, nowHhMm = bangkokNowHhMm()) {
+  return dateYmd === todayYmd && time <= nowHhMm;
+}
