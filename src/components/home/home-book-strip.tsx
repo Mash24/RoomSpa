@@ -3,13 +3,6 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
-const TREATMENTS = [
-  { label: "Swedish Massage", slug: "swedish" },
-  { label: "Thai Massage", slug: "thai" },
-  { label: "Deep Tissue", slug: "deep-tissue" },
-  { label: "Couples Massage", slug: "couples" },
-] as const;
-
 const DURATIONS = [
   { label: "60 min", value: "60" },
   { label: "90 min", value: "90" },
@@ -18,20 +11,28 @@ const DURATIONS = [
 
 const PLACE_TYPES = ["Hotel", "Condo", "Home"] as const;
 
+export type BookStripTreatment = {
+  label: string;
+  slug: string;
+};
+
+type Props = {
+  treatments: BookStripTreatment[];
+};
+
 /**
  * Homepage booking strip — platform cue without stuffing the hero.
  * Sends guests into /book with service + duration prefilled.
+ * Treatment list comes from the catalog (private/sensual first).
  */
-export function HomeBookStrip() {
-  const [treatment, setTreatment] = useState<string>(TREATMENTS[0].slug);
+export function HomeBookStrip({ treatments }: Props) {
+  const [treatment, setTreatment] = useState<string>("");
   const [duration, setDuration] = useState<string>(DURATIONS[0].value);
   const [placeType, setPlaceType] = useState<(typeof PLACE_TYPES)[number]>("Hotel");
 
   const href = useMemo(() => {
-    const params = new URLSearchParams({
-      service: treatment,
-      duration,
-    });
+    const params = new URLSearchParams({ duration });
+    if (treatment) params.set("service", treatment);
     return `/book?${params.toString()}`;
   }, [treatment, duration]);
 
@@ -41,10 +42,10 @@ export function HomeBookStrip() {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
-              Book your massage
+              Book a private massage
             </p>
             <p className="mt-2 font-display text-2xl tracking-tight text-foreground md:text-3xl">
-              We come to your room tonight
+              We come to your hotel, condo, or home
             </p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -62,7 +63,8 @@ export function HomeBookStrip() {
                   onChange={(e) => setTreatment(e.target.value)}
                   className="mt-1.5 block min-h-11 w-full border border-border bg-background px-3 text-sm text-foreground"
                 >
-                  {TREATMENTS.map((item) => (
+                  <option value="">Choose a treatment</option>
+                  {treatments.map((item) => (
                     <option key={item.slug} value={item.slug}>
                       {item.label}
                     </option>

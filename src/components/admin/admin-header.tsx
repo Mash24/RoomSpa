@@ -7,6 +7,7 @@ import { site } from "@/content/site";
 
 const links = [
   { href: "/admin", label: "Bookings" },
+  { href: "/admin/tickets", label: "Tickets" },
   { href: "/admin/services", label: "Services" },
   { href: "/admin/media", label: "Media" },
   { href: "/admin/blog", label: "Blog" },

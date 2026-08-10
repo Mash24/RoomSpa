@@ -38,7 +38,9 @@ Use the exact `include:` value Resend displays (often Amazon SES). Do not remove
 | `EMAIL_BOOKING` | `booking@getroomspa.com` |
 | `EMAIL_SUPPORT` | `support@getroomspa.com` |
 | `EMAIL_ADMIN` | `admin@getroomspa.com` |
-| `EMAIL_OPS_NOTIFY` | Your personal inbox for **NEW BOOKING** alerts (e.g. `testtestness@gmail.com`). Comma-separated OK. |
+| `EMAIL_OPS_NOTIFY` | Your personal inbox for **NEW BOOKING** and **NEW TICKET** alerts (e.g. `testtestness@gmail.com`). Comma-separated OK. |
+| `OPENAI_API_KEY` | Optional. Powers the site concierge chat (GPT). Without it, chat still answers from the grounded knowledge base. |
+| `OPENAI_CHAT_MODEL` | Optional. Defaults to `gpt-4o-mini`. |
 
 Redeploy after saving.
 
@@ -49,13 +51,17 @@ Redeploy after saving.
 | `support@` | Reply-To (guest replies) |
 | `booking@` | BCC of guest confirmation |
 | `admin@` | BCC of guest confirmation |
-| `EMAIL_OPS_NOTIFY` | **To:** dedicated ops “New booking” email with full details |
+| `EMAIL_OPS_NOTIFY` | **To:** dedicated ops “New booking” + “New support ticket” emails |
 
 ### 4. What the app sends
 After a successful `/api/bookings` create:
 - Guest receives confirmation with reference + **PIN** + manage link
 - You receive a separate **New booking** email at `EMAIL_OPS_NOTIFY` with guest, service, time, place, payment, PIN, and admin link
 - `booking@` and `admin@` are still BCC’d on the guest confirmation when configured
+
+When a guest opens an agent ticket from the site chat (`/api/chat/ticket`):
+- You receive a **New support ticket** email at `EMAIL_OPS_NOTIFY` with contact details, message, and recent chat transcript
+- Manage status under `/admin/tickets` (after running the `support_tickets` migration)
 
 After Stripe Checkout payment succeeds:
 - Guest receives a **payment receipt** email with booking details + PIN

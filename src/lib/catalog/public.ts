@@ -1,5 +1,6 @@
 import {
   catalogServices,
+  isPrivateExperience,
   type CatalogService,
   type ServiceCategoryId,
 } from "@/content/services";
@@ -116,11 +117,51 @@ export async function getPublicCatalogProduct(slug: string) {
   return catalog.find((service) => service.slug === slug) ?? null;
 }
 
-export async function getPublicFeaturedServices(limit = 4) {
+function uniqueBySlug(services: CatalogService[]) {
+  const seen = new Set<string>();
+  const out: CatalogService[] = [];
+  for (const service of services) {
+    if (seen.has(service.slug)) continue;
+    seen.add(service.slug);
+    out.push(service);
+  }
+  return out;
+}
+
+/**
+ * Featured services for homepage cards.
+ * Private/sensual experiences always lead; CMS `featured` ranks within that set.
+ * Wellness stays available but never crowds out the commercial focus.
+ */
+export async function getPublicFeaturedServices(limit = 6) {
   const catalog = await getPublicCatalog();
-  const featured = catalog.filter((service) => service.featured);
-  if (featured.length >= limit) return featured.slice(0, limit);
-  return [...featured, ...catalog.filter((service) => !service.featured)].slice(0, limit);
+  const privateOnes = catalog.filter(isPrivateExperience);
+  const privateFeatured = privateOnes.filter((service) => service.featured);
+  const privateRest = privateOnes.filter((service) => !service.featured);
+  const otherFeatured = catalog.filter(
+    (service) => service.featured && !isPrivateExperience(service),
+  );
+  const otherRest = catalog.filter(
+    (service) => !service.featured && !isPrivateExperience(service),
+  );
+
+  return uniqueBySlug([
+    ...privateFeatured,
+    ...privateRest,
+    ...otherFeatured,
+    ...otherRest,
+  ]).slice(0, limit);
+}
+
+/** Treatments for the homepage book strip — private first, then wellness. */
+export async function getBookStripTreatments() {
+  const catalog = await getPublicCatalog();
+  const privateOnes = catalog.filter(isPrivateExperience);
+  const others = catalog.filter((service) => !isPrivateExperience(service));
+  return [...privateOnes, ...others].map((service) => ({
+    label: service.name,
+    slug: service.slug,
+  }));
 }
 
 export async function getPublicServicesByCategory(category: ServiceCategoryId) {

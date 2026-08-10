@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = buildPageMetadata({
   title: "Services | In-room massage Chiang Mai",
   description:
-    "Mobile massage menu for hotels, condos, and homes in Chiang Mai — classic, therapeutic, couples, and private sessions.",
+    "Private and wellness in-room massage in Chiang Mai — sensual, tantric, couples, classic, and therapeutic treatments at your hotel, condo, or home.",
   path: "/services",
 });
 
@@ -30,10 +30,11 @@ export default async function ServicesPage() {
         <div className="mx-auto max-w-6xl">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Services</p>
           <h1 className="mt-3 max-w-2xl font-display text-4xl tracking-tight text-foreground md:text-5xl">
-            Massage that comes to your room
+            Private massage that comes to your room
           </h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-            Choose a treatment, pick a length, and we come to you in Chiang Mai.
+            Sensual and wellness treatments — choose a session, pick a length, and we come to you in
+            Chiang Mai.
           </p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link

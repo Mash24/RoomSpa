@@ -5,13 +5,19 @@ import { HomeServices } from "@/components/home/home-services";
 import { HomeTestimonials } from "@/components/home/home-testimonials";
 import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 import { testimonials } from "@/content/marketing";
-import { getPublicFeaturedServices } from "@/lib/catalog/public";
+import {
+  getBookStripTreatments,
+  getPublicFeaturedServices,
+} from "@/lib/catalog/public";
 import { aggregateRating, getApprovedReviews } from "@/lib/reviews/fetch";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const featured = await getPublicFeaturedServices(4);
+  const [featured, bookTreatments] = await Promise.all([
+    getPublicFeaturedServices(6),
+    getBookStripTreatments(),
+  ]);
   const approved = await getApprovedReviews(12);
   const allForRating = await getApprovedReviews(50);
   const aggregate = aggregateRating(allForRating);
@@ -39,7 +45,7 @@ export default async function HomePage() {
       <WebSiteJsonLd />
       <LocalBusinessJsonLd aggregate={aggregate} />
       <HomeHero />
-      <HomeBookStrip />
+      <HomeBookStrip treatments={bookTreatments} />
       <HomeServices services={featured} />
       <HomeHowItWorks />
       <HomeTestimonials items={items} fromGuests={fromGuests} />

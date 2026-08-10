@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import {
   catalogProducts,
   getServiceAmountForDuration,
+  isPrivateExperience,
   productPriceLabel,
   serviceAcceptsCardNow,
   serviceCategories,
@@ -40,7 +41,16 @@ function pickServiceSlug(list: CatalogService[], fromQuery: string | null) {
   if (fromQuery && list.some((product) => product.slug === fromQuery)) {
     return fromQuery;
   }
-  return list[0]?.slug ?? "swedish";
+  const featuredPrivate = list.find(
+    (service) => service.featured && isPrivateExperience(service),
+  );
+  if (featuredPrivate) return featuredPrivate.slug;
+
+  const anyPrivate = list.find(isPrivateExperience);
+  if (anyPrivate) return anyPrivate.slug;
+
+  const featured = list.find((service) => service.featured);
+  return featured?.slug ?? list[0]?.slug ?? "tantric";
 }
 
 function initialDuration(fromQuery: string | null): DurationMinutes {

@@ -10,18 +10,21 @@ type Props = {
 };
 
 export function HomeServices({ services }: Props) {
-  const picks = services.slice(0, 4);
+  const picks = services.slice(0, 6);
 
   return (
     <section className="bg-background px-4 py-12 xs:px-5 xs:py-14 md:px-8 md:py-20">
       <div className="mx-auto max-w-6xl">
         <div className="max-w-xl">
-          <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Services</p>
+          <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
+            Private & sensual
+          </p>
           <h2 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-            Popular treatments
+            Featured experiences
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
-            Delivered to your hotel, condo, or home.
+            Consent-led private sessions delivered to your hotel, condo, or home — discreet and
+            professional.
           </p>
         </div>
 
@@ -59,12 +62,18 @@ export function HomeServices({ services }: Props) {
           })}
         </ul>
 
-        <div className="mt-8">
+        <div className="mt-8 flex flex-wrap gap-x-5 gap-y-2">
           <Link
-            href="/services"
+            href="/services#sensual"
             className="inline-flex text-sm font-medium text-accent transition hover:opacity-80"
           >
-            See all services →
+            Private & sensual →
+          </Link>
+          <Link
+            href="/services#classic"
+            className="inline-flex text-sm font-medium text-muted transition hover:text-accent"
+          >
+            Wellness & therapeutic →
           </Link>
         </div>
       </div>

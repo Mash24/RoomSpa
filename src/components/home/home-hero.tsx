@@ -28,7 +28,7 @@ export function HomeHero() {
 
       <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] pt-[max(6.5rem,calc(env(safe-area-inset-top)+5rem))] xs:px-5 sm:pb-20 md:justify-center md:px-8 md:pb-24 md:pt-24">
         <p className="animate-fade-up text-xs font-medium uppercase tracking-[0.22em] text-white/75">
-          In-room massage · Chiang Mai
+          Private in-room massage · Chiang Mai
         </p>
 
         <p className="animate-fade-up delay-1 mt-4 font-display text-[2.75rem] leading-[0.95] tracking-tight text-white xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl">

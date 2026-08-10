@@ -14,7 +14,7 @@ export const site = {
   name: "RoomSpa",
   tagline: "We come to you",
   description:
-    "Book professional in-room massage at your hotel, condo, or home in Chiang Mai. We come to you — classic, therapeutic, and couples sessions.",
+    "Private in-room massage in Chiang Mai — sensual, tantric, and wellness treatments delivered discreetly to your hotel, condo, or home.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en",
   contact: {
@@ -23,6 +23,7 @@ export const site = {
   },
   /** Primary chrome — keep short; secondary links live in the footer */
   nav: [
+    { label: "Private", href: "/services#sensual" },
     { label: "Services", href: "/services" },
     { label: "Pricing", href: "/pricing" },
     { label: "Gallery", href: "/gallery" },
@@ -30,11 +31,11 @@ export const site = {
   ],
   hero: {
     brand: "RoomSpa",
-    headline: "Professional massage, delivered to your door",
+    headline: "Private massage, delivered to your door",
     support:
-      "Enjoy a private massage in your Chiang Mai hotel, condo, or home. Choose your treatment, pick a time, and we’ll come to you — no spa commute.",
-    primaryCta: { label: "Book a massage", href: "/book" },
-    secondaryCta: { label: "View services", href: "/services" },
+      "Discreet sessions in your Chiang Mai hotel, condo, or home — from sensual and tantric bodywork to classic wellness massage.",
+    primaryCta: { label: "Book a private massage", href: "/book" },
+    secondaryCta: { label: "Private & sensual", href: "/services#sensual" },
   },
   services: homeServicePicks.map((service) => ({
     slug: service.slug,

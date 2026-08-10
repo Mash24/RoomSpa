@@ -40,6 +40,17 @@ export type CatalogService = {
 
 export const serviceCategories: ServiceCategory[] = [
   {
+    id: "sensual",
+    title: "Private & sensual",
+    summary:
+      "Consent-led bodywork for intimacy, connection, and deep body awareness — always private and professional.",
+  },
+  {
+    id: "shared",
+    title: "For two",
+    summary: "Side-by-side or dual-therapist sessions in your hotel, condo, or home.",
+  },
+  {
     id: "classic",
     title: "Classic & relaxing",
     summary: "Soft-to-medium pressure sessions for unwind, jet lag, and everyday tension.",
@@ -48,17 +59,6 @@ export const serviceCategories: ServiceCategory[] = [
     id: "therapeutic",
     title: "Therapeutic",
     summary: "Focused work for tight muscles, posture strain, and recovery.",
-  },
-  {
-    id: "shared",
-    title: "For two",
-    summary: "Side-by-side or dual-therapist sessions in your hotel, condo, or home.",
-  },
-  {
-    id: "sensual",
-    title: "Sensual & tantric",
-    summary:
-      "Consent-led bodywork for intimacy, connection, and deep body awareness — always private and professional.",
   },
 ];
 
@@ -79,7 +79,7 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 60,
     amountThb: 800,
     category: "classic",
-    featured: true,
+    featured: false,
     bookable: true,
   },
   {
@@ -225,7 +225,7 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 60,
     amountThb: 2500,
     category: "shared",
-    featured: true,
+    featured: false,
     bookable: true,
   },
   {
@@ -264,6 +264,7 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 75,
     amountThb: 3000,
     category: "sensual",
+    featured: true,
     bookable: true,
   },
   {
@@ -277,6 +278,7 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 75,
     amountThb: 2800,
     category: "sensual",
+    featured: true,
     bookable: true,
   },
   {
@@ -290,6 +292,7 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 75,
     amountThb: 2800,
     category: "sensual",
+    featured: true,
     bookable: true,
   },
   {
@@ -302,6 +305,7 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 90,
     amountThb: 3200,
     category: "sensual",
+    featured: true,
     bookable: true,
   },
   {
@@ -314,6 +318,7 @@ export const catalogServices: CatalogService[] = [
     durationMinutes: 90,
     amountThb: 4500,
     category: "shared",
+    featured: true,
     bookable: true,
   },
 ];
@@ -321,6 +326,11 @@ export const catalogServices: CatalogService[] = [
 export const catalogProducts = catalogServices.filter((service) => service.bookable);
 
 export const featuredServices = catalogServices.filter((service) => service.featured);
+
+/** Private / sensual commercial focus (homepage, booking defaults). */
+export function isPrivateExperience(service: Pick<CatalogService, "category" | "slug">) {
+  return service.category === "sensual" || service.slug === "couples-sensual";
+}
 
 export function productPriceLabel(amountThb: number) {
   return dualPriceLabel(amountThb);

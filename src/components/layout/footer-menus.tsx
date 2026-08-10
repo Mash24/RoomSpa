@@ -3,9 +3,10 @@ import { cities } from "@/content/cities";
 import { site, whatsappHref } from "@/content/site";
 
 const bookLinks = [
-  { label: "Book a massage", href: "/book" },
+  { label: "Book a private massage", href: "/book" },
   { label: "My booking", href: "/my-booking" },
-  { label: "Services", href: "/services" },
+  { label: "Private & sensual", href: "/services#sensual" },
+  { label: "All services", href: "/services" },
   { label: "Pricing", href: "/pricing" },
 ] as const;
 
