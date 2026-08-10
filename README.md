@@ -1,18 +1,25 @@
 # RoomSpa
 
-Premium mobile-first booking platform for in-room massage at hotels, condos, and homes.
+Premium mobile-first booking for private in-room massage in Chiang Mai — hotel, condo, or home.
 
-See [PROJECT_BRIEF.md](./PROJECT_BRIEF.md) for full product scope and [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) for engineering notes.
+Live: [https://www.getroomspa.com](https://www.getroomspa.com)
 
-## Current status
+**Shipping?** Start with [docs/SHIP.md](./docs/SHIP.md).
 
-**Phase 1 — started**
-- Next.js + TypeScript + Tailwind scaffold
-- Premium landing page (dark / light mode)
-- SEO foundation: metadata, sitemap, robots.txt, JSON-LD
-- Route shells for all marketing pages
+## Brand
 
-**Next up:** Supabase, booking flow, admin CMS + media
+- **RoomSpa** — guest-facing product name (hero, nav, chat, copy)
+- **getroomspa.com** / GetRoomSpa — domain, email From, SEO alternate name
+
+## What’s live
+
+- Booking with duration tiers, PIN manage flow, Stripe pay-now / pay-later / cash
+- Catalog CMS (services, media, blog) + admin dashboard
+- Guest reviews + approval
+- Pricing page with sensual full-bleed backdrop
+- Homepage featured private/sensual experiences
+- Ask RoomSpa concierge + care-team tickets (`/admin/tickets`)
+- Mobile-first layout (safe areas, float clearance, fluid type)
 
 ## Quick start
 
@@ -24,16 +31,22 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
-## Accounts to connect (start here)
+## Docs
 
-| Service | Purpose |
+| Doc | Purpose |
 | --- | --- |
-| GitHub | Source control |
-| Vercel | Hosting |
-| Supabase | Database + auth + storage |
-| Domain | Cloudflare / Namecheap |
+| [docs/SHIP.md](./docs/SHIP.md) | **Go-live checklist** |
+| [docs/CHAT.md](./docs/CHAT.md) | Concierge + care tickets |
+| [docs/EMAIL.md](./docs/EMAIL.md) | Resend + domain email |
+| [docs/BOOKING.md](./docs/BOOKING.md) | Booking & payments |
+| [docs/ADMIN.md](./docs/ADMIN.md) | Admin access |
+| [docs/REVIEWS.md](./docs/REVIEWS.md) | Reviews |
+| [docs/CMS.md](./docs/CMS.md) | Services / media / blog |
+| [docs/SEO.md](./docs/SEO.md) | SEO |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Stack map |
+| [PROJECT_BRIEF.md](./PROJECT_BRIEF.md) | Product scope |
 
-Add Stripe, Maps, email, and WhatsApp when those features ship. Store keys in `.env.local` / Vercel env vars only.
+Production env import template: `env/VERCEL_IMPORT.production.env`
 
 ## Scripts
 
@@ -43,7 +56,3 @@ Add Stripe, Maps, email, and WhatsApp when those features ship. Store keys in `.
 | `npm run build` | Production build |
 | `npm run start` | Serve production build |
 | `npm run lint` | ESLint |
-
-## Brand
-
-**RoomSpa** is city-agnostic by design. Expand service areas without renaming the product.

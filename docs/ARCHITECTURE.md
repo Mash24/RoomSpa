@@ -1,39 +1,42 @@
 # Architecture
 
 ## Principles
-- **MVP first** — ship Phase 1 modularly; avoid over-engineering.
-- **City-agnostic brand** — coverage areas are data, not hardcoded into the product name.
-- **CMS-ready content** — copy lives in `src/content` now; migrate to Supabase tables + admin later.
-- **API-first later** — booking and CMS will expose clear server boundaries for mobile apps / hotel partners.
+- **MVP first** — ship modularly; avoid over-engineering.
+- **City-agnostic brand** — coverage areas are data; product name stays **RoomSpa**.
+- **CMS-ready content** — seed/copy in `src/content`; live catalog in Supabase via admin.
+- **Mobile-first** — phones are the primary device; floats and safe areas are first-class.
 
 ## Stack
 | Layer | Choice |
 | --- | --- |
 | UI | Next.js App Router, React, Tailwind CSS v4 |
 | Language | TypeScript |
-| Auth / DB / Storage | Supabase (wired next) |
+| Auth / DB / Storage | Supabase |
 | Hosting | Vercel |
-| Payments | Stripe (Phase 2) |
+| Payments | Stripe |
+| Email | Resend (`getroomspa.com`) |
+| Concierge | Site knowledge + optional OpenAI |
 
 ## Folder map
 ```
 src/
-  app/                 # Routes, metadata, sitemap, robots
+  app/                 # Routes, APIs, metadata, sitemap
   components/
     home/              # Landing sections
-    layout/            # Header, footer, theme toggle
-    providers/         # Theme provider
-    seo/               # JSON-LD and SEO helpers
-    ui/                # Shared presentational pieces
-  content/             # Static site content (CMS precursor)
-  lib/                 # Shared utilities (expand as features land)
+    chat/              # Ask RoomSpa widget
+    booking/           # Booking form
+    layout/            # Header, footer, floats
+    admin/             # Dashboard panels
+    seo/               # JSON-LD helpers
+  content/             # Static / CMS precursor content
+  lib/                 # Catalog, chat, email, payments, reviews
+supabase/migrations/   # Apply on Supabase before relying on new features
+env/                   # Vercel import templates (no secrets in git values)
+docs/                  # Ship + feature docs
 ```
 
-## Phase 1 remaining
-1. Supabase schema + seed data
-2. Booking calendar + availability
-3. Admin dashboard + media uploads (Supabase Storage)
-4. Service / SEO landing pages with real content
-
 ## Environments
-Use separate Supabase projects and Vercel environments for **development**, **staging**, and **production**. Keep all secrets in environment variables (see `.env.example`).
+Separate Supabase projects and Vercel envs for **development** / **preview** / **production** when possible. Secrets only in env vars — see `.env.example` and `env/VERCEL_IMPORT.production.env`.
+
+## Go live
+Follow [SHIP.md](./SHIP.md).

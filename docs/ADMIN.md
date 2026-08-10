@@ -41,8 +41,16 @@ If the user was created before the profile trigger existed, this insert is requi
 - **Mark completed / Cancel / No show** — for confirmed bookings
 - **Stats** — today's count, upcoming, bookings this week, paid revenue this week
 - **Reviews** (`/admin/reviews`) — approve or reject guest submissions
+- **Care chats** (`/admin/tickets`) — reply to Ask RoomSpa care-team threads, end chats, see ratings
 
 Also run `supabase/migrations/20260805_reviews.sql` for the reviews table.
+
+For care chat tables, run:
+
+- `supabase/migrations/20260810144039_support_tickets.sql`
+- `supabase/migrations/20260810_ticket_messaging_ratings.sql`
+
+See [CHAT.md](./CHAT.md).
 
 ## Security notes
 
