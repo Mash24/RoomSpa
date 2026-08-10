@@ -106,7 +106,7 @@ export default async function ServiceDetailPage({ params }: PageProps) {
       <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">
         {category?.title ?? "Service"} · Chiang Mai · In-room
       </p>
-      <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
+      <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         {service.name}
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">{service.summary}</p>

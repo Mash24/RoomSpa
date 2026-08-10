@@ -64,7 +64,7 @@ export function FooterMenus() {
   const whatsappDisplay = formatWhatsAppDisplay(site.contact.whatsapp);
 
   return (
-    <div className="grid grid-cols-3 gap-4 xs:gap-5 md:gap-8">
+    <div className="grid grid-cols-1 gap-8 min-[400px]:grid-cols-3 min-[400px]:gap-4 xs:gap-5 md:gap-8">
       <Column title="Book">
         <nav aria-label="Book" className="flex flex-col">
           {bookLinks.map((item) => (

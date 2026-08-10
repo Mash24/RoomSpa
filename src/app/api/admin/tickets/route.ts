@@ -15,10 +15,19 @@ export type AdminTicket = {
   pagePath: string | null;
   transcript: { role: string; content: string }[];
   adminNotes: string;
+  endedAt: string | null;
+  endedBy: string | null;
+  rating: number | null;
+  ratingComment: string;
+  ratingShareOk: boolean;
   createdAt: string;
+  messages: { id: string; sender: string; body: string; createdAt: string }[];
 };
 
-function mapTicket(row: Record<string, unknown>): AdminTicket {
+function mapTicket(
+  row: Record<string, unknown>,
+  messages: { id: string; sender: string; body: string; createdAt: string }[],
+): AdminTicket {
   const transcript = Array.isArray(row.transcript)
     ? (row.transcript as { role: string; content: string }[])
     : [];
@@ -34,7 +43,13 @@ function mapTicket(row: Record<string, unknown>): AdminTicket {
     pagePath: row.page_path ? String(row.page_path) : null,
     transcript,
     adminNotes: String(row.admin_notes ?? ""),
+    endedAt: row.ended_at ? String(row.ended_at) : null,
+    endedBy: row.ended_by ? String(row.ended_by) : null,
+    rating: typeof row.rating === "number" ? row.rating : row.rating ? Number(row.rating) : null,
+    ratingComment: String(row.rating_comment ?? ""),
+    ratingShareOk: Boolean(row.rating_share_ok),
     createdAt: String(row.created_at ?? ""),
+    messages,
   };
 }
 
@@ -53,7 +68,7 @@ export async function GET(request: Request) {
   let query = supabase
     .from("support_tickets")
     .select(
-      "id, reference_code, status, guest_name, guest_email, guest_phone, subject, message, page_path, transcript, admin_notes, created_at",
+      "id, reference_code, status, guest_name, guest_email, guest_phone, subject, message, page_path, transcript, admin_notes, ended_at, ended_by, rating, rating_comment, rating_share_ok, created_at",
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -67,8 +82,36 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: dbError.message }, { status: 500 });
   }
 
+  const rows = data ?? [];
+  const ids = rows.map((row) => row.id as string);
+  const messagesByTicket = new Map<
+    string,
+    { id: string; sender: string; body: string; createdAt: string }[]
+  >();
+
+  if (ids.length) {
+    const { data: messageRows } = await supabase
+      .from("support_ticket_messages")
+      .select("id, ticket_id, sender, body, created_at")
+      .in("ticket_id", ids)
+      .order("created_at", { ascending: true });
+
+    for (const message of messageRows ?? []) {
+      const list = messagesByTicket.get(String(message.ticket_id)) || [];
+      list.push({
+        id: String(message.id),
+        sender: String(message.sender),
+        body: String(message.body),
+        createdAt: String(message.created_at),
+      });
+      messagesByTicket.set(String(message.ticket_id), list);
+    }
+  }
+
   return NextResponse.json({
-    tickets: (data ?? []).map((row) => mapTicket(row as Record<string, unknown>)),
+    tickets: rows.map((row) =>
+      mapTicket(row as Record<string, unknown>, messagesByTicket.get(String(row.id)) || []),
+    ),
     filter,
   });
 }

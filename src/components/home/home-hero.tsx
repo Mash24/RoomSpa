@@ -31,7 +31,7 @@ export function HomeHero() {
           Private in-room massage · Chiang Mai
         </p>
 
-        <p className="animate-fade-up delay-1 mt-4 font-display text-[2.75rem] leading-[0.95] tracking-tight text-white xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+        <p className="animate-fade-up delay-1 mt-4 font-display text-[2.35rem] leading-[0.95] tracking-tight text-white min-[360px]:text-[2.75rem] xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
           {hero.brand}
         </p>
 

@@ -29,7 +29,7 @@ export default async function ServicesPage() {
       <section className="border-b border-border bg-surface px-4 py-14 xs:px-5 md:px-8 md:py-20">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Services</p>
-          <h1 className="mt-3 max-w-2xl font-display text-4xl tracking-tight text-foreground md:text-5xl">
+          <h1 className="mt-3 max-w-2xl font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
             Private massage that comes to your room
           </h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted md:text-lg">
@@ -55,14 +55,14 @@ export default async function ServicesPage() {
 
       <nav
         aria-label="Service categories"
-        className="sticky top-[3.75rem] z-30 border-b border-border bg-background/95 backdrop-blur-md md:top-[4.25rem]"
+        className="sticky top-[calc(3.75rem+env(safe-area-inset-top))] z-30 border-b border-border bg-background/95 backdrop-blur-md md:top-[calc(4.25rem+env(safe-area-inset-top))]"
       >
-        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 xs:px-5 md:px-8">
+        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 scrollbar-hide xs:px-5 md:px-8">
           {visibleCategories.map((category) => (
             <a
               key={category.id}
               href={`#${category.id}`}
-              className="shrink-0 rounded-sm border border-border px-3 py-2 text-sm text-foreground transition hover:border-accent hover:text-accent"
+              className="inline-flex min-h-10 shrink-0 items-center rounded-sm border border-border px-3 py-2 text-sm text-foreground transition hover:border-accent hover:text-accent"
             >
               {category.title}
             </a>
@@ -75,8 +75,12 @@ export default async function ServicesPage() {
           const services = catalog.filter((service) => service.category === category.id);
 
           return (
-            <section key={category.id} id={category.id} className="scroll-mt-24">
-              <h2 className="font-display text-3xl tracking-tight text-foreground md:text-4xl">
+            <section
+              key={category.id}
+              id={category.id}
+              className="scroll-mt-[calc(7.5rem+env(safe-area-inset-top))] md:scroll-mt-[calc(8rem+env(safe-area-inset-top))]"
+            >
+              <h2 className="font-display text-[1.65rem] tracking-tight text-foreground xs:text-3xl md:text-4xl">
                 {category.title}
               </h2>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted md:text-base">

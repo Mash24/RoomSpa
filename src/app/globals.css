@@ -63,6 +63,18 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), system-ui, sans-serif;
   overflow-x: clip;
+  min-width: 0;
+}
+
+/* Prevent flex/grid children from forcing horizontal scroll */
+main {
+  min-width: 0;
+  overflow-x: clip;
+}
+
+img,
+video {
+  max-width: 100%;
 }
 
 /* Comfortable tap targets on phones */
@@ -74,6 +86,18 @@ body {
     font-size: 16px; /* reduces iOS zoom-on-focus */
   }
 }
+
+/* Clearance so fixed chat + WhatsApp never cover page content */
+.page-bottom-clearance {
+  padding-bottom: max(6.5rem, calc(env(safe-area-inset-bottom) + 5.5rem));
+}
+
+@media (min-width: 1024px) {
+  .page-bottom-clearance {
+    padding-bottom: max(2rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+  }
+}
+
 
 ::selection {
   background: color-mix(in oklab, var(--accent) 35%, transparent);

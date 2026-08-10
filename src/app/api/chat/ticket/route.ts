@@ -56,14 +56,14 @@ export async function POST(request: Request) {
     const ip = clientIp(request);
     if (!allow(`ticket:${ip}`)) {
       return NextResponse.json(
-        { error: "Too many tickets from this connection. Please WhatsApp us instead." },
+        { error: "A few too many requests — please try WhatsApp for now." },
         { status: 429 },
       );
     }
 
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== "object") {
-      return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+      return NextResponse.json({ error: "Something went wrong. Please try again." }, { status: 400 });
     }
 
     const guestName = String(body.guestName ?? "").trim();
@@ -75,22 +75,22 @@ export async function POST(request: Request) {
     const transcript = normalizeTranscript(body.transcript);
 
     if (guestName.length < 2 || guestName.length > 80) {
-      return NextResponse.json({ error: "Please enter your name." }, { status: 400 });
+      return NextResponse.json({ error: "Please share your name." }, { status: 400 });
     }
     if (message.length < 10 || message.length > 4000) {
       return NextResponse.json(
-        { error: "Please add a short message (at least 10 characters)." },
+        { error: "Tell us a little more about how we can help (a short note is perfect)." },
         { status: 400 },
       );
     }
     if (!guestPhone && !guestEmailRaw) {
       return NextResponse.json(
-        { error: "Add a WhatsApp/phone number or email so we can reach you." },
+        { error: "Leave a WhatsApp number or email so we can reach you." },
         { status: 400 },
       );
     }
     if (guestEmailRaw && !isEmail(guestEmailRaw)) {
-      return NextResponse.json({ error: "That email does not look valid." }, { status: 400 });
+      return NextResponse.json({ error: "That email doesn’t look quite right." }, { status: 400 });
     }
 
     const guestEmail = guestEmailRaw ? normalizeEmail(guestEmailRaw) : null;
@@ -98,6 +98,7 @@ export async function POST(request: Request) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim() || site.url;
 
     let ticketId: string | null = null;
+    let guestToken: string | null = null;
     let stored = false;
 
     try {
@@ -110,23 +111,31 @@ export async function POST(request: Request) {
           guest_name: guestName,
           guest_email: guestEmail,
           guest_phone: guestPhone || null,
-          subject: subject || "Talk to Live Agent",
+          subject: subject || "Care team request",
           message,
           page_path: pagePath,
           transcript,
           ip_hash: hashIp(ip),
         })
-        .select("id, reference_code")
+        .select("id, reference_code, guest_token")
         .single();
 
       if (error) {
-        console.error("[ticket] insert failed (will still email ops):", error);
+        console.error("[ticket] insert failed (will still email care team):", error);
       } else {
         ticketId = data.id;
+        guestToken = data.guest_token;
         stored = true;
+
+        // Seed first guest note via secure RPC (RLS blocks direct message inserts).
+        await supabase.rpc("ticket_guest_post_message", {
+          p_code: data.reference_code,
+          p_token: data.guest_token,
+          p_body: message,
+        });
       }
     } catch (dbError) {
-      console.error("[ticket] database unavailable (will still email ops):", dbError);
+      console.error("[ticket] database unavailable (will still email care team):", dbError);
     }
 
     const emailResult = await sendNewTicketOpsEmail({
@@ -134,19 +143,18 @@ export async function POST(request: Request) {
       guestName,
       guestEmail,
       guestPhone: guestPhone || null,
-      subject: subject || "Talk to Live Agent",
+      subject: subject || "Care team request",
       message,
       pagePath,
       transcript,
       siteUrl,
     });
 
-    // Guest handoff succeeds if we emailed ops OR saved the row.
     if (!stored && !emailResult.sent) {
       return NextResponse.json(
         {
           error:
-            "Could not reach customer care just now. Please WhatsApp us — we’ll help right away.",
+            "We couldn’t reach the care team just now. WhatsApp us and we’ll look after you right away.",
         },
         { status: 503 },
       );
@@ -156,11 +164,12 @@ export async function POST(request: Request) {
       ok: true,
       referenceCode: code,
       id: ticketId,
+      guestToken,
       stored,
       emailed: emailResult.sent,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Could not open ticket.";
+    const message = error instanceof Error ? error.message : "Could not reach the care team.";
     console.error("[ticket]", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }

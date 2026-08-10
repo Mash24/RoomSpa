@@ -261,19 +261,19 @@ export function BookingForm({ products: initialProducts }: Props) {
             href={result.whatsappHref}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center justify-center rounded-sm bg-[#25D366] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#20bd5b]"
+            className="inline-flex min-h-12 items-center justify-center rounded-sm bg-[#25D366] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#20bd5b]"
           >
             Confirm on WhatsApp
           </a>
           <Link
             href={manageHref}
-            className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+            className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
           >
             Manage booking
           </Link>
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
+            className="inline-flex min-h-12 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
           >
             Back to home
           </Link>
@@ -582,7 +582,7 @@ export function BookingForm({ products: initialProducts }: Props) {
         <button
           type="submit"
           disabled={submitting}
-          className="inline-flex items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
+          className="inline-flex min-h-12 w-full items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60 sm:w-auto"
         >
           {submitting
             ? payNow

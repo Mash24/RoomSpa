@@ -42,7 +42,7 @@ export default async function BlogPostPage({ params }: PageProps) {
     .slice(0, 3);
 
   return (
-    <article className="mx-auto max-w-3xl px-5 py-20 md:px-8 md:py-28">
+    <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-28">
       <BlogPostingJsonLd
         title={post.title}
         description={post.description}
@@ -68,7 +68,7 @@ export default async function BlogPostPage({ params }: PageProps) {
       <p className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-accent">
         {post.categoryName} · {post.datePublished}
       </p>
-      <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
+      <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         {post.title}
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">{post.description}</p>
@@ -79,16 +79,16 @@ export default async function BlogPostPage({ params }: PageProps) {
         ))}
       </div>
 
-      <div className="mt-12 flex flex-wrap gap-3 border-t border-border pt-8">
+      <div className="mt-12 flex flex-col gap-2.5 border-t border-border pt-8 xs:flex-row xs:flex-wrap xs:gap-3">
         <Link
           href={post.primaryCta?.href ?? "/book"}
-          className="inline-flex rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
+          className="inline-flex min-h-11 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
         >
           {post.primaryCta?.label ?? "Book a session"}
         </Link>
         <Link
           href={post.secondaryCta?.href ?? "/services"}
-          className="inline-flex rounded-sm border border-border px-5 py-3 text-sm transition hover:border-accent hover:text-accent"
+          className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm transition hover:border-accent hover:text-accent"
         >
           {post.secondaryCta?.label ?? "Browse services"}
         </Link>

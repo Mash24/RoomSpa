@@ -104,8 +104,8 @@ export function SiteHeader() {
           id="mobile-nav"
           className={
             onHero
-              ? "animate-fade-in max-h-[min(80vh,28rem)] overflow-y-auto border-t border-white/15 bg-[rgba(18,28,24,0.96)] px-4 py-4 backdrop-blur-md xs:px-5 lg:hidden"
-              : "animate-fade-in max-h-[min(80vh,28rem)] overflow-y-auto border-t border-border bg-background px-4 py-4 xs:px-5 lg:hidden"
+              ? "animate-fade-in max-h-[min(calc(100dvh-4.5rem-env(safe-area-inset-top)),28rem)] overflow-y-auto overscroll-contain border-t border-white/15 bg-[rgba(18,28,24,0.96)] px-4 py-4 backdrop-blur-md xs:px-5 lg:hidden"
+              : "animate-fade-in max-h-[min(calc(100dvh-4.5rem-env(safe-area-inset-top)),28rem)] overflow-y-auto overscroll-contain border-t border-border bg-background px-4 py-4 xs:px-5 lg:hidden"
           }
         >
           <nav className="flex flex-col" aria-label="Mobile">

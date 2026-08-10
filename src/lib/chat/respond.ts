@@ -227,8 +227,9 @@ Respond ONLY as JSON:
   "links": [{"label":"string","href":"/path"}]
 }
 Max 3 links (relative hrefs starting with /).
-Set suggestTicket=true when the guest wants a human, something is missing from the docs, or the issue is urgent/complaint.
-For price questions: always list 60 / 90 / 120 from the documents.`,
+Set suggestTicket=true when the guest wants a person, something is missing, or the issue is urgent — invite them to “Talk to our care team”.
+For price questions: always list 60 / 90 / 120 from the documents.
+Keep the guest-facing reply warm and easy — spa hospitality language, not technical jargon.`,
         },
         ...messages.map((message) => ({
           role: message.role,

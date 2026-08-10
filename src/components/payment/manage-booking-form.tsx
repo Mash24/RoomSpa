@@ -107,7 +107,7 @@ export function ManageBookingForm() {
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60 sm:w-auto"
         >
           {loading ? "Searching..." : "Find my booking"}
         </button>
@@ -159,7 +159,7 @@ export function ManageBookingForm() {
                       type="button"
                       onClick={() => onPay(booking.id)}
                       disabled={payingId === booking.id}
-                      className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60 sm:w-auto"
                     >
                       {payingId === booking.id ? "Redirecting..." : "Pay by card"}
                     </button>
@@ -173,7 +173,7 @@ export function ManageBookingForm() {
                       href={`/reviews?ref=${encodeURIComponent(booking.referenceCode)}&email=${encodeURIComponent(email)}${
                         booking.serviceSlug ? `&service=${encodeURIComponent(booking.serviceSlug)}` : ""
                       }`}
-                      className="inline-flex items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90 sm:w-auto"
                     >
                       Leave a review
                     </Link>

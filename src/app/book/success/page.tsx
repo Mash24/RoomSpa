@@ -37,7 +37,7 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
 
   if (!sessionId) {
     return (
-      <section className="mx-auto max-w-2xl px-5 py-24 md:px-8">
+      <section className="mx-auto max-w-2xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
         <h1 className="font-display text-4xl tracking-tight">Missing payment session</h1>
         <p className="mt-4 text-muted">Return to booking and try again.</p>
         <Link href="/book" className="mt-6 inline-flex text-accent underline">
@@ -64,11 +64,11 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
   }
 
   return (
-    <section className="mx-auto max-w-2xl px-5 py-24 md:px-8">
+    <section className="mx-auto max-w-2xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
         {paid ? "Paid" : "Checkout complete"}
       </p>
-      <h1 className="mt-3 font-display text-4xl tracking-tight text-foreground md:text-5xl">
+      <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         {paid ? "Payment successful" : "Thanks — we’re confirming payment"}
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">

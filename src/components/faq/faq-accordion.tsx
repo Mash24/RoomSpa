@@ -31,9 +31,9 @@ export function FaqAccordion({ items }: Props) {
                 aria-expanded={open}
                 aria-controls={panelId}
                 onClick={() => setOpenIndex(open ? null : index)}
-                className="flex w-full items-center justify-between gap-4 py-5 text-left transition hover:text-accent"
+                className="flex min-h-12 w-full items-center justify-between gap-3 py-4 text-left transition hover:text-accent xs:gap-4 xs:py-5"
               >
-                <span className="font-display text-xl tracking-tight text-foreground md:text-2xl">
+                <span className="min-w-0 font-display text-lg leading-snug tracking-tight text-foreground xs:text-xl md:text-2xl">
                   {item.question}
                 </span>
                 <span

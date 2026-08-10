@@ -17,7 +17,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1">{children}</main>
+      <main className="page-bottom-clearance flex-1">{children}</main>
       <ChatWidget />
       <WhatsAppFloat />
       <SiteFooter />

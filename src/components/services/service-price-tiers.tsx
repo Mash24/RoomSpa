@@ -13,6 +13,8 @@ type ServicePriceTiersProps = {
   selectedMinutes?: DurationMinutes;
   onSelect?: (minutes: DurationMinutes) => void;
   className?: string;
+  /** Light text / glass borders for dark photo backdrops */
+  onDark?: boolean;
 };
 
 export function ServicePriceTiers({
@@ -20,13 +22,14 @@ export function ServicePriceTiers({
   selectedMinutes,
   onSelect,
   className = "",
+  onDark = false,
 }: ServicePriceTiersProps) {
   const tiers = getServicePriceTiers(service);
   const interactive = Boolean(onSelect);
 
   return (
     <div
-      className={`grid grid-cols-3 gap-2 sm:gap-3 ${className}`}
+      className={`grid grid-cols-3 gap-1.5 xs:gap-2 sm:gap-3 ${className}`}
       role={interactive ? "radiogroup" : undefined}
       aria-label={`${service.name} duration and price`}
     >
@@ -35,10 +38,22 @@ export function ServicePriceTiers({
         const amount = tiers[minutes];
         const inner = (
           <>
-            <p className="text-[0.65rem] font-medium uppercase tracking-[0.14em] text-muted sm:text-xs">
+            <p
+              className={`text-[0.6rem] font-medium uppercase tracking-[0.12em] xs:text-[0.65rem] sm:text-xs ${
+                onDark
+                  ? "text-white/80 drop-shadow-[0_1px_6px_rgba(0,0,0,0.55)]"
+                  : "text-muted"
+              }`}
+            >
               {DURATION_TIER_LABELS[minutes]}
             </p>
-            <p className="mt-1.5 font-display text-lg tracking-tight text-accent sm:text-xl md:text-2xl">
+            <p
+              className={`mt-1 break-words font-display text-base tracking-tight xs:text-lg sm:mt-1.5 sm:text-xl md:text-2xl ${
+                onDark
+                  ? "text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.55)]"
+                  : "text-accent"
+              }`}
+            >
               {productPriceLabel(amount)}
             </p>
           </>
@@ -54,8 +69,12 @@ export function ServicePriceTiers({
               onClick={() => onSelect?.(minutes)}
               className={`rounded-sm border px-2 py-3 text-left transition sm:px-3 sm:py-4 ${
                 selected
-                  ? "border-accent bg-accent-soft/40"
-                  : "border-border bg-surface-elevated hover:border-accent/50"
+                  ? onDark
+                    ? "border-white/70 bg-white/15"
+                    : "border-accent bg-accent-soft/40"
+                  : onDark
+                    ? "border-white/20 bg-transparent hover:border-white/45"
+                    : "border-border bg-surface-elevated hover:border-accent/50"
               }`}
             >
               {inner}
@@ -66,7 +85,11 @@ export function ServicePriceTiers({
         return (
           <div
             key={minutes}
-            className="rounded-sm border border-border bg-surface-elevated px-2 py-3 sm:px-3 sm:py-4"
+            className={
+              onDark
+                ? "px-0 py-1 text-left sm:py-1.5"
+                : "rounded-sm border border-border bg-surface-elevated px-2 py-3 sm:px-3 sm:py-4"
+            }
           >
             {inner}
           </div>

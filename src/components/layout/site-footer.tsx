@@ -12,7 +12,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden bg-[#121816] text-white pb-[max(5.75rem,calc(env(safe-area-inset-bottom)+5rem))] md:pb-[max(1.75rem,env(safe-area-inset-bottom))]">
+    <footer className="relative overflow-hidden bg-[#121816] text-white pb-[max(5.75rem,calc(env(safe-area-inset-bottom)+5rem))] lg:pb-[max(1.75rem,env(safe-area-inset-bottom))]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"
@@ -25,7 +25,10 @@ export function SiteFooter() {
       <div className="relative mx-auto max-w-6xl px-4 pt-12 xs:px-5 sm:pt-14 md:px-8 md:pt-16">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <Link href="/" className="inline-block font-display text-4xl tracking-tight text-white md:text-5xl">
+            <Link
+              href="/"
+              className="inline-block font-display text-[2rem] tracking-tight text-white xs:text-4xl md:text-5xl"
+            >
               {site.name}
             </Link>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/55">
