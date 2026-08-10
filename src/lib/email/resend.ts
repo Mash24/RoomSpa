@@ -34,6 +34,28 @@ export function getAdminEmail() {
   return envEmail("EMAIL_ADMIN", "admin@getroomspa.com");
 }
 
+/**
+ * Where NEW BOOKING ops alerts are sent (To — dedicated email, not guest BCC).
+ * Comma/space separated. Defaults to EMAIL_ADMIN, then EMAIL_BOOKING.
+ * Example: EMAIL_OPS_NOTIFY=testtestness@gmail.com
+ */
+export function getOpsNotifyEmails() {
+  const raw =
+    process.env.EMAIL_OPS_NOTIFY?.trim() ||
+    process.env.EMAIL_ADMIN?.trim() ||
+    process.env.EMAIL_BOOKING?.trim() ||
+    "";
+  if (!raw) return [];
+  return [
+    ...new Set(
+      raw
+        .split(/[,;\s]+/)
+        .map((email) => email.trim())
+        .filter(Boolean),
+    ),
+  ];
+}
+
 /** Resend From — must match verified domain (default: GetRoomSpa <hello@…>) */
 export function getEmailFrom() {
   return (

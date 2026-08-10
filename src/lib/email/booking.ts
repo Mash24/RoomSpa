@@ -3,6 +3,7 @@ import { productPriceLabel } from "@/content/services";
 import { paymentMethodLabel } from "@/lib/booking/pin";
 import {
   getBookingNotifyEmails,
+  getOpsNotifyEmails,
   getResend,
   sendAppEmail,
 } from "@/lib/email/resend";
@@ -23,6 +24,9 @@ export type BookingEmailInput = {
   amountThb: number;
   paymentMethod: string;
   siteUrl: string;
+  durationMinutes?: number;
+  paymentStatus?: string;
+  bookingStatus?: string;
 };
 
 function manageUrl(input: BookingEmailInput) {
@@ -221,7 +225,162 @@ export async function sendBookingConfirmationEmail(input: BookingEmailInput) {
     });
   }
 
+  // Separate ops alert (To your inbox) — independent of guest email success.
+  const opsResult = await sendNewBookingOpsEmail(input);
+  if (!opsResult.sent) {
+    console.warn("[email] ops booking alert failed:", opsResult);
+  }
+
   return result;
+}
+
+function adminDashboardUrl(input: BookingEmailInput) {
+  return `${input.siteUrl.replace(/\/$/, "")}/admin`;
+}
+
+function opsBookingEmailHtml(input: BookingEmailInput) {
+  const placeType = locationTypeLabel(input.locationType);
+  const details = input.locationDetails?.trim();
+  const notes = input.notes?.trim();
+  const duration =
+    input.durationMinutes && input.durationMinutes > 0
+      ? `${input.durationMinutes} minutes`
+      : "";
+  const admin = adminDashboardUrl(input);
+
+  return `<!DOCTYPE html>
+<html>
+  <body style="margin:0;padding:0;background:#f1f5f3;font-family:Georgia,'Times New Roman',serif;color:#1c1917;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f3;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border:1px solid #d6e0db;padding:32px;">
+            <tr>
+              <td>
+                <p style="margin:0;font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#2f5d50;">RoomSpa Ops</p>
+                <h1 style="margin:12px 0 0;font-size:28px;font-weight:normal;line-height:1.2;">New booking</h1>
+                <p style="margin:16px 0 0;font-size:16px;line-height:1.5;color:#57534e;">
+                  A guest just booked online. Review details below and confirm in the admin dashboard.
+                </p>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0 0;font-size:15px;line-height:1.6;color:#44403c;">
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;width:130px;vertical-align:top;">Reference</td>
+                    <td style="padding:6px 0;"><strong>${escapeHtml(input.referenceCode)}</strong></td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Service</td>
+                    <td style="padding:6px 0;"><strong>${escapeHtml(input.serviceName)}</strong>${duration ? ` · ${escapeHtml(duration)}` : ""}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">When</td>
+                    <td style="padding:6px 0;">${escapeHtml(input.scheduledDate)} at ${escapeHtml(input.scheduledTime)}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Where</td>
+                    <td style="padding:6px 0;">
+                      ${placeType ? `${escapeHtml(placeType)} · ` : ""}${escapeHtml(input.locationLabel)}
+                      ${details ? `<br /><span style="color:#78716c;">${escapeHtml(details)}</span>` : ""}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Guest</td>
+                    <td style="padding:6px 0;">
+                      ${escapeHtml(input.customerName)}<br />
+                      <a href="mailto:${escapeHtml(input.customerEmail)}" style="color:#2f5d50;">${escapeHtml(input.customerEmail)}</a>
+                      ${input.customerPhone ? `<br />${escapeHtml(input.customerPhone)}` : ""}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Amount</td>
+                    <td style="padding:6px 0;">${escapeHtml(productPriceLabel(input.amountThb))}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Payment</td>
+                    <td style="padding:6px 0;">${escapeHtml(paymentMethodLabel(input.paymentMethod))}${input.paymentStatus ? ` · ${escapeHtml(input.paymentStatus)}` : ""}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Status</td>
+                    <td style="padding:6px 0;">${escapeHtml(input.bookingStatus || "pending")}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">PIN</td>
+                    <td style="padding:6px 0;font-family:ui-monospace,monospace;letter-spacing:0.12em;">${escapeHtml(input.accessPin)}</td>
+                  </tr>
+                  ${
+                    notes
+                      ? `<tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Notes</td>
+                    <td style="padding:6px 0;">${escapeHtml(notes)}</td>
+                  </tr>`
+                      : ""
+                  }
+                </table>
+
+                <p style="margin:28px 0 0;">
+                  <a href="${escapeHtml(admin)}" style="display:inline-block;background:#2f5d50;color:#f7f9f8;text-decoration:none;padding:12px 18px;font-size:14px;">
+                    Open admin dashboard
+                  </a>
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+function opsBookingEmailText(input: BookingEmailInput) {
+  const placeType = locationTypeLabel(input.locationType);
+  const lines = [
+    `NEW BOOKING — RoomSpa`,
+    ``,
+    `Reference: ${input.referenceCode}`,
+    `Service: ${input.serviceName}${input.durationMinutes ? ` · ${input.durationMinutes} min` : ""}`,
+    `When: ${input.scheduledDate} at ${input.scheduledTime}`,
+    `Where: ${placeType ? `${placeType} · ` : ""}${input.locationLabel}`,
+  ];
+  if (input.locationDetails?.trim()) lines.push(`Details: ${input.locationDetails.trim()}`);
+  lines.push(
+    `Guest: ${input.customerName}`,
+    `Email: ${input.customerEmail}`,
+  );
+  if (input.customerPhone) lines.push(`Phone: ${input.customerPhone}`);
+  lines.push(
+    `Amount: ${productPriceLabel(input.amountThb)}`,
+    `Payment: ${paymentMethodLabel(input.paymentMethod)}${input.paymentStatus ? ` · ${input.paymentStatus}` : ""}`,
+    `Status: ${input.bookingStatus || "pending"}`,
+    `PIN: ${input.accessPin}`,
+  );
+  if (input.notes?.trim()) lines.push(`Notes: ${input.notes.trim()}`);
+  lines.push(``, `Admin: ${adminDashboardUrl(input)}`);
+  return lines.join("\n");
+}
+
+/** Dedicated ops alert To EMAIL_OPS_NOTIFY (e.g. your Gmail). Never throws. */
+export async function sendNewBookingOpsEmail(input: BookingEmailInput) {
+  if (!getResend()) {
+    console.info("[email] RESEND_API_KEY not set — skipped ops booking alert.");
+    return { sent: false as const, reason: "not_configured" as const };
+  }
+
+  const recipients = getOpsNotifyEmails().filter(
+    (email) => email.toLowerCase() !== input.customerEmail.toLowerCase(),
+  );
+  if (!recipients.length) {
+    console.info("[email] EMAIL_OPS_NOTIFY / EMAIL_ADMIN not set — skipped ops booking alert.");
+    return { sent: false as const, reason: "no_recipients" as const };
+  }
+
+  return sendAppEmail({
+    to: recipients,
+    subject: `New booking ${input.referenceCode} — ${input.serviceName} · ${input.scheduledDate} ${input.scheduledTime}`,
+    html: opsBookingEmailHtml(input),
+    text: opsBookingEmailText(input),
+    replyTo: input.customerEmail,
+  });
 }
 
 function statusLabel(status: string) {

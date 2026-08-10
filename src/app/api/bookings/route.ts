@@ -240,6 +240,9 @@ export async function POST(request: Request) {
       amountThb,
       paymentMethod,
       siteUrl,
+      durationMinutes,
+      paymentStatus: "unpaid",
+      bookingStatus: "pending",
     });
 
     const response: Record<string, unknown> = {

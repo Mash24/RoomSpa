@@ -38,6 +38,7 @@ Use the exact `include:` value Resend displays (often Amazon SES). Do not remove
 | `EMAIL_BOOKING` | `booking@getroomspa.com` |
 | `EMAIL_SUPPORT` | `support@getroomspa.com` |
 | `EMAIL_ADMIN` | `admin@getroomspa.com` |
+| `EMAIL_OPS_NOTIFY` | Your personal inbox for **NEW BOOKING** alerts (e.g. `testtestness@gmail.com`). Comma-separated OK. |
 
 Redeploy after saving.
 
@@ -46,13 +47,15 @@ Redeploy after saving.
 |---------|------|
 | `hello@` | Public contact / From |
 | `support@` | Reply-To (guest replies) |
-| `booking@` | BCC of new bookings |
-| `admin@` | BCC of new bookings (ops) |
+| `booking@` | BCC of guest confirmation |
+| `admin@` | BCC of guest confirmation |
+| `EMAIL_OPS_NOTIFY` | **To:** dedicated ops “New booking” email with full details |
 
 ### 4. What the app sends
 After a successful `/api/bookings` create:
 - Guest receives confirmation with reference + **PIN** + manage link
-- `booking@` and `admin@` are BCC’d
+- You receive a separate **New booking** email at `EMAIL_OPS_NOTIFY` with guest, service, time, place, payment, PIN, and admin link
+- `booking@` and `admin@` are still BCC’d on the guest confirmation when configured
 
 After Stripe Checkout payment succeeds:
 - Guest receives a **payment receipt** email with booking details + PIN
