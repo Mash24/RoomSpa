@@ -19,6 +19,9 @@ function mapService(row: Record<string, unknown>, prices: AdminServiceRow["price
     isActive: row.is_active !== false,
     sortOrder: Number(row.sort_order ?? 0),
     imageUrl: (row.image_url as string | null) ?? null,
+    imageHeroUrl: (row.image_hero_url as string | null) ?? null,
+    imageAlt: (row.image_alt as string | null) ?? null,
+    imageFocus: (row.image_focus as string | null) ?? null,
     seoTitle: (row.seo_title as string | null) ?? null,
     seoDescription: (row.seo_description as string | null) ?? null,
     prices,
@@ -34,7 +37,7 @@ export async function GET() {
   const { data: services, error: servicesError } = await supabase
     .from("services")
     .select(
-      "id, slug, name, summary, details, category, duration_minutes, duration_label, price_thb, featured, bookable, is_active, sort_order, image_url, seo_title, seo_description",
+      "id, slug, name, summary, details, category, duration_minutes, duration_label, price_thb, featured, bookable, is_active, sort_order, image_url, image_hero_url, image_alt, image_focus, seo_title, seo_description",
     )
     .order("sort_order", { ascending: true });
 
@@ -120,6 +123,9 @@ export async function POST(request: Request) {
       is_active: body.isActive !== false,
       sort_order: Number(body.sortOrder ?? 100),
       image_url: body.imageUrl || null,
+      image_hero_url: body.imageHeroUrl || null,
+      image_alt: body.imageAlt || null,
+      image_focus: body.imageFocus || null,
       seo_title: body.seoTitle || null,
       seo_description: body.seoDescription || null,
     })

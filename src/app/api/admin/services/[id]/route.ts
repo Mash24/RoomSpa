@@ -27,6 +27,9 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body.isActive != null) patch.is_active = Boolean(body.isActive);
   if (body.sortOrder != null) patch.sort_order = Number(body.sortOrder);
   if (body.imageUrl !== undefined) patch.image_url = body.imageUrl || null;
+  if (body.imageHeroUrl !== undefined) patch.image_hero_url = body.imageHeroUrl || null;
+  if (body.imageAlt !== undefined) patch.image_alt = body.imageAlt || null;
+  if (body.imageFocus !== undefined) patch.image_focus = body.imageFocus || null;
   if (body.seoTitle !== undefined) patch.seo_title = body.seoTitle || null;
   if (body.seoDescription !== undefined) patch.seo_description = body.seoDescription || null;
   if (body.durationLabel != null) patch.duration_label = String(body.durationLabel);

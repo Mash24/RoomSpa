@@ -6,6 +6,7 @@ import {
   type CatalogService,
 } from "@/content/services";
 import { DURATION_TIER_LABELS } from "@/lib/catalog/prices";
+import { getServicePath } from "@/lib/catalog/service-paths";
 import {
   buildSiteIndex,
   formatDocsForPrompt,
@@ -87,7 +88,7 @@ function formatServicePrices(service: CatalogService): ChatReply {
     suggestTicket: false,
     links: [
       { label: `Book ${service.name}`, href: `/book?service=${service.slug}` },
-      { label: "Details", href: `/services/${service.slug}` },
+      { label: "Details", href: getServicePath(service) },
       { label: "Full pricing", href: "/pricing" },
     ],
   };
@@ -106,7 +107,8 @@ function tryStructuredReply(
       suggestTicket: false,
       links: [
         { label: "Full pricing", href: "/pricing" },
-        { label: "Private & sensual", href: "/services#sensual" },
+        { label: "Signature Experiences", href: "/services/signature" },
+        { label: "Wellness Massage", href: "/services/wellness" },
       ],
     };
   }
@@ -117,7 +119,7 @@ function linksFromDocs(docs: SiteDoc[], service: CatalogService | null): ChatRep
   const links: { label: string; href: string }[] = [];
   if (service) {
     links.push({ label: `Book ${service.name}`, href: `/book?service=${service.slug}` });
-    links.push({ label: "Details", href: `/services/${service.slug}` });
+    links.push({ label: "Details", href: getServicePath(service) });
   }
   for (const doc of docs) {
     if (links.length >= 3) break;

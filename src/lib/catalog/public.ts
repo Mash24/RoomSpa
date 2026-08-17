@@ -1,14 +1,17 @@
 import {
   catalogServices,
-  isPrivateExperience,
+  isSignatureExperience,
   type CatalogService,
   type ServiceCategoryId,
 } from "@/content/services";
+import { filterSignatureCatalog } from "@/lib/catalog/signature";
+import { filterWellnessCatalog } from "@/lib/catalog/wellness";
 import {
   buildPriceTiers,
   DURATION_TIERS,
   type DurationMinutes,
 } from "@/lib/catalog/prices";
+import type { BookStripTreatment } from "@/lib/catalog/book-strip-types";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 
 type DbService = {
@@ -69,7 +72,13 @@ function mapService(row: DbService, priceRows: DbPrice[]): CatalogService {
       90: Number(tiers[90] ?? derived[90]),
       120: Number(tiers[120] ?? derived[120]),
     },
-    category: isCategory(row.category) ? row.category : fallback?.category ?? "classic",
+    category: (() => {
+      const dbCat = isCategory(row.category) ? row.category : null;
+      const staticCat = fallback?.category;
+      // Static catalog wins for known signature slugs when DB category was not migrated yet.
+      if (staticCat === "sensual" && dbCat !== "sensual") return "sensual";
+      return dbCat ?? staticCat ?? "classic";
+    })(),
     featured: Boolean(row.featured ?? fallback?.featured),
     bookable: row.bookable !== false,
   };
@@ -129,38 +138,46 @@ function uniqueBySlug(services: CatalogService[]) {
 }
 
 /**
- * Featured services for homepage cards.
- * Private/sensual experiences always lead; CMS `featured` ranks within that set.
- * Wellness stays available but never crowds out the commercial focus.
+ * Signature-only services for homepage & signature zone — never backfills with wellness.
  */
-export async function getPublicFeaturedServices(limit = 6) {
+export async function getPublicSignatureServices(limit = 6) {
   const catalog = await getPublicCatalog();
-  const privateOnes = catalog.filter(isPrivateExperience);
-  const privateFeatured = privateOnes.filter((service) => service.featured);
-  const privateRest = privateOnes.filter((service) => !service.featured);
-  const otherFeatured = catalog.filter(
-    (service) => service.featured && !isPrivateExperience(service),
-  );
-  const otherRest = catalog.filter(
-    (service) => !service.featured && !isPrivateExperience(service),
-  );
-
-  return uniqueBySlug([
-    ...privateFeatured,
-    ...privateRest,
-    ...otherFeatured,
-    ...otherRest,
-  ]).slice(0, limit);
+  const signature = filterSignatureCatalog(catalog);
+  const featured = signature.filter((service) => service.featured);
+  const rest = signature.filter((service) => !service.featured);
+  return uniqueBySlug([...featured, ...rest]).slice(0, limit);
 }
 
-/** Treatments for the homepage book strip — private first, then wellness. */
-export async function getBookStripTreatments() {
+/** @deprecated Use getPublicSignatureServices */
+export async function getPublicSensualServices(limit = 6) {
+  return getPublicSignatureServices(limit);
+}
+
+/** @deprecated Prefer getPublicSignatureServices */
+export async function getPublicFeaturedServices(limit = 6) {
+  return getPublicSignatureServices(limit);
+}
+
+/** Wellness-only services — never includes signature experiences. */
+export async function getPublicWellnessServices(limit = 12) {
   const catalog = await getPublicCatalog();
-  const privateOnes = catalog.filter(isPrivateExperience);
-  const others = catalog.filter((service) => !isPrivateExperience(service));
-  return [...privateOnes, ...others].map((service) => ({
+  const wellness = filterWellnessCatalog(catalog);
+  const featured = wellness.filter((service) => service.featured);
+  const rest = wellness.filter((service) => !service.featured);
+  return uniqueBySlug([...featured, ...rest]).slice(0, limit);
+}
+
+export type { BookStripTreatment } from "@/lib/catalog/book-strip-types";
+
+/** Homepage book strip — signature treatments first, then wellness (separate optgroups). */
+export async function getBookStripTreatments(): Promise<BookStripTreatment[]> {
+  const catalog = await getPublicCatalog();
+  const signature = filterSignatureCatalog(catalog);
+  const wellness = filterWellnessCatalog(catalog);
+  return [...signature, ...wellness].map((service) => ({
     label: service.name,
     slug: service.slug,
+    tier: isSignatureExperience(service) ? ("signature" as const) : ("wellness" as const),
   }));
 }
 

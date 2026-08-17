@@ -5,6 +5,7 @@ import {
   productPriceLabel,
   type CatalogService,
 } from "@/content/services";
+import { getServicePath } from "@/lib/catalog/service-paths";
 
 type Props = {
   services: CatalogService[];
@@ -43,10 +44,10 @@ export function HomeServices({ services }: Props) {
       <div className="relative mx-auto max-w-6xl px-4 py-12 xs:px-5 xs:py-14 md:px-8 md:py-20">
         <div className="max-w-xl">
           <p className="text-[0.7rem] font-medium uppercase tracking-[0.2em] text-white drop-shadow-[0_1px_10px_rgba(0,0,0,0.75)] xs:text-xs">
-            Private & sensual
+            Signature experiences
           </p>
           <h2 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-white drop-shadow-[0_2px_18px_rgba(0,0,0,0.7)] xs:text-4xl md:text-5xl">
-            Featured experiences
+            Our most requested sessions
           </h2>
           <p className="mt-3 max-w-md text-[0.95rem] leading-relaxed text-white drop-shadow-[0_1px_12px_rgba(0,0,0,0.7)] xs:text-base md:text-lg">
             Consent-led private sessions delivered to your hotel, condo, or home — discreet and
@@ -81,7 +82,7 @@ export function HomeServices({ services }: Props) {
                     Book
                   </Link>
                   <Link
-                    href={`/services/${service.slug}`}
+                    href={getServicePath(service)}
                     className="inline-flex min-h-11 flex-1 items-center justify-center rounded-sm border border-white/35 px-4 py-2.5 text-sm text-white transition hover:border-white hover:bg-white/10 sm:flex-none"
                   >
                     Details
@@ -94,16 +95,16 @@ export function HomeServices({ services }: Props) {
 
         <div className="mt-8 flex flex-col gap-3 xs:flex-row xs:flex-wrap xs:gap-x-6">
           <Link
-            href="/services#sensual"
+            href="/services/signature"
             className="inline-flex min-h-11 items-center text-sm font-medium text-white underline decoration-white/35 underline-offset-4 transition hover:decoration-white"
           >
-            Private & sensual →
+            All signature experiences →
           </Link>
           <Link
             href="/services#classic"
             className="inline-flex min-h-11 items-center text-sm font-medium text-white/75 transition hover:text-white"
           >
-            Wellness & therapeutic →
+            Wellness massage →
           </Link>
         </div>
       </div>

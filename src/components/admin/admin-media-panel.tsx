@@ -2,10 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { readApiJson } from "@/lib/admin/api";
+import { categoryToTier, experienceTierLabels } from "@/lib/catalog/experience-tier";
 import type { AdminMediaRow } from "@/lib/admin/cms-types";
 import { createClient } from "@/utils/supabase/client";
 
-type ServiceOption = { id: string; slug: string; name?: string };
+type ServiceOption = { id: string; slug: string; name?: string; category?: string };
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 const MAX_VIDEO_BYTES = 95 * 1024 * 1024;
@@ -37,6 +38,17 @@ export function AdminMediaPanel() {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string | null>(null);
+
+  const servicesByTier = useMemo(() => {
+    const signature: ServiceOption[] = [];
+    const wellness: ServiceOption[] = [];
+    for (const service of services) {
+      const tier = categoryToTier((service.category || "classic") as "classic");
+      if (tier === "signature") signature.push(service);
+      else wellness.push(service);
+    }
+    return { signature, wellness };
+  }, [services]);
 
   const selectedServiceLabels = useMemo(() => {
     return services
@@ -195,7 +207,7 @@ export function AdminMediaPanel() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="font-display text-3xl tracking-tight text-foreground md:text-4xl">
+        <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-3xl md:text-4xl">
           Media library
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
@@ -210,8 +222,8 @@ export function AdminMediaPanel() {
         </div>
       ) : null}
 
-      <form onSubmit={onCreate} className="space-y-4 border border-border bg-surface-elevated p-5 md:p-6">
-        <h2 className="font-display text-2xl text-foreground">Add media</h2>
+      <form onSubmit={onCreate} className="space-y-4 border border-border bg-surface-elevated p-4 pb-4 md:p-6 md:pb-6">
+        <h2 className="font-display text-xl text-foreground xs:text-2xl">Add media</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <label className="block text-sm md:col-span-2">
             <span className="text-muted">Title</span>
@@ -320,18 +332,44 @@ export function AdminMediaPanel() {
           ) : (
             <p className="mt-2 text-xs text-muted">Select the service(s) this media is about.</p>
           )}
-          <div className="mt-2 grid max-h-48 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
-            {services.map((service) => (
-              <label key={service.id} className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={selectedServices.includes(service.id)}
-                  onChange={() => toggleService(service.id)}
-                />
-                <span className="truncate">{service.name || service.slug}</span>
-              </label>
-            ))}
-          </div>
+          {servicesByTier.wellness.length > 0 ? (
+            <div className="mt-3">
+              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted">
+                {experienceTierLabels.wellness}
+              </p>
+              <div className="mt-2 grid max-h-40 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
+                {servicesByTier.wellness.map((service) => (
+                  <label key={service.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedServices.includes(service.id)}
+                      onChange={() => toggleService(service.id)}
+                    />
+                    <span className="truncate">{service.name || service.slug}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ) : null}
+          {servicesByTier.signature.length > 0 ? (
+            <div className="mt-4">
+              <p className="text-xs font-medium uppercase tracking-[0.12em] text-muted">
+                {experienceTierLabels.signature}
+              </p>
+              <div className="mt-2 grid max-h-40 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3">
+                {servicesByTier.signature.map((service) => (
+                  <label key={service.id} className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={selectedServices.includes(service.id)}
+                      onChange={() => toggleService(service.id)}
+                    />
+                    <span className="truncate">{service.name || service.slug}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ) : null}
         </fieldset>
 
         <div className="flex flex-wrap gap-4 text-sm">
@@ -352,18 +390,57 @@ export function AdminMediaPanel() {
         <button
           type="submit"
           disabled={saving || uploading || !mediaUrl}
-          className="rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-60"
+          className="hidden min-h-11 rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-60 md:inline-flex md:items-center"
         >
           {saving ? "Saving…" : "Save media"}
         </button>
+
+        <div className="admin-mobile-actions -mx-4 md:hidden">
+          <button
+            type="submit"
+            disabled={saving || uploading || !mediaUrl}
+            className="flex min-h-12 w-full items-center justify-center rounded-sm bg-accent text-sm font-medium text-accent-foreground disabled:opacity-60"
+          >
+            {saving ? "Saving…" : "Save media"}
+          </button>
+        </div>
       </form>
 
       <div>
-        <h2 className="font-display text-2xl text-foreground">Library</h2>
+        <h2 className="font-display text-xl text-foreground xs:text-2xl">Library</h2>
         {loading ? (
           <p className="mt-4 text-sm text-muted">Loading…</p>
         ) : (
-          <ul className="mt-4 divide-y divide-border border border-border bg-surface-elevated">
+          <>
+            <ul className="admin-card-list mt-4">
+              {media.map((item) => (
+                <li key={item.id} className="border border-border bg-surface-elevated p-4">
+                  <p className="font-medium text-foreground">{item.title}</p>
+                  <p className="mt-1 text-xs uppercase tracking-wide text-muted">
+                    {item.kind} · {item.status}
+                    {item.featured ? " · Featured" : ""}
+                  </p>
+                  <p className="mt-2 line-clamp-2 break-all text-xs text-muted">{item.mediaUrl}</p>
+                  <p className="mt-2 text-xs text-muted">
+                    Services: {item.serviceSlugs.length ? item.serviceSlugs.join(", ") : "—"}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => void onDelete(item.id)}
+                    className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-sm border border-border text-sm text-muted transition hover:border-red-400 hover:text-red-600"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+              {media.length === 0 ? (
+                <li className="border border-border bg-surface-elevated px-4 py-8 text-sm text-muted">
+                  No media yet. Add your first video above.
+                </li>
+              ) : null}
+            </ul>
+
+            <ul className="admin-table-wrap mt-4 divide-y divide-border border border-border bg-surface-elevated">
             {media.map((item) => (
               <li
                 key={item.id}
@@ -394,6 +471,7 @@ export function AdminMediaPanel() {
               <li className="px-4 py-8 text-sm text-muted">No media yet. Add your first video above.</li>
             ) : null}
           </ul>
+          </>
         )}
       </div>
     </div>

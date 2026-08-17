@@ -3,9 +3,20 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { serviceCategories, type ServiceCategoryId } from "@/content/services";
+import {
+  serviceCategories,
+  type ServiceCategoryId,
+} from "@/content/services";
+import {
+  categoryToTier,
+  experienceTierLabels,
+  tierToCategory,
+  type ExperienceTier,
+  WELLNESS_CATEGORY_IDS,
+} from "@/lib/catalog/experience-tier";
 import { DURATION_TIER_LABELS } from "@/lib/catalog/prices";
 import type { AdminServiceRow } from "@/lib/admin/cms-types";
+import { AdminServiceImageField } from "@/components/admin/admin-service-image-field";
 
 type Props = {
   serviceId?: string;
@@ -27,6 +38,8 @@ export function AdminServiceEditor({ serviceId }: Props) {
   const [summary, setSummary] = useState("");
   const [details, setDetails] = useState("");
   const [category, setCategory] = useState<ServiceCategoryId>("classic");
+  const [experienceTier, setExperienceTier] = useState<ExperienceTier>("wellness");
+  const [wellnessSubCategory, setWellnessSubCategory] = useState<ServiceCategoryId>("classic");
   const [featured, setFeatured] = useState(false);
   const [bookable, setBookable] = useState(true);
   const [isActive, setIsActive] = useState(true);
@@ -35,6 +48,9 @@ export function AdminServiceEditor({ serviceId }: Props) {
   const [price120, setPrice120] = useState("");
   const [seoTitle, setSeoTitle] = useState("");
   const [seoDescription, setSeoDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageHeroUrl, setImageHeroUrl] = useState<string | null>(null);
+  const [imageAlt, setImageAlt] = useState("");
 
   useEffect(() => {
     if (!serviceId) return;
@@ -53,6 +69,10 @@ export function AdminServiceEditor({ serviceId }: Props) {
         setSummary(service.summary);
         setDetails(service.details);
         setCategory(service.category);
+        setExperienceTier(categoryToTier(service.category));
+        if (WELLNESS_CATEGORY_IDS.includes(service.category)) {
+          setWellnessSubCategory(service.category);
+        }
         setFeatured(service.featured);
         setBookable(service.bookable);
         setIsActive(service.isActive);
@@ -61,6 +81,9 @@ export function AdminServiceEditor({ serviceId }: Props) {
         setPrice120(priceOf(service, 120));
         setSeoTitle(service.seoTitle || "");
         setSeoDescription(service.seoDescription || "");
+        setImageUrl(service.imageUrl);
+        setImageHeroUrl(service.imageHeroUrl);
+        setImageAlt(service.imageAlt || "");
       } catch (err) {
         if (!cancelled) setError(err instanceof Error ? err.message : "Could not load.");
       } finally {
@@ -88,18 +111,27 @@ export function AdminServiceEditor({ serviceId }: Props) {
     event.preventDefault();
     setSaving(true);
     setError(null);
+    const resolvedCategory = tierToCategory(experienceTier, wellnessSubCategory);
+    if (experienceTier === "signature" && !imageUrl) {
+      setError("Signature experiences need a hero image. Upload one before saving.");
+      setSaving(false);
+      return;
+    }
     const payload = {
       name,
       slug,
       summary,
       details,
-      category,
+      category: resolvedCategory,
       featured,
       bookable,
       isActive,
       price60: Number(price60),
       price90: Number(price90),
       price120: Number(price120),
+      imageUrl,
+      imageHeroUrl,
+      imageAlt,
       seoTitle,
       seoDescription,
     };
@@ -126,20 +158,20 @@ export function AdminServiceEditor({ serviceId }: Props) {
   }
 
   return (
-    <form onSubmit={onSave} className="mx-auto max-w-3xl space-y-8">
-      <div className="flex items-center justify-between gap-4">
-        <div>
+    <form onSubmit={onSave} className="mx-auto max-w-3xl space-y-8 pb-4 md:pb-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="min-w-0">
           <Link href="/admin/services" className="text-sm text-accent">
             ← Services
           </Link>
-          <h1 className="mt-2 font-display text-3xl tracking-tight text-foreground">
+          <h1 className="mt-2 font-display text-2xl tracking-tight text-foreground xs:text-3xl">
             {isNew ? "Add service" : "Edit service"}
           </h1>
         </div>
         <button
           type="submit"
           disabled={saving}
-          className="rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-60"
+          className="hidden min-h-11 shrink-0 rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-60 md:inline-flex md:items-center"
         >
           {saving ? "Saving…" : "Save"}
         </button>
@@ -187,21 +219,70 @@ export function AdminServiceEditor({ serviceId }: Props) {
             className="mt-1 w-full border border-border bg-background px-3 py-2.5"
           />
         </label>
-        <label className="block text-sm">
-          <span className="text-muted">Category</span>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value as ServiceCategoryId)}
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
-          >
-            {serviceCategories.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.title}
-              </option>
-            ))}
-          </select>
-        </label>
+        <fieldset className="space-y-3">
+          <legend className="text-sm text-muted">Service category</legend>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="experienceTier"
+              checked={experienceTier === "wellness"}
+              onChange={() => {
+                setExperienceTier("wellness");
+                setCategory(tierToCategory("wellness", wellnessSubCategory));
+              }}
+            />
+            {experienceTierLabels.wellness}
+          </label>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="radio"
+              name="experienceTier"
+              checked={experienceTier === "signature"}
+              onChange={() => {
+                setExperienceTier("signature");
+                setCategory("sensual");
+              }}
+            />
+            {experienceTierLabels.signature}
+          </label>
+          {experienceTier === "wellness" ? (
+            <label className="block text-sm">
+              <span className="text-muted">Wellness type</span>
+              <select
+                value={wellnessSubCategory}
+                onChange={(e) => {
+                  const next = e.target.value as ServiceCategoryId;
+                  setWellnessSubCategory(next);
+                  setCategory(tierToCategory("wellness", next));
+                }}
+                className="mt-1 w-full border border-border bg-background px-3 py-2.5"
+              >
+                {serviceCategories
+                  .filter((item) => WELLNESS_CATEGORY_IDS.includes(item.id))
+                  .map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.title}
+                    </option>
+                  ))}
+              </select>
+            </label>
+          ) : (
+            <p className="text-xs text-muted">
+              Appears on Signature Experiences only — not in Wellness menus.
+            </p>
+          )}
+        </fieldset>
       </section>
+
+      <AdminServiceImageField
+        slug={slug}
+        experienceTier={experienceTier}
+        imageUrl={imageUrl}
+        imageAlt={imageAlt}
+        onImageUrlChange={setImageUrl}
+        onImageHeroUrlChange={setImageHeroUrl}
+        onImageAltChange={setImageAlt}
+      />
 
       <section className="space-y-4 border border-border bg-surface-elevated p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
@@ -269,6 +350,16 @@ export function AdminServiceEditor({ serviceId }: Props) {
           />
         </label>
       </section>
+
+      <div className="admin-mobile-actions">
+        <button
+          type="submit"
+          disabled={saving}
+          className="flex min-h-12 w-full items-center justify-center rounded-sm bg-accent text-sm font-medium text-accent-foreground disabled:opacity-60"
+        >
+          {saving ? "Saving…" : "Save service"}
+        </button>
+      </div>
     </form>
   );
 }

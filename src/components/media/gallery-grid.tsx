@@ -5,6 +5,7 @@ import { GalleryPlaybackProvider } from "@/components/media/gallery-playback";
 import { MediaEmbed } from "@/components/media/media-embed";
 import { classifyMediaUrl } from "@/lib/media/urls";
 import type { PublicMediaItem } from "@/lib/media/public";
+import { getServicePathBySlug } from "@/lib/catalog/service-paths";
 
 function isNativeGalleryVideo(item: PublicMediaItem) {
   if (item.kind === "image") return false;
@@ -54,7 +55,7 @@ export function GalleryGrid({ items }: { items: PublicMediaItem[] }) {
               ) : null}
               {primarySlug ? (
                 <Link
-                  href={`/services/${primarySlug}`}
+                  href={getServicePathBySlug(primarySlug)}
                   className="mt-3 inline-flex text-sm font-medium text-accent"
                 >
                   View service →

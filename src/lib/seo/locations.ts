@@ -1,4 +1,5 @@
 import { catalogServices, productPriceLabel, type CatalogService } from "@/content/services";
+import { getRelatedServicesInTier } from "@/lib/catalog/related";
 import { cities, type CityDefinition } from "@/content/cities";
 import { getAllBlogPosts } from "@/content/blog";
 
@@ -123,12 +124,5 @@ export function relatedBlogLinks(keywords: string[], limit = 3) {
 }
 
 export function relatedServices(service: CatalogService, limit = 4) {
-  return catalogServices
-    .filter((s) => s.bookable && s.slug !== service.slug)
-    .sort((a, b) => {
-      const aScore = a.category === service.category ? 1 : 0;
-      const bScore = b.category === service.category ? 1 : 0;
-      return bScore - aScore;
-    })
-    .slice(0, limit);
+  return getRelatedServicesInTier(catalogServices, service, limit);
 }

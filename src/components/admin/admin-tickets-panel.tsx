@@ -108,24 +108,24 @@ export function AdminTicketsPanel() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-4xl tracking-tight text-foreground">Care chats</h1>
+        <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-4xl">Care chats</h1>
         <p className="mt-2 text-sm text-muted">
           Guests who asked for a person. Reply here — they’ll see it in the site chat (and by email
           when they left one). Closing a chat invites an optional guest rating.
         </p>
       </div>
 
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
         {FILTERS.map((item) => (
           <button
             key={item.value}
             type="button"
             onClick={() => setFilter(item.value)}
-            className={
+            className={`min-h-11 rounded-sm px-3 py-2.5 text-sm font-medium transition sm:px-4 ${
               filter === item.value
-                ? "rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-foreground"
-                : "rounded-sm border border-border px-4 py-2 text-sm text-foreground transition hover:border-accent hover:text-accent"
-            }
+                ? "bg-accent text-accent-foreground"
+                : "border border-border text-foreground hover:border-accent hover:text-accent"
+            }`}
           >
             {item.label}
           </button>
@@ -144,18 +144,26 @@ export function AdminTicketsPanel() {
           return (
             <li key={ticket.id} className="border border-border bg-surface-elevated p-4 md:p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <p className="font-display text-2xl tracking-tight text-foreground">
+                <p className="font-display text-xl tracking-tight text-foreground xs:text-2xl">
                   {ticket.referenceCode}
                 </p>
                 <p className="text-xs uppercase tracking-[0.14em] text-muted">
                   {ticket.status.replace("_", " ")} · {formatWhen(ticket.createdAt)}
                 </p>
               </div>
-              <p className="mt-2 text-sm text-foreground">
-                <strong>{ticket.guestName}</strong>
-                {ticket.guestPhone ? ` · ${ticket.guestPhone}` : ""}
-                {ticket.guestEmail ? ` · ${ticket.guestEmail}` : ""}
-              </p>
+              <div className="mt-2 space-y-1 text-sm text-foreground">
+                <p><strong>{ticket.guestName}</strong></p>
+                {ticket.guestPhone ? (
+                  <p>
+                    <a href={`tel:${ticket.guestPhone}`} className="text-accent">{ticket.guestPhone}</a>
+                  </p>
+                ) : null}
+                {ticket.guestEmail ? (
+                  <p>
+                    <a href={`mailto:${ticket.guestEmail}`} className="break-all text-accent">{ticket.guestEmail}</a>
+                  </p>
+                ) : null}
+              </div>
               <p className="mt-1 text-sm text-muted">{ticket.subject}</p>
 
               <div className="mt-4 max-h-64 space-y-2 overflow-y-auto border border-border bg-background p-3">
@@ -202,7 +210,7 @@ export function AdminTicketsPanel() {
                     placeholder="Write a warm reply…"
                     className="w-full border border-border bg-background px-3 py-2 text-sm"
                   />
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                     <button
                       type="button"
                       disabled={updatingId === ticket.id || !(replyDrafts[ticket.id] ?? "").trim()}
@@ -212,7 +220,7 @@ export function AdminTicketsPanel() {
                           message: replyDrafts[ticket.id],
                         })
                       }
-                      className="rounded-sm bg-accent px-3 py-2 text-sm font-medium text-accent-foreground disabled:opacity-50"
+                      className="min-h-11 rounded-sm bg-accent px-3 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-50 sm:py-2"
                     >
                       Send reply
                     </button>

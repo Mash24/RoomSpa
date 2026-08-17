@@ -4,7 +4,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
   return (
     <>
       <AdminHeader />
-      <div className="mx-auto max-w-6xl px-5 py-8 md:px-8">{children}</div>
+      <div className="mx-auto max-w-6xl px-4 py-6 xs:px-5 md:px-8 md:py-8">{children}</div>
     </>
   );
 }

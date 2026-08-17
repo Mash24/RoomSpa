@@ -1,150 +1,135 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import {
-  getServicePriceTiers,
-  productPriceLabel,
-  serviceCategories,
-} from "@/content/services";
+import { ServicesHashRedirect } from "@/components/services/services-hash-redirect";
 import { whatsappHref } from "@/content/site";
-import { getPublicCatalog } from "@/lib/catalog/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Services | In-room massage Chiang Mai",
+  title: "Services | RoomSpa Chiang Mai",
   description:
-    "Private and wellness in-room massage in Chiang Mai — sensual, tantric, couples, classic, and therapeutic treatments at your hotel, condo, or home.",
+    "Choose Wellness Massage or Signature Experiences — premium in-room massage delivered to your hotel, condo, or home in Chiang Mai.",
   path: "/services",
 });
 
-export default async function ServicesPage() {
-  const catalog = await getPublicCatalog();
-  const visibleCategories = serviceCategories.filter((category) =>
-    catalog.some((service) => service.category === category.id),
-  );
-
+export default function ServicesHubPage() {
   return (
     <div>
+      <ServicesHashRedirect />
       <section className="border-b border-border bg-surface px-4 py-14 xs:px-5 md:px-8 md:py-20">
         <div className="mx-auto max-w-6xl">
           <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Services</p>
           <h1 className="mt-3 max-w-2xl font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-            Private massage that comes to your room
+            Two experiences. One RoomSpa.
           </h1>
           <p className="mt-4 max-w-xl text-base leading-relaxed text-muted md:text-lg">
-            Sensual and wellness treatments — choose a session, pick a length, and we come to you in
-            Chiang Mai.
+            Wellness massage for classic relaxation and recovery. Signature Experiences for
+            something more intimate — both book through the same private in-room service.
           </p>
-          <div className="mt-7 flex flex-wrap gap-3">
+        </div>
+      </section>
+
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 xs:px-5 md:grid-cols-2 md:gap-10 md:px-8 md:py-16">
+        <ExperienceHubCard
+          eyebrow="Wellness"
+          title="Wellness Massage"
+          summary="Swedish, Thai, deep tissue, hot oil, sports, prenatal, couples, and more — professional spa massage in your room."
+          href="/services/wellness"
+          cta="Explore Wellness"
+          variant="wellness"
+        />
+        <ExperienceHubCard
+          eyebrow="Signature"
+          title="Signature Experiences"
+          summary="Tantric, Nuru, body-to-body, Yoni, Lingam, and couples sensual — private, consent-led, and discreet."
+          href="/services/signature"
+          cta="Explore Signature Experiences"
+          variant="signature"
+        />
+      </div>
+
+      <div className="border-t border-border bg-surface-elevated px-4 py-10 xs:px-5 md:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-muted">Ready to book? Same flow for both experiences.</p>
+          <div className="flex flex-wrap gap-3">
             <Link
               href="/book"
               className="inline-flex min-h-11 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
             >
               Book now
             </Link>
-            <Link
-              href="/pricing"
+            <a
+              href={whatsappHref}
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
             >
-              Pricing
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <nav
-        aria-label="Service categories"
-        className="sticky top-[calc(3.75rem+env(safe-area-inset-top))] z-30 border-b border-border bg-background/95 backdrop-blur-md md:top-[calc(4.25rem+env(safe-area-inset-top))]"
-      >
-        <div className="mx-auto flex max-w-6xl gap-2 overflow-x-auto px-4 py-3 scrollbar-hide xs:px-5 md:px-8">
-          {visibleCategories.map((category) => (
-            <a
-              key={category.id}
-              href={`#${category.id}`}
-              className="inline-flex min-h-10 shrink-0 items-center rounded-sm border border-border px-3 py-2 text-sm text-foreground transition hover:border-accent hover:text-accent"
-            >
-              {category.title}
+              WhatsApp us
             </a>
-          ))}
-        </div>
-      </nav>
-
-      <div className="mx-auto max-w-6xl space-y-16 px-4 py-12 xs:px-5 md:space-y-20 md:px-8 md:py-16">
-        {visibleCategories.map((category) => {
-          const services = catalog.filter((service) => service.category === category.id);
-
-          return (
-            <section
-              key={category.id}
-              id={category.id}
-              className="scroll-mt-[calc(7.5rem+env(safe-area-inset-top))] md:scroll-mt-[calc(8rem+env(safe-area-inset-top))]"
-            >
-              <h2 className="font-display text-[1.65rem] tracking-tight text-foreground xs:text-3xl md:text-4xl">
-                {category.title}
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
-                {category.summary}
-              </p>
-              {category.id === "sensual" ? (
-                <p className="mt-3 max-w-2xl text-sm text-muted">
-                  Consent first — professional bodywork, not escort services. Pause or stop anytime.
-                </p>
-              ) : null}
-
-              <ul className="mt-6 divide-y divide-border border-y border-border">
-                {services.map((service) => {
-                  const from = getServicePriceTiers(service)[60];
-                  return (
-                    <li
-                      key={service.slug}
-                      id={service.slug}
-                      className="flex flex-col gap-3 py-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6"
-                    >
-                      <div className="min-w-0">
-                        <Link
-                          href={`/services/${service.slug}`}
-                          className="font-display text-xl tracking-tight text-foreground transition hover:text-accent md:text-2xl"
-                        >
-                          {service.name}
-                        </Link>
-                        <p className="mt-1 text-sm text-muted line-clamp-2">{service.summary}</p>
-                        <p className="mt-2 text-sm text-accent">From {productPriceLabel(from)}</p>
-                      </div>
-                      <div className="flex shrink-0 gap-2">
-                        <Link
-                          href={`/book?service=${service.slug}`}
-                          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground sm:flex-none"
-                        >
-                          Book
-                        </Link>
-                        <Link
-                          href={`/services/${service.slug}`}
-                          className="inline-flex min-h-11 flex-1 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm transition hover:border-accent hover:text-accent sm:flex-none"
-                        >
-                          Details
-                        </Link>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          );
-        })}
-
-        <div className="flex flex-col gap-3 border-t border-border pt-8 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted">Questions before you book?</p>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium transition hover:border-accent hover:text-accent"
-          >
-            WhatsApp us
-          </a>
+          </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function ExperienceHubCard({
+  eyebrow,
+  title,
+  summary,
+  href,
+  cta,
+  variant,
+}: {
+  eyebrow: string;
+  title: string;
+  summary: string;
+  href: string;
+  cta: string;
+  variant: "wellness" | "signature";
+}) {
+  const isSignature = variant === "signature";
+
+  return (
+    <Link
+      href={href}
+      className={`group flex flex-col rounded-sm p-8 transition md:p-10 ${
+        isSignature
+          ? "bg-[#0c0a09] ring-1 ring-[#c9a86c]/25 hover:ring-[#c9a86c]/45"
+          : "bg-surface-elevated ring-1 ring-border hover:ring-accent/35"
+      }`}
+    >
+      <p
+        className={`text-xs font-medium uppercase tracking-[0.2em] ${
+          isSignature ? "text-[#c9a86c]" : "text-accent"
+        }`}
+      >
+        {eyebrow}
+      </p>
+      <h2
+        className={`mt-3 font-display text-3xl tracking-tight md:text-4xl ${
+          isSignature ? "text-[#f5f0e8]" : "text-foreground"
+        }`}
+      >
+        {title}
+      </h2>
+      <p
+        className={`mt-4 flex-1 text-sm leading-relaxed md:text-base ${
+          isSignature ? "text-[#f5f0e8]/75" : "text-muted"
+        }`}
+      >
+        {summary}
+      </p>
+      <span
+        className={`mt-6 inline-flex min-h-10 items-center text-sm font-medium underline underline-offset-4 ${
+          isSignature
+            ? "text-[#f5f0e8] decoration-[#c9a86c]/50 group-hover:decoration-[#c9a86c]"
+            : "text-foreground decoration-border group-hover:decoration-accent"
+        }`}
+      >
+        {cta} →
+      </span>
+    </Link>
   );
 }

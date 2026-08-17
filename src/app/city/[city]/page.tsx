@@ -9,7 +9,11 @@ import { cities, getCity } from "@/content/cities";
 import { faqItems } from "@/content/pages";
 import { productPriceLabel } from "@/content/services";
 import { site, whatsappHref } from "@/content/site";
-import { getPublicCatalog } from "@/lib/catalog/public";
+import {
+  getPublicSignatureServices,
+  getPublicWellnessServices,
+} from "@/lib/catalog/public";
+import { getServicePath } from "@/lib/catalog/service-paths";
 import { aggregateRating, getApprovedReviews } from "@/lib/reviews/fetch";
 import { getTodayAvailabilityTeaser } from "@/lib/seo/availability-teaser";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -41,8 +45,10 @@ export default async function CityPage({ params }: PageProps) {
   if (!city) notFound();
 
   const live = city.status === "active";
-  const catalog = await getPublicCatalog();
-  const topServices = catalog.slice(0, 6);
+  const [wellnessPicks, signaturePicks] = await Promise.all([
+    getPublicWellnessServices(4),
+    getPublicSignatureServices(4),
+  ]);
   const reviews = await getApprovedReviews(4);
   const aggregate = aggregateRating(reviews);
   const teaser = live ? await getTodayAvailabilityTeaser() : null;
@@ -130,10 +136,10 @@ export default async function CityPage({ params }: PageProps) {
           </a>
         )}
         <Link
-          href="/services"
+          href="/services/wellness"
           className="inline-flex min-h-12 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm"
         >
-          Services
+          Wellness & Signature
         </Link>
       </div>
 
@@ -157,25 +163,61 @@ export default async function CityPage({ params }: PageProps) {
       </section>
 
       {live ? (
-        <section className="mt-12">
-          <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
-            Popular services
-          </h2>
-          <ul className="mt-4 divide-y divide-border border-y border-border">
-            {topServices.map((service) => (
-              <li key={service.slug} className="flex items-center justify-between gap-4 py-4">
-                <Link
-                  href={`/services/${service.slug}`}
-                  className="font-medium text-foreground transition hover:text-accent"
-                >
-                  {service.name}
+        <section className="mt-12 space-y-10">
+          {wellnessPicks.length > 0 ? (
+            <div>
+              <div className="flex items-end justify-between gap-4">
+                <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
+                  Wellness Massage
+                </h2>
+                <Link href="/services/wellness" className="text-sm text-accent hover:underline">
+                  All wellness →
                 </Link>
-                <span className="shrink-0 text-sm text-accent">
-                  From {productPriceLabel(service.amountThb)}
-                </span>
-              </li>
-            ))}
-          </ul>
+              </div>
+              <ul className="mt-4 divide-y divide-border border-y border-border">
+                {wellnessPicks.map((service) => (
+                  <li key={service.slug} className="flex items-center justify-between gap-4 py-4">
+                    <Link
+                      href={getServicePath(service)}
+                      className="font-medium text-foreground transition hover:text-accent"
+                    >
+                      {service.name}
+                    </Link>
+                    <span className="shrink-0 text-sm text-accent">
+                      From {productPriceLabel(service.amountThb)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {signaturePicks.length > 0 ? (
+            <div>
+              <div className="flex items-end justify-between gap-4">
+                <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
+                  Signature Experiences
+                </h2>
+                <Link href="/services/signature" className="text-sm text-accent hover:underline">
+                  All Signature →
+                </Link>
+              </div>
+              <ul className="mt-4 divide-y divide-border border-y border-border">
+                {signaturePicks.map((service) => (
+                  <li key={service.slug} className="flex items-center justify-between gap-4 py-4">
+                    <Link
+                      href={getServicePath(service)}
+                      className="font-medium text-foreground transition hover:text-accent"
+                    >
+                      {service.name}
+                    </Link>
+                    <span className="shrink-0 text-sm text-accent">
+                      From {productPriceLabel(service.amountThb)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </section>
       ) : null}
 

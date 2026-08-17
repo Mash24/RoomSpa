@@ -5,7 +5,11 @@ import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { BreadcrumbJsonLd, JsonLd } from "@/components/seo/json-ld";
 import { cities, coverageForNeighborhood, getNeighborhood } from "@/content/cities";
 import { site, whatsappHref } from "@/content/site";
-import { getPublicCatalog } from "@/lib/catalog/public";
+import {
+  getPublicSignatureServices,
+  getPublicWellnessServices,
+} from "@/lib/catalog/public";
+import { getServicePath } from "@/lib/catalog/service-paths";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = {
@@ -40,7 +44,10 @@ export default async function NeighborhoodPage({ params }: PageProps) {
   const { city, area } = match;
   const coverage = coverageForNeighborhood(area.coverageSlug);
   const live = city.status === "active";
-  const picks = (await getPublicCatalog()).slice(0, 5);
+  const [wellnessPicks, signaturePicks] = await Promise.all([
+    getPublicWellnessServices(3),
+    getPublicSignatureServices(3),
+  ]);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
@@ -115,20 +122,41 @@ export default async function NeighborhoodPage({ params }: PageProps) {
       </div>
 
       {live ? (
-        <section className="mt-12">
-          <h2 className="font-display text-2xl text-foreground">Popular services</h2>
-          <ul className="mt-4 divide-y divide-border border-y border-border">
-            {picks.map((service) => (
-              <li key={service.slug}>
-                <Link
-                  href={`/services/${service.slug}`}
-                  className="block py-3.5 text-sm font-medium text-foreground transition hover:text-accent"
-                >
-                  {service.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <section className="mt-12 space-y-8">
+          {wellnessPicks.length > 0 ? (
+            <div>
+              <h2 className="font-display text-2xl text-foreground">Wellness Massage</h2>
+              <ul className="mt-4 divide-y divide-border border-y border-border">
+                {wellnessPicks.map((service) => (
+                  <li key={service.slug}>
+                    <Link
+                      href={getServicePath(service)}
+                      className="block py-3.5 text-sm font-medium text-foreground transition hover:text-accent"
+                    >
+                      {service.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+          {signaturePicks.length > 0 ? (
+            <div>
+              <h2 className="font-display text-2xl text-foreground">Signature Experiences</h2>
+              <ul className="mt-4 divide-y divide-border border-y border-border">
+                {signaturePicks.map((service) => (
+                  <li key={service.slug}>
+                    <Link
+                      href={getServicePath(service)}
+                      className="block py-3.5 text-sm font-medium text-foreground transition hover:text-accent"
+                    >
+                      {service.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
         </section>
       ) : null}
     </article>

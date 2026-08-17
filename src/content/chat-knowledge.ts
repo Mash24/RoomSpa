@@ -157,14 +157,14 @@ export const chatKnowledge: KnowledgeEntry[] = [
     title: "Classic wellness massages",
     tags: ["swedish", "thai", "deep tissue", "aromatherapy", "wellness", "therapeutic"],
     content:
-      "RoomSpa also offers classic and therapeutic options (Swedish, Thai, Deep Tissue, Aromatherapy, sports, prenatal, foot reflexology, etc.). These remain available; private/sensual experiences are the commercial focus. Browse /services#classic and /services#therapeutic.",
+      "RoomSpa offers classic and therapeutic wellness massage (Swedish, Thai, Deep Tissue, Aromatherapy, sports, prenatal, foot reflexology, etc.) at /services/wellness. Signature Experiences (Tantric, Nuru, etc.) are separate at /services/signature.",
   },
   {
     id: "private-vs-wellness",
-    title: "Private vs wellness",
+    title: "Signature vs wellness",
     tags: ["sensual", "private", "difference", "which service", "recommend"],
     content:
-      "Private & sensual (Tantric, Nuru, Body-to-Body, Yoni, Lingam, Couples Sensual) emphasize intimacy, presence, and consent-led bodywork. Classic/therapeutic focus on relaxation and muscle work. Ask what the guest wants (relax vs intimate connection) and recommend accordingly, then link to book.",
+      "Signature experiences (Tantric, Nuru, Body-to-Body, Yoni, Lingam, Couples Sensual) emphasize intimacy, presence, and consent-led bodywork. Wellness massage (classic/therapeutic) focuses on relaxation and muscle work. Ask what the guest wants (relax vs intimate connection) and recommend accordingly, then link to book.",
   },
   {
     id: "arrival-speed",

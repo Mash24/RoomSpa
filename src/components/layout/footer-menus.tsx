@@ -5,8 +5,8 @@ import { site, whatsappHref } from "@/content/site";
 const bookLinks = [
   { label: "Book a private massage", href: "/book" },
   { label: "My booking", href: "/my-booking" },
-  { label: "Private & sensual", href: "/services#sensual" },
-  { label: "All services", href: "/services" },
+  { label: "Wellness Massage", href: "/services/wellness" },
+  { label: "Signature Experiences", href: "/services/signature" },
   { label: "Pricing", href: "/pricing" },
 ] as const;
 

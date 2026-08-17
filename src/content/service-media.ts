@@ -2,7 +2,13 @@ import type { ServiceCategoryId } from "@/content/services";
 
 export type ServiceMedia = {
   image: string;
+  /** Detail-page hero when CMS provides a separate 16:10 crop */
+  imageHero?: string;
   imageAlt: string;
+  /** CSS object-position for card/hero crops (static images only) */
+  imageFocus?: string;
+  /** CMS uploads are pre-cropped to frame — use cover on site */
+  imageFit?: "contain" | "cover";
   /** Short looping clip that matches this service category of work */
   video: string;
 };
@@ -11,6 +17,14 @@ export type ServiceMedia = {
  * Local stills were visually verified before assignment.
  * Intimate services use tasteful atmosphere / matching bodywork context — never mismatched face-facial shots.
  * Alt text stays natural — not keyword dumps.
+ *
+ * Signature stock credits (Pexels / Unsplash — free license):
+ * - tantric: Unsplash (oil ritual, cupped palm)
+ * - nuru: Pexels 4041392 — rose petals + amber oil
+ * - body-to-body: Pexels 37719639 — oiled back massage
+ * - yoni: Pexels 3757942 — relaxed woman, orchids + candlelight
+ * - lingam: Pexels 7365408 — man receiving oil massage, dim spa
+ * - couples-sensual: Pexels 6429513 — couple in robes, intimate moment
  */
 export const serviceMedia: Record<string, ServiceMedia> = {
   swedish: {
@@ -84,33 +98,39 @@ export const serviceMedia: Record<string, ServiceMedia> = {
     video: "/media/services/shared.mp4",
   },
   nuru: {
-    image: "/media/services/stills/v-bath.jpg",
-    imageAlt: "Private setting prepared for Nuru massage",
+    image: "/media/marketing/signature/nuru.jpg",
+    imageAlt: "Nuru gel — rose petals and warm amber oil on marble",
+    imageFocus: "center 42%",
     video: "/media/services/sensual.mp4",
   },
   "body-to-body": {
-    image: "/media/services/stills/v-back.jpg",
-    imageAlt: "Body-to-body oil massage setting",
+    image: "/media/marketing/signature/body-to-body.jpg",
+    imageAlt: "Body-to-body massage — oiled skin, close-contact hands on back",
+    imageFocus: "center 28%",
     video: "/media/services/sensual.mp4",
   },
   yoni: {
-    image: "/media/services/stills/c-thai.jpg",
-    imageAlt: "Private candlelit space for consent-led Yoni massage",
+    image: "/media/marketing/signature/yoni.jpg",
+    imageAlt: "Yoni massage — woman at rest among orchids and soft candlelight",
+    imageFocus: "center 32%",
     video: "/media/services/sensual.mp4",
   },
   lingam: {
-    image: "/media/services/stills/v-manback.jpg",
-    imageAlt: "Private setting for consent-led Lingam massage",
+    image: "/media/marketing/signature/lingam.jpg",
+    imageAlt: "Lingam massage — man receiving slow oil work in a dim spa room",
+    imageFocus: "center 48%",
     video: "/media/services/sensual.mp4",
   },
   tantric: {
-    image: "/media/services/stills/c-thai.jpg",
-    imageAlt: "Calm private space for tantric massage",
+    image: "/media/marketing/signature/tantric.jpg",
+    imageAlt: "Tantric massage — warm oil poured into an open palm, candlelit ritual",
+    imageFocus: "center 38%",
     video: "/media/services/sensual.mp4",
   },
   "couples-sensual": {
-    image: "/media/services/stills/v-bath.jpg",
-    imageAlt: "Private suite prepared for a couples sensual session",
+    image: "/media/marketing/signature/couples-sensual.jpg",
+    imageAlt: "Couples sensual session — two people in robes, close and unhurried",
+    imageFocus: "center 35%",
     video: "/media/services/shared.mp4",
   },
 };
@@ -136,8 +156,8 @@ export const categoryMedia: Record<
   },
   sensual: {
     video: "/media/services/sensual.mp4",
-    poster: "/media/services/stills/v-bath.jpg",
-    caption: "Private sensual and tantric bodywork",
+    poster: "/media/marketing/home-hero-sensual.jpg",
+    caption: "Private signature and sensual bodywork",
   },
 };
 

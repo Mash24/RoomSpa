@@ -22,6 +22,9 @@ export type AdminServiceRow = {
   isActive: boolean;
   sortOrder: number;
   imageUrl: string | null;
+  imageHeroUrl: string | null;
+  imageAlt: string | null;
+  imageFocus: string | null;
   seoTitle: string | null;
   seoDescription: string | null;
   prices: AdminServicePrice[];

@@ -2,16 +2,28 @@ import { randomUUID } from "crypto";
 import { NextResponse } from "next/server";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 import type { BookingPayload } from "@/lib/booking/types";
-import { TIME_SLOTS } from "@/lib/booking/types";
-import { getSlotCapacity, normalizeSlotTime } from "@/lib/booking/availability";
 import { site } from "@/content/site";
 import { getCatalogProduct, getServiceAmountForDuration } from "@/content/services";
 import { DURATION_TIERS, type DurationMinutes } from "@/lib/catalog/prices";
+import { normalizeSlotTime } from "@/lib/booking/availability";
 import { createBookingCheckoutSession } from "@/lib/stripe/checkout";
 import { generateBookingPin, mapPaymentPreferenceToMethod } from "@/lib/booking/pin";
 import { sendBookingConfirmationEmail } from "@/lib/email/booking";
 import { isEmail, normalizeEmail, resolveSiteUrl } from "@/lib/payments/lookup";
+import { isTherapistBookableAt } from "@/lib/therapists/bookability";
+import { assignBestAvailableTherapist } from "@/lib/therapists/assignment";
 
+function isValidSlotTime(value: string) {
+  return /^\d{2}:\d{2}$/.test(value);
+}
+
+function normalizeTherapistPreference(
+  pref: BookingPayload["therapistPreference"],
+  hasTherapist: boolean,
+): "specific" | "best_available" {
+  if (pref === "specific" || (hasTherapist && pref !== "best_available")) return "specific";
+  return "best_available";
+}
 function buildReferenceCode() {
   return `RS-${randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase()}`;
 }
@@ -153,35 +165,86 @@ export async function POST(request: Request) {
       coverageAreaId = area?.id ?? null;
     }
 
-    const bookingId = randomUUID();
-    const referenceCode = buildReferenceCode();
-    const accessPin = generateBookingPin();
     const scheduledTime = normalizeSlotTime(body.scheduledTime);
-    const customerName = body.customerName.trim();
-    const customerEmail = normalizeEmail(body.customerEmail);
-    const locationLabel = body.locationLabel.trim();
-
-    if (!TIME_SLOTS.includes(scheduledTime as (typeof TIME_SLOTS)[number])) {
+    if (!isValidSlotTime(scheduledTime)) {
       return NextResponse.json({ error: "Please choose a valid time slot." }, { status: 400 });
     }
 
-    const { data: slotRows, error: slotError } = await supabase.rpc("get_slot_booking_counts", {
-      p_date: body.scheduledDate,
-    });
+    const availabilityQuery = {
+      serviceSlug: body.serviceSlug,
+      date: body.scheduledDate,
+      durationMinutes,
+      coverageAreaSlug: body.coverageAreaSlug,
+      lat: body.lat,
+      lng: body.lng,
+      inferCoverageFromLocation: body.lat != null && body.lng != null,
+    };
 
-    if (!slotError && slotRows) {
-      const capacity = getSlotCapacity();
-      const match = (slotRows as { scheduled_time: string; booking_count: number }[]).find(
-        (row) => normalizeSlotTime(String(row.scheduled_time)) === scheduledTime,
-      );
-      const booked = Number(match?.booking_count ?? 0);
-      if (booked >= capacity) {
+    const therapistPreference = normalizeTherapistPreference(
+      body.therapistPreference,
+      Boolean(body.therapistSlug),
+    );
+    let therapistId: string | null = null;
+    let therapistDisplayName: string | null = null;
+
+    if (therapistPreference === "specific" && body.therapistSlug) {
+      const key = body.therapistSlug.trim();
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(key);
+      const therapistQuery = supabase
+        .from("therapists")
+        .select("id, display_name")
+        .eq("status", "active")
+        .eq("is_active", true)
+        .eq("is_bookable", true);
+      const { data: therapist } = await (isUuid
+        ? therapistQuery.eq("id", key)
+        : therapistQuery.eq("slug", key)
+      ).maybeSingle();
+
+      if (!therapist) {
+        return NextResponse.json({ error: "Selected therapist is not available." }, { status: 400 });
+      }
+
+      const bookable = await isTherapistBookableAt(therapist.id, {
+        ...availabilityQuery,
+        scheduledTime,
+      });
+      if (!bookable) {
         return NextResponse.json(
-          { error: "That time just filled up. Please choose another slot." },
+          {
+            error:
+              "That time was just taken. Please choose another available time.",
+          },
           { status: 409 },
         );
       }
+
+      therapistId = therapist.id;
+      therapistDisplayName = therapist.display_name as string;
+    } else {
+      const assigned = await assignBestAvailableTherapist({
+        ...availabilityQuery,
+        scheduledTime,
+      });
+      if (!assigned) {
+        return NextResponse.json(
+          {
+            error:
+              "That time was just taken. Please choose another available time.",
+          },
+          { status: 409 },
+        );
+      }
+      therapistId = assigned.therapistId;
+      therapistDisplayName = assigned.displayName;
     }
+
+    const bookingId = randomUUID();
+    const referenceCode = buildReferenceCode();
+    const accessPin = generateBookingPin();
+    const customerName = body.customerName.trim();
+    const customerEmail = normalizeEmail(body.customerEmail);
+    const locationLabel = body.locationLabel.trim();
 
     const bookingError = await insertBooking(supabase, {
       id: bookingId,
@@ -200,6 +263,8 @@ export async function POST(request: Request) {
       duration_minutes: durationMinutes,
       amount_thb: amountThb,
       notes: body.notes?.trim() ?? "",
+      therapist_id: therapistId,
+      therapist_preference: therapistPreference,
       status: "pending",
       payment_status: "unpaid",
       payment_method: paymentMethod,
@@ -243,6 +308,8 @@ export async function POST(request: Request) {
       durationMinutes,
       paymentStatus: "unpaid",
       bookingStatus: "pending",
+      therapistDisplayName,
+      therapistAssignment: therapistPreference,
     });
 
     const response: Record<string, unknown> = {
@@ -257,6 +324,8 @@ export async function POST(request: Request) {
       paymentMethod,
       whatsappHref,
       emailSent: emailResult.sent,
+      therapistDisplayName,
+      therapistAssignment: therapistPreference,
     };
 
     if (payNow) {

@@ -6,26 +6,27 @@ import { useSearchParams } from "next/navigation";
 import {
   catalogProducts,
   getServiceAmountForDuration,
-  isPrivateExperience,
+  isSignatureExperience,
   productPriceLabel,
   serviceAcceptsCardNow,
-  serviceCategories,
   type CatalogService,
   type DurationMinutes,
 } from "@/content/services";
+import { experienceTierLabels } from "@/lib/catalog/experience-tier";
 import { DURATION_TIER_LABELS } from "@/lib/catalog/prices";
 import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import { coverageAreas } from "@/content/coverage";
 import { whatsappHref } from "@/content/site";
 import { PaymentBadges } from "@/components/payment/payment-badges";
 import { paymentMethodLabel } from "@/lib/booking/pin";
-import type { SlotAvailability } from "@/lib/booking/availability";
 import {
-  TIME_SLOTS,
   type BookingResult,
   type LocationType,
   type PaymentPreference,
+  type TherapistPreference,
 } from "@/lib/booking/types";
+import type { AvailableTherapist } from "@/lib/therapists/bookability";
+import { BookingTherapistPicker, formatSlot12h } from "@/components/booking/booking-therapist-picker";
 import { redirectToUrl } from "@/lib/navigation";
 
 function todayInBangkok() {
@@ -42,11 +43,11 @@ function pickServiceSlug(list: CatalogService[], fromQuery: string | null) {
     return fromQuery;
   }
   const featuredPrivate = list.find(
-    (service) => service.featured && isPrivateExperience(service),
+    (service) => service.featured && isSignatureExperience(service),
   );
   if (featuredPrivate) return featuredPrivate.slug;
 
-  const anyPrivate = list.find(isPrivateExperience);
+  const anyPrivate = list.find(isSignatureExperience);
   if (anyPrivate) return anyPrivate.slug;
 
   const featured = list.find((service) => service.featured);
@@ -82,13 +83,19 @@ export function BookingForm({ products: initialProducts }: Props) {
   const [locationLabel, setLocationLabel] = useState("");
   const [locationDetails, setLocationDetails] = useState("");
   const [scheduledDate, setScheduledDate] = useState(todayInBangkok);
-  const [scheduledTime, setScheduledTime] = useState<string>(TIME_SLOTS[2]);
-  const [slots, setSlots] = useState<SlotAvailability[]>([]);
-  const [slotsLoading, setSlotsLoading] = useState(true);
+  const [scheduledTime, setScheduledTime] = useState<string | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState(searchParams.get("email") ?? "");
   const [customerPhone, setCustomerPhone] = useState("");
   const [notes, setNotes] = useState("");
+  const [therapistRef, setTherapistRef] = useState<string | null>(searchParams.get("therapist"));
+  const [therapistPreference, setTherapistPreference] = useState<TherapistPreference>(
+    searchParams.get("therapist") ? "specific" : "best_available",
+  );
+  const [bookableTherapists, setBookableTherapists] = useState<AvailableTherapist[]>([]);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [geocoding, setGeocoding] = useState(false);
   const [paymentPreference, setPaymentPreference] = useState<PaymentPreference>("cash");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -128,55 +135,102 @@ export function BookingForm({ products: initialProducts }: Props) {
     paymentPreference === "card_now" && !canPayNow ? "card_later" : paymentPreference;
   const payNow = effectivePaymentPreference === "card_now";
 
+  const totalLabel = selectedService
+    ? productPriceLabel(getServiceAmountForDuration(selectedService, durationMinutes))
+    : null;
+
+  const slotSummary = useMemo(() => {
+    if (!scheduledTime) return null;
+    const therapistName =
+      therapistPreference === "specific" && therapistRef
+        ? bookableTherapists.find((t) => t.id === therapistRef)?.displayName
+        : null;
+    const timeLabel = formatSlot12h(scheduledTime);
+    if (therapistName) return `${therapistName} · ${timeLabel}`;
+    if (therapistPreference === "best_available") return `Best available · ${timeLabel}`;
+    return timeLabel;
+  }, [scheduledTime, therapistPreference, therapistRef, bookableTherapists]);
+
+  const submitLabel = submitting
+    ? payNow
+      ? "Redirecting…"
+      : "Sending…"
+    : payNow
+      ? "Book & pay now"
+      : "Request booking";
+
+  useEffect(() => {
+    if (!locationLabel.trim() || locationLabel.trim().length < 4) {
+      setCoords(null);
+      return;
+    }
+    const t = setTimeout(() => {
+      void (async () => {
+        setGeocoding(true);
+        try {
+          const res = await fetch(`/api/geocode?q=${encodeURIComponent(locationLabel.trim())}`);
+          const data = await res.json();
+          if (res.ok && data.lat != null && data.lng != null) {
+            setCoords({ lat: data.lat, lng: data.lng });
+          }
+        } catch {
+          setCoords(null);
+        } finally {
+          setGeocoding(false);
+        }
+      })();
+    }, 600);
+    return () => clearTimeout(t);
+  }, [locationLabel]);
+
   useEffect(() => {
     let cancelled = false;
-
     void (async () => {
-      setSlotsLoading(true);
+      if (!serviceSlug || !scheduledDate || !coverageAreaSlug) {
+        setBookableTherapists([]);
+        return;
+      }
+      setAvailabilityLoading(true);
       try {
-        const response = await fetch(`/api/availability?date=${scheduledDate}`);
-        const data = await response.json();
-        if (cancelled) return;
-        if (!response.ok) throw new Error(data.error || "Could not load times.");
-
-        const nextSlots = (data.slots ?? []) as SlotAvailability[];
-        setSlots(nextSlots);
-
-        const stillOpen = nextSlots.find((slot) => slot.time === scheduledTime && slot.available);
-        if (!stillOpen) {
-          const firstOpen = nextSlots.find((slot) => slot.available);
-          setScheduledTime(firstOpen?.time ?? "");
+        const params = new URLSearchParams({
+          service: serviceSlug,
+          date: scheduledDate,
+          duration: String(durationMinutes),
+          coverage: coverageAreaSlug,
+        });
+        if (coords) {
+          params.set("lat", String(coords.lat));
+          params.set("lng", String(coords.lng));
+          params.set("inferCoverage", "1");
         }
+        const res = await fetch(`/api/therapists/availability?${params}`);
+        const data = await res.json();
+        if (cancelled) return;
+        if (!res.ok) throw new Error(data.error || "Could not load availability.");
+        setBookableTherapists(data.therapists || []);
         setError(null);
       } catch (err) {
         if (!cancelled) {
-          setSlots(
-            TIME_SLOTS.map((time) => ({
-              time,
-              booked: 0,
-              capacity: 3,
-              remaining: 3,
-              available: true,
-            })),
-          );
-          setError(err instanceof Error ? err.message : "Could not load times.");
+          setBookableTherapists([]);
+          setError(err instanceof Error ? err.message : "Could not load availability.");
         }
       } finally {
-        if (!cancelled) setSlotsLoading(false);
+        if (!cancelled) setAvailabilityLoading(false);
       }
     })();
-
     return () => {
       cancelled = true;
     };
-    // Only refetch when the date changes; scheduledTime is adjusted inside.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scheduledDate]);
+  }, [serviceSlug, scheduledDate, durationMinutes, coverageAreaSlug, coords]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!scheduledTime) {
       setError("Please choose an available time.");
+      return;
+    }
+    if (therapistPreference === "specific" && !therapistRef) {
+      setError("Please choose a therapist and time.");
       return;
     }
 
@@ -200,6 +254,10 @@ export function BookingForm({ products: initialProducts }: Props) {
           customerEmail,
           customerPhone,
           notes,
+          therapistSlug: therapistPreference === "specific" ? therapistRef : null,
+          therapistPreference,
+          lat: coords?.lat,
+          lng: coords?.lng,
           paymentPreference: effectivePaymentPreference,
           payNow,
         }),
@@ -235,8 +293,19 @@ export function BookingForm({ products: initialProducts }: Props) {
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
           Reference <span className="font-medium text-foreground">{result.referenceCode}</span> for{" "}
-          {result.serviceName} on {result.scheduledDate} at {result.scheduledTime}. Amount:{" "}
-          {productPriceLabel(result.amountThb)}.
+          {result.serviceName} on {result.scheduledDate} at {formatSlot12h(result.scheduledTime)}.
+          {result.therapistDisplayName ? (
+            <>
+              {" "}
+              Therapist:{" "}
+              <span className="font-medium text-foreground">
+                {result.therapistDisplayName}
+                {result.therapistAssignment === "best_available" ? " (best available)" : ""}
+              </span>
+              .
+            </>
+          ) : null}{" "}
+          Amount: {productPriceLabel(result.amountThb)}.
         </p>
         <p className="mt-2 text-sm text-muted">
           Payment plan: {paymentMethodLabel(result.paymentMethod)}
@@ -283,9 +352,9 @@ export function BookingForm({ products: initialProducts }: Props) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-8">
+    <form onSubmit={onSubmit} className="booking-form-with-bar space-y-8">
       <fieldset className="space-y-4">
-        <legend className="font-display text-2xl tracking-tight text-foreground">1. Service</legend>
+        <legend className="font-display text-xl tracking-tight text-foreground xs:text-2xl">1. Service</legend>
         <label className="block text-sm">
           <span className="text-muted">Choose a massage</span>
           <select
@@ -294,19 +363,32 @@ export function BookingForm({ products: initialProducts }: Props) {
             onChange={(e) => setServiceSlug(e.target.value)}
             className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
           >
-            {serviceCategories.map((category) => {
-              const options = products.filter((product) => product.category === category.id);
-              if (options.length === 0) return null;
+            {(() => {
+              const signature = products.filter(isSignatureExperience);
+              const wellness = products.filter((p) => !isSignatureExperience(p));
               return (
-                <optgroup key={category.id} label={category.title}>
-                  {options.map((product) => (
-                    <option key={product.slug} value={product.slug}>
-                      {product.name} — {productPriceLabel(product.amountThb)}
-                    </option>
-                  ))}
-                </optgroup>
+                <>
+                  {signature.length > 0 ? (
+                    <optgroup label={experienceTierLabels.signature}>
+                      {signature.map((product) => (
+                        <option key={product.slug} value={product.slug}>
+                          {product.name} — {productPriceLabel(product.amountThb)}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ) : null}
+                  {wellness.length > 0 ? (
+                    <optgroup label={experienceTierLabels.wellness}>
+                      {wellness.map((product) => (
+                        <option key={product.slug} value={product.slug}>
+                          {product.name} — {productPriceLabel(product.amountThb)}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ) : null}
+                </>
               );
-            })}
+            })()}
           </select>
         </label>
         {selectedService ? (
@@ -332,7 +414,7 @@ export function BookingForm({ products: initialProducts }: Props) {
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="font-display text-2xl tracking-tight text-foreground">2. When & where</legend>
+        <legend className="font-display text-xl tracking-tight text-foreground xs:text-2xl">2. When & where</legend>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
             <span className="text-muted">Date</span>
@@ -341,79 +423,41 @@ export function BookingForm({ products: initialProducts }: Props) {
               required
               min={todayInBangkok()}
               value={scheduledDate}
-              onChange={(e) => setScheduledDate(e.target.value)}
+              onChange={(e) => {
+                setScheduledDate(e.target.value);
+                setScheduledTime(null);
+                setTherapistRef(null);
+              }}
               className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
             />
           </label>
-          <div className="block text-sm sm:col-span-2">
-            <span className="text-muted">Available times</span>
-            {slotsLoading ? (
-              <p className="mt-2 text-sm text-muted">Checking availability...</p>
-            ) : (
-              <div className="mt-2 grid grid-cols-2 gap-2 min-[380px]:grid-cols-3 sm:grid-cols-4 md:grid-cols-6">
-                {(slots.length ? slots : TIME_SLOTS.map((time) => ({
-                  time,
-                  booked: 0,
-                  capacity: 3,
-                  remaining: 3,
-                  available: true,
-                }))).map((slot) => {
-                  const selected = scheduledTime === slot.time;
-                  return (
-                    <button
-                      key={slot.time}
-                      type="button"
-                      disabled={!slot.available}
-                      onClick={() => setScheduledTime(slot.time)}
-                      className={`min-h-12 rounded-sm border px-2 py-2.5 text-sm transition ${
-                        !slot.available
-                          ? "cursor-not-allowed border-border bg-surface text-muted line-through opacity-50"
-                          : selected
-                            ? "border-accent bg-accent text-accent-foreground"
-                            : "border-border bg-surface-elevated text-foreground hover:border-accent"
-                      }`}
-                    >
-                      <span className="block font-medium">{slot.time}</span>
-                      <span className="mt-0.5 block text-[10px] uppercase tracking-wide opacity-80">
-                        {slot.available
-                          ? slot.remaining <= 1
-                            ? "Last spot"
-                            : `${slot.remaining} left`
-                          : "Full"}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-            <p className="mt-2 text-xs text-muted">
-              Multiple therapists can take the same time. Full slots are hidden from new bookings.
-            </p>
-          </div>
+          <label className="block text-sm">
+            <span className="text-muted">Coverage area</span>
+            <select
+              required
+              value={coverageAreaSlug}
+              onChange={(e) => {
+                setCoverageAreaSlug(e.target.value);
+                setScheduledTime(null);
+                setTherapistRef(null);
+              }}
+              className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
+            >
+              {coverageAreas.map((area) => (
+                <option key={area.slug} value={area.slug}>
+                  {area.name}
+                  {area.travelFeeThb > 0 ? ` (+฿${area.travelFeeThb} travel)` : ""}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
-        <label className="block text-sm">
-          <span className="text-muted">Coverage area</span>
-          <select
-            required
-            value={coverageAreaSlug}
-            onChange={(e) => setCoverageAreaSlug(e.target.value)}
-            className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
-          >
-            {coverageAreas.map((area) => (
-              <option key={area.slug} value={area.slug}>
-                {area.name}
-                {area.travelFeeThb > 0 ? ` (+฿${area.travelFeeThb} travel)` : ""}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-3 xs:grid-cols-3">
           {(["hotel", "condo", "home"] as LocationType[]).map((type) => (
             <label
               key={type}
-              className={`cursor-pointer border px-3 py-3 text-center text-sm capitalize transition ${
+              className={`flex min-h-12 cursor-pointer items-center justify-center border px-3 py-3.5 text-sm capitalize transition ${
                 locationType === type
                   ? "border-accent bg-accent-soft/40 text-foreground"
                   : "border-border bg-surface-elevated text-muted"
@@ -439,10 +483,19 @@ export function BookingForm({ products: initialProducts }: Props) {
           <input
             required
             value={locationLabel}
-            onChange={(e) => setLocationLabel(e.target.value)}
+            onChange={(e) => {
+              setLocationLabel(e.target.value);
+              setScheduledTime(null);
+              setTherapistRef(null);
+            }}
             placeholder={locationType === "hotel" ? "e.g. Anantara Chiang Mai" : "e.g. Near Nimman Soi 9"}
             className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
           />
+          {geocoding ? (
+            <span className="mt-1 block text-xs text-muted">Looking up your location…</span>
+          ) : coords ? (
+            <span className="mt-1 block text-xs text-accent">Location found — showing nearest available therapists</span>
+          ) : null}
         </label>
 
         <label className="block text-sm">
@@ -456,7 +509,47 @@ export function BookingForm({ products: initialProducts }: Props) {
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="font-display text-2xl tracking-tight text-foreground">3. Your details</legend>
+        <legend className="font-display text-xl tracking-tight text-foreground xs:text-2xl">3. Choose therapist & time</legend>
+        <p className="text-sm text-muted">
+          Only therapists who offer your service, cover your area, and have a free slot appear below.
+        </p>
+        {scheduledTime ? (
+          <p className="text-sm text-accent">
+            Selected:{" "}
+            <strong>
+              {therapistPreference === "specific" && therapistRef
+                ? `${bookableTherapists.find((t) => t.id === therapistRef)?.displayName ?? "Therapist"} · `
+                : "Best available · "}
+              {formatSlot12h(scheduledTime)}
+            </strong>
+          </p>
+        ) : null}
+        <BookingTherapistPicker
+          therapists={bookableTherapists}
+          loading={availabilityLoading}
+          preference={therapistPreference}
+          selectedTherapistId={therapistPreference === "specific" ? therapistRef : null}
+          selectedTime={scheduledTime}
+          onPreferenceChange={(pref) => {
+            setTherapistPreference(pref);
+            setScheduledTime(null);
+            setTherapistRef(null);
+          }}
+          onSelectTherapistSlot={(therapistId, time) => {
+            setTherapistPreference("specific");
+            setTherapistRef(therapistId);
+            setScheduledTime(time);
+          }}
+          onSelectBestAvailableTime={(time) => {
+            setTherapistPreference("best_available");
+            setTherapistRef(null);
+            setScheduledTime(time);
+          }}
+        />
+      </fieldset>
+
+      <fieldset className="space-y-4">
+        <legend className="font-display text-xl tracking-tight text-foreground xs:text-2xl">4. Your details</legend>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm sm:col-span-2">
             <span className="text-muted">Full name</span>
@@ -500,7 +593,7 @@ export function BookingForm({ products: initialProducts }: Props) {
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="font-display text-2xl tracking-tight text-foreground">4. Payment (optional)</legend>
+        <legend className="font-display text-xl tracking-tight text-foreground xs:text-2xl">5. Payment (optional)</legend>
         <p className="text-sm text-muted">
           No payment is required to book. Choose what works best for you.
         </p>
@@ -571,11 +664,11 @@ export function BookingForm({ products: initialProducts }: Props) {
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
+      <div className="hidden border-t border-border pt-6 md:flex md:flex-row md:items-center md:justify-between md:gap-3">
         <p className="text-sm text-muted">
-          {selectedService
-            ? `Total: ${productPriceLabel(getServiceAmountForDuration(selectedService, durationMinutes))} · ${DURATION_TIER_LABELS[durationMinutes]}${
-                payNow ? " — you’ll pay by card next" : " — no payment required now"
+          {selectedService && totalLabel
+            ? `Total: ${totalLabel} · ${DURATION_TIER_LABELS[durationMinutes]}${
+                payNow ? " — you'll pay by card next" : " — no payment required now"
               }`
             : null}
         </p>
@@ -584,14 +677,35 @@ export function BookingForm({ products: initialProducts }: Props) {
           disabled={submitting}
           className="inline-flex min-h-12 w-full items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60 sm:w-auto"
         >
-          {submitting
-            ? payNow
-              ? "Redirecting to payment..."
-              : "Sending booking..."
-            : payNow
-              ? "Book & pay now"
-              : "Request booking"}
+          {submitLabel}
         </button>
+      </div>
+
+      <div className="booking-mobile-bar md:hidden">
+        <div className="mx-auto max-w-3xl">
+          <div className="flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              {totalLabel ? (
+                <p className="font-display text-lg tracking-tight text-foreground">{totalLabel}</p>
+              ) : (
+                <p className="text-sm text-muted">Complete the form</p>
+              )}
+              <p className="truncate text-xs text-muted">
+                {slotSummary ??
+                  (selectedService
+                    ? `${selectedService.name} · ${DURATION_TIER_LABELS[durationMinutes]}`
+                    : "Choose service & time")}
+              </p>
+            </div>
+            <button
+              type="submit"
+              disabled={submitting}
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
+            >
+              {submitting ? "…" : payNow ? "Pay & book" : "Book"}
+            </button>
+          </div>
+        </div>
       </div>
     </form>
   );

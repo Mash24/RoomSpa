@@ -9,6 +9,7 @@ import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
+  const isBooking = pathname.startsWith("/book");
 
   if (isAdmin) {
     return <>{children}</>;
@@ -17,9 +18,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       <SiteHeader />
-      <main className="page-bottom-clearance flex-1">{children}</main>
-      <ChatWidget />
-      <WhatsAppFloat />
+      <main className={`flex-1 ${isBooking ? "" : "page-bottom-clearance"}`}>{children}</main>
+      {!isBooking ? <ChatWidget /> : null}
+      {!isBooking ? <WhatsAppFloat /> : null}
       <SiteFooter />
     </>
   );

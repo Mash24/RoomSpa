@@ -4,6 +4,7 @@ import { catalogServices } from "@/content/services";
 import { faqItems } from "@/content/pages";
 import type { ServiceFaq } from "@/content/service-faqs";
 import type { PublicReview } from "@/lib/reviews/types";
+import { getServicePath, getServicePathBySlug } from "@/lib/catalog/service-paths";
 
 type JsonLdProps = {
   data: Record<string, unknown> | Record<string, unknown>[];
@@ -91,7 +92,7 @@ export function LocalBusinessJsonLd(input?: {
           "@type": "Service",
           name: service.name,
           description: service.summary,
-          url: `${site.url}/services/${service.slug}`,
+          url: `${site.url}${getServicePath(service)}`,
         },
       })),
   };
@@ -162,7 +163,11 @@ export function ServiceJsonLd(input: {
   videoUrl?: string;
   videoPoster?: string;
 }) {
-  const pageUrl = input.url ?? `${site.url}/services/${input.slug}`;
+  const pageUrl = input.url
+    ? input.url.startsWith("http")
+      ? input.url
+      : `${site.url}${input.url.startsWith("/") ? input.url : `/${input.url}`}`
+    : `${site.url}${getServicePathBySlug(input.slug)}`;
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Service",

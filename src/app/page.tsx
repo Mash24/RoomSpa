@@ -1,22 +1,28 @@
 import { HomeBookStrip } from "@/components/home/home-book-strip";
+import { HomeExperienceChooser } from "@/components/home/home-experience-chooser";
 import { HomeHero } from "@/components/home/home-hero";
 import { HomeHowItWorks } from "@/components/home/home-how-it-works";
-import { HomeServices } from "@/components/home/home-services";
+import { HomeSignaturePreview } from "@/components/home/home-signature-preview";
+import { HomeTherapistSearch } from "@/components/home/home-therapist-search";
 import { HomeTestimonials } from "@/components/home/home-testimonials";
 import { LocalBusinessJsonLd, OrganizationJsonLd, WebSiteJsonLd } from "@/components/seo/json-ld";
 import { testimonials } from "@/content/marketing";
 import {
   getBookStripTreatments,
-  getPublicFeaturedServices,
+  getPublicCatalog,
+  getPublicSignatureServices,
 } from "@/lib/catalog/public";
+import { getPublicTherapists } from "@/lib/therapists/public";
 import { aggregateRating, getApprovedReviews } from "@/lib/reviews/fetch";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [featured, bookTreatments] = await Promise.all([
-    getPublicFeaturedServices(6),
+  const [signature, bookTreatments, therapists, catalog] = await Promise.all([
+    getPublicSignatureServices(4),
     getBookStripTreatments(),
+    getPublicTherapists({ limit: 12 }),
+    getPublicCatalog(),
   ]);
   const approved = await getApprovedReviews(12);
   const allForRating = await getApprovedReviews(50);
@@ -28,7 +34,6 @@ export default async function HomePage() {
     detail: review.serviceName || "Guest review",
   }));
 
-  // Only show placeholder quotes when there are no approved guest reviews yet.
   const items =
     guestItems.length > 0
       ? guestItems
@@ -45,8 +50,13 @@ export default async function HomePage() {
       <WebSiteJsonLd />
       <LocalBusinessJsonLd aggregate={aggregate} />
       <HomeHero />
+      <HomeExperienceChooser />
       <HomeBookStrip treatments={bookTreatments} />
-      <HomeServices services={featured} />
+      {signature.length > 0 ? <HomeSignaturePreview services={signature} /> : null}
+      <HomeTherapistSearch
+        initialTherapists={therapists}
+        serviceOptions={catalog.map((s) => ({ slug: s.slug, name: s.name }))}
+      />
       <HomeHowItWorks />
       <HomeTestimonials items={items} fromGuests={fromGuests} />
     </>

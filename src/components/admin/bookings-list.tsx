@@ -114,7 +114,7 @@ export function BookingsList({ bookings, onStatusChange, updatingId }: BookingsL
               </div>
             </div>
 
-            <div className="flex shrink-0 flex-wrap gap-2 lg:w-48 lg:flex-col">
+            <div className="flex shrink-0 flex-col gap-2 sm:flex-row sm:flex-wrap lg:w-48 lg:flex-col">
               {booking.status === "pending" ? (
                 <>
                   <StatusButton
@@ -177,8 +177,8 @@ function StatusButton({
 }) {
   const className =
     variant === "primary"
-      ? "rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60"
-      : "rounded-sm border border-border px-4 py-2 text-sm text-foreground transition hover:border-accent hover:text-accent disabled:opacity-60";
+      ? "min-h-11 w-full rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60 sm:w-auto sm:py-2"
+      : "min-h-11 w-full rounded-sm border border-border px-4 py-2.5 text-sm text-foreground transition hover:border-accent hover:text-accent disabled:opacity-60 sm:w-auto sm:py-2";
 
   return (
     <button type="button" onClick={onClick} disabled={disabled} className={className}>
@@ -296,7 +296,7 @@ export function AdminDashboardPanel() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="font-display text-4xl tracking-tight text-foreground md:text-5xl">Dashboard</h1>
+        <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-4xl md:text-5xl">Dashboard</h1>
         <p className="mt-2 text-sm text-muted">Manage appointments and track performance.</p>
       </div>
 
@@ -308,17 +308,17 @@ export function AdminDashboardPanel() {
         </div>
       ) : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
         {FILTERS.map((item) => (
           <button
             key={item.value}
             type="button"
             onClick={() => onFilterChange(item.value)}
-            className={
+            className={`min-h-11 rounded-sm px-3 py-2.5 text-sm font-medium transition sm:px-4 ${
               filter === item.value
-                ? "rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-foreground"
-                : "rounded-sm border border-border px-4 py-2 text-sm text-foreground transition hover:border-accent hover:text-accent"
-            }
+                ? "bg-accent text-accent-foreground"
+                : "border border-border text-foreground hover:border-accent hover:text-accent"
+            }`}
           >
             {item.label}
           </button>

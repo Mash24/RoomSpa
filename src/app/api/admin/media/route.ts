@@ -56,7 +56,7 @@ export async function GET() {
     ids.length
       ? supabase.from("media_locations").select("media_id, location_slug").in("media_id", ids)
       : Promise.resolve({ data: [] as { media_id: string; location_slug: string }[] }),
-    supabase.from("services").select("id, slug, name"),
+    supabase.from("services").select("id, slug, name, category"),
   ]);
 
   const slugById = new Map((services || []).map((s) => [s.id, s.slug]));

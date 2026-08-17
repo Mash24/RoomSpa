@@ -18,7 +18,11 @@ const secondaryLinks = [
 export function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  const onHero = pathname === "/";
+  const onHero =
+    pathname === "/" ||
+    pathname === "/services/signature" ||
+    pathname.startsWith("/services/signature/") ||
+    pathname === "/services/sensual";
 
   useEffect(() => {
     setOpen(false);

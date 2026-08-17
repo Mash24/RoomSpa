@@ -1,6 +1,8 @@
 export type LocationType = "hotel" | "condo" | "home";
 export type PaymentPreference = "cash" | "card_later" | "card_now";
 
+export type TherapistPreference = "specific" | "best_available";
+
 export type BookingPayload = {
   serviceSlug: string;
   coverageAreaSlug?: string;
@@ -17,6 +19,11 @@ export type BookingPayload = {
   notes?: string;
   paymentPreference?: PaymentPreference;
   payNow?: boolean;
+  /** Therapist UUID or slug when preference is specific */
+  therapistSlug?: string | null;
+  therapistPreference?: TherapistPreference;
+  lat?: number;
+  lng?: number;
 };
 
 export type BookingResult = {
@@ -32,6 +39,8 @@ export type BookingResult = {
   whatsappHref: string;
   checkoutUrl?: string;
   emailSent?: boolean;
+  therapistDisplayName?: string | null;
+  therapistAssignment?: TherapistPreference;
 };
 
 export type BookingSummary = {

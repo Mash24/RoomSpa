@@ -322,7 +322,7 @@ export function ChatWidget() {
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls="roomspa-chat-panel"
-        className="fixed bottom-[max(5.25rem,calc(env(safe-area-inset-bottom)+4.5rem))] right-[max(1rem,env(safe-area-inset-right))] z-50 inline-flex min-h-12 max-w-[calc(100vw-5.5rem)] items-center gap-2 rounded-full border border-border bg-foreground px-3.5 py-3 text-sm font-medium text-background shadow-lg shadow-black/20 transition hover:opacity-90 xs:right-[max(1.25rem,env(safe-area-inset-right))] xs:px-4"
+        className="fixed bottom-[max(4.75rem,calc(env(safe-area-inset-bottom)+4rem))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 inline-flex min-h-12 max-w-[calc(100vw-4.5rem)] items-center gap-2 rounded-full border border-border bg-foreground px-3.5 py-3 text-sm font-medium text-background shadow-lg shadow-black/20 transition hover:opacity-90 xs:right-[max(1rem,env(safe-area-inset-right))] xs:px-4 sm:bottom-[max(5.25rem,calc(env(safe-area-inset-bottom)+4.5rem))]"
       >
         <span aria-hidden className="text-base leading-none">
           ✦
@@ -333,7 +333,7 @@ export function ChatWidget() {
       {open ? (
         <div
           id="roomspa-chat-panel"
-          className="fixed inset-x-3 bottom-[max(9.25rem,calc(env(safe-area-inset-bottom)+8.5rem))] z-50 flex h-[min(34rem,calc(100svh-11.25rem))] max-h-[calc(100dvh-11.25rem)] flex-col overflow-hidden rounded-sm border border-border bg-background shadow-2xl shadow-black/25 sm:inset-x-auto sm:right-[max(1.25rem,env(safe-area-inset-right))] sm:h-[min(34rem,72svh)] sm:w-[min(24rem,calc(100vw-1.5rem))] sm:max-h-none"
+          className="fixed inset-x-3 bottom-[max(8.75rem,calc(env(safe-area-inset-bottom)+8rem))] z-50 flex h-[min(34rem,calc(100svh-10rem))] max-h-[calc(100dvh-10rem)] flex-col overflow-hidden rounded-sm border border-border bg-background shadow-2xl shadow-black/25 sm:inset-x-auto sm:bottom-[max(9.25rem,calc(env(safe-area-inset-bottom)+8.5rem))] sm:right-[max(1.25rem,env(safe-area-inset-right))] sm:h-[min(34rem,72svh)] sm:w-[min(24rem,calc(100vw-1.5rem))] sm:max-h-none"
         >
           <div className="border-b border-border bg-surface px-4 py-3">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">

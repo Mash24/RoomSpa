@@ -3,6 +3,8 @@ import { cities } from "@/content/cities";
 import { catalogServices } from "@/content/services";
 import { site } from "@/content/site";
 import { getPublishedBlogPosts } from "@/lib/blog/public";
+import { getPublicTherapists } from "@/lib/therapists/public";
+import { getServicePath, getServiceLocationPath } from "@/lib/catalog/service-paths";
 import { getServiceLocationParams } from "@/lib/seo/locations";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -12,6 +14,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes: MetadataRoute.Sitemap = [
     "",
     "/services",
+    "/services/wellness",
+    "/services/signature",
+    "/therapists",
     "/pricing",
     "/about",
     "/book",
@@ -36,20 +41,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const serviceRoutes: MetadataRoute.Sitemap = catalogServices
     .filter((service) => service.bookable)
     .map((service) => ({
-      url: `${base}/services/${service.slug}`,
+      url: `${base}${getServicePath(service)}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
       priority: 0.85,
     }));
 
   const serviceLocationRoutes: MetadataRoute.Sitemap = getServiceLocationParams().map(
-    ({ slug, location }) => ({
-      url: `${base}/services/${slug}/${location}`,
-      lastModified: now,
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }),
-  );
+    ({ slug, location }) => {
+      const service = catalogServices.find((s) => s.slug === slug);
+      if (!service) return null;
+      return {
+        url: `${base}${getServiceLocationPath(service, location)}`,
+        lastModified: now,
+        changeFrequency: "weekly" as const,
+        priority: 0.8,
+      };
+    },
+  ).filter(Boolean) as MetadataRoute.Sitemap;
 
   const cityRoutes: MetadataRoute.Sitemap = cities.flatMap((city) => [
     {
@@ -67,6 +76,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const blogPosts = await getPublishedBlogPosts();
+  const therapists = await getPublicTherapists({});
+  const therapistRoutes: MetadataRoute.Sitemap = therapists.map((t) => ({
+    url: `${base}/therapists/${t.slug}`,
+    lastModified: now,
+    changeFrequency: "weekly" as const,
+    priority: 0.75,
+  }));
+
   const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${base}/blog/${post.slug}`,
     lastModified: new Date(post.datePublished),
@@ -79,6 +96,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...serviceRoutes,
     ...serviceLocationRoutes,
     ...cityRoutes,
+    ...therapistRoutes,
     ...blogRoutes,
   ];
 }

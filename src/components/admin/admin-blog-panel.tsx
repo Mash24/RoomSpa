@@ -120,7 +120,7 @@ export function AdminBlogPanel() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="font-display text-3xl tracking-tight text-foreground md:text-4xl">Blog</h1>
+        <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-3xl md:text-4xl">Blog</h1>
         <p className="mt-2 max-w-2xl text-sm text-muted">
           Write articles about what RoomSpa does — treatments, Chiang Mai stays, wellness travel,
           consent-led work. FAQ is for short Q&A. Published titles appear under each category on
@@ -134,9 +134,9 @@ export function AdminBlogPanel() {
         </div>
       ) : null}
 
-      <form onSubmit={onSubmit} className="space-y-4 border border-border bg-surface-elevated p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-display text-2xl text-foreground">
+      <form onSubmit={onSubmit} className="space-y-4 border border-border bg-surface-elevated p-4 md:p-5">
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <h2 className="font-display text-xl text-foreground xs:text-2xl">
             {editingId ? "Edit post" : "New post"}
           </h2>
           {editingId ? (
@@ -191,7 +191,7 @@ export function AdminBlogPanel() {
           />
         </label>
 
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
           <label className="block text-sm">
             <span className="text-muted">Category</span>
             <select
@@ -300,14 +300,24 @@ Second paragraph…"
         <button
           type="submit"
           disabled={saving}
-          className="rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-60"
+          className="hidden min-h-11 rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-60 md:inline-flex md:items-center"
         >
           {saving ? "Saving…" : editingId ? "Update post" : "Publish / save post"}
         </button>
+
+        <div className="admin-mobile-actions -mx-4 md:hidden">
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex min-h-12 w-full items-center justify-center rounded-sm bg-accent text-sm font-medium text-accent-foreground disabled:opacity-60"
+          >
+            {saving ? "Saving…" : editingId ? "Update post" : "Save post"}
+          </button>
+        </div>
       </form>
 
       <div>
-        <h2 className="font-display text-2xl text-foreground">All posts</h2>
+        <h2 className="font-display text-xl text-foreground xs:text-2xl">All posts</h2>
         {loading ? (
           <p className="mt-4 text-sm text-muted">Loading…</p>
         ) : posts.length === 0 ? (
@@ -315,7 +325,40 @@ Second paragraph…"
             No CMS posts yet. Run the blog SQL migration, or create your first article above.
           </p>
         ) : (
-          <ul className="mt-4 divide-y divide-border border border-border bg-surface-elevated">
+          <>
+            <ul className="admin-card-list mt-4">
+              {posts.map((post) => {
+                const category =
+                  BLOG_CATEGORIES.find((item) => item.slug === post.category)?.name ?? post.category;
+                return (
+                  <li key={post.id} className="border border-border bg-surface-elevated p-4">
+                    <p className="font-medium text-foreground">{post.title}</p>
+                    <p className="mt-1 text-xs text-muted">
+                      {category} · {post.status} · {post.publishedAt}
+                    </p>
+                    <p className="mt-1 break-all text-xs text-muted">/blog/{post.slug}</p>
+                    <div className="mt-3 flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={() => startEdit(post)}
+                        className="inline-flex min-h-11 items-center justify-center rounded-sm bg-accent px-3 text-sm font-medium text-accent-foreground"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void onDelete(post.id, post.title)}
+                        className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-3 text-sm text-muted transition hover:border-red-400 hover:text-red-600"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <ul className="admin-table-wrap mt-4 divide-y divide-border border border-border bg-surface-elevated">
             {posts.map((post) => {
               const category =
                 BLOG_CATEGORIES.find((item) => item.slug === post.category)?.name ?? post.category;
@@ -347,6 +390,7 @@ Second paragraph…"
               );
             })}
           </ul>
+          </>
         )}
       </div>
     </div>

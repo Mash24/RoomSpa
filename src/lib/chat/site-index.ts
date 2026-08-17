@@ -18,6 +18,8 @@ import {
   serviceCategories,
   type CatalogService,
 } from "@/content/services";
+import { getExperienceTier } from "@/lib/catalog/experience-tier";
+import { getServicePath } from "@/lib/catalog/service-paths";
 import { DURATION_TIER_LABELS } from "@/lib/catalog/prices";
 
 export type SiteDoc = {
@@ -103,13 +105,18 @@ export function buildSiteIndex(catalog: CatalogService[]): SiteDoc[] {
   }
 
   for (const category of serviceCategories) {
+    const tier = category.id === "sensual" ? "signature" : "wellness";
+    const url =
+      tier === "signature"
+        ? "/services/signature"
+        : `/services/wellness#${category.id}`;
     push(docs, {
       id: `category-${category.id}`,
       title: category.title,
-      url: `/services#${category.id}`,
-      section: "services",
+      url,
+      section: tier === "signature" ? "signature" : "wellness",
       text: category.summary,
-      tags: [category.id, "services", category.title.toLowerCase()],
+      tags: [category.id, tier, "services", category.title.toLowerCase()],
     });
   }
 
@@ -118,16 +125,19 @@ export function buildSiteIndex(catalog: CatalogService[]): SiteDoc[] {
     const priceLine = ([60, 90, 120] as const)
       .map((m) => `${DURATION_TIER_LABELS[m]} ${productPriceLabel(tiers[m])}`)
       .join("; ");
+    const tier = getExperienceTier(service);
+    const tierLabel = tier === "signature" ? "Signature Experience" : "Wellness Massage";
 
     push(docs, {
       id: `service-${service.slug}`,
       title: service.name,
-      url: `/services/${service.slug}`,
-      section: "service",
-      text: `${service.name} (${service.category}). ${service.summary} ${service.details} Duration options: ${service.duration}. Prices: ${priceLine}. Book at /book?service=${service.slug}.`,
+      url: getServicePath(service),
+      section: tier === "signature" ? "signature" : "wellness",
+      text: `${service.name} (${tierLabel}). ${service.summary} ${service.details} Duration options: ${service.duration}. Prices: ${priceLine}. Book at /book?service=${service.slug}. Menu: ${tier === "signature" ? "/services/signature" : "/services/wellness"}.`,
       tags: [
         service.slug,
         service.name.toLowerCase(),
+        tier,
         service.category,
         "price",
         "massage",
@@ -138,7 +148,7 @@ export function buildSiteIndex(catalog: CatalogService[]): SiteDoc[] {
       push(docs, {
         id: `service-faq-${service.slug}-${faq.question.slice(0, 40)}`,
         title: `${service.name} FAQ: ${faq.question}`,
-        url: `/services/${service.slug}`,
+        url: getServicePath(service),
         section: "service-faq",
         text: `Q: ${faq.question} A: ${faq.answer}`,
         tags: [service.slug, "faq", ...faq.question.toLowerCase().split(/\s+/).slice(0, 6)],

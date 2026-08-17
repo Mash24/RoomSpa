@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { catalogProducts } from "@/content/services";
+import { catalogProducts, isSignatureExperience } from "@/content/services";
+import { experienceTierLabels } from "@/lib/catalog/experience-tier";
 import {
   REVIEW_MAX_BODY,
   REVIEW_MAX_NAME,
@@ -153,11 +154,24 @@ export function ReviewForm() {
             className="mt-1 w-full border border-border bg-background px-3 py-2.5 text-foreground outline-none focus:border-accent"
           >
             <option value="">Select a service</option>
-            {catalogProducts.map((product) => (
-              <option key={product.slug} value={product.slug}>
-                {product.name}
-              </option>
-            ))}
+            {catalogProducts.some(isSignatureExperience) ? (
+              <optgroup label={experienceTierLabels.signature}>
+                {catalogProducts.filter(isSignatureExperience).map((product) => (
+                  <option key={product.slug} value={product.slug}>
+                    {product.name}
+                  </option>
+                ))}
+              </optgroup>
+            ) : null}
+            {catalogProducts.some((p) => !isSignatureExperience(p)) ? (
+              <optgroup label={experienceTierLabels.wellness}>
+                {catalogProducts.filter((p) => !isSignatureExperience(p)).map((product) => (
+                  <option key={product.slug} value={product.slug}>
+                    {product.name}
+                  </option>
+                ))}
+              </optgroup>
+            ) : null}
           </select>
         </label>
         <label className="block text-sm">

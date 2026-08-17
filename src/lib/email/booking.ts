@@ -27,6 +27,8 @@ export type BookingEmailInput = {
   durationMinutes?: number;
   paymentStatus?: string;
   bookingStatus?: string;
+  therapistDisplayName?: string | null;
+  therapistAssignment?: "specific" | "best_available";
 };
 
 function manageUrl(input: BookingEmailInput) {
@@ -88,6 +90,18 @@ function bookingEmailHtml(input: BookingEmailInput) {
                     <td style="padding:6px 0;color:#78716c;vertical-align:top;">When</td>
                     <td style="padding:6px 0;">${escapeHtml(input.scheduledDate)} at ${escapeHtml(input.scheduledTime)}</td>
                   </tr>
+                  ${
+                    input.therapistDisplayName
+                      ? `<tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Therapist</td>
+                    <td style="padding:6px 0;"><strong>${escapeHtml(input.therapistDisplayName)}</strong>${
+                      input.therapistAssignment === "best_available"
+                        ? `<br /><span style="color:#78716c;font-size:13px;">Assigned as best available</span>`
+                        : ""
+                    }</td>
+                  </tr>`
+                      : ""
+                  }
                   <tr>
                     <td style="padding:6px 0;color:#78716c;vertical-align:top;">Where</td>
                     <td style="padding:6px 0;">
@@ -160,8 +174,15 @@ function bookingEmailText(input: BookingEmailInput) {
     ``,
     `Service: ${input.serviceName}`,
     `When: ${input.scheduledDate} at ${input.scheduledTime}`,
-    `Where: ${placeType ? `${placeType} · ` : ""}${input.locationLabel}`,
   ];
+  if (input.therapistDisplayName) {
+    lines.push(
+      `Therapist: ${input.therapistDisplayName}${
+        input.therapistAssignment === "best_available" ? " (best available)" : ""
+      }`,
+    );
+  }
+  lines.push(`Where: ${placeType ? `${placeType} · ` : ""}${input.locationLabel}`);
 
   if (input.locationDetails?.trim()) {
     lines.push(`Details: ${input.locationDetails.trim()}`);
@@ -199,7 +220,7 @@ export async function sendBookingConfirmationEmail(input: BookingEmailInput) {
     return { sent: false as const, reason: "not_configured" as const };
   }
 
-  const subject = `Your RoomSpa booking ${input.referenceCode}`;
+  const subject = `RoomSpa Booking Confirmed — ${input.referenceCode}`;
   const html = bookingEmailHtml(input);
   const text = bookingEmailText(input);
   const notify = getBookingNotifyEmails().filter(
@@ -276,6 +297,21 @@ function opsBookingEmailHtml(input: BookingEmailInput) {
                     <td style="padding:6px 0;color:#78716c;vertical-align:top;">When</td>
                     <td style="padding:6px 0;">${escapeHtml(input.scheduledDate)} at ${escapeHtml(input.scheduledTime)}</td>
                   </tr>
+                  ${
+                    input.therapistDisplayName
+                      ? `<tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Therapist</td>
+                    <td style="padding:6px 0;"><strong>${escapeHtml(input.therapistDisplayName)}</strong>${
+                      input.therapistAssignment === "best_available"
+                        ? `<br /><span style="color:#78716c;font-size:13px;">Auto-assigned (best available)</span>`
+                        : ""
+                    }</td>
+                  </tr>`
+                      : `<tr>
+                    <td style="padding:6px 0;color:#78716c;vertical-align:top;">Therapist</td>
+                    <td style="padding:6px 0;color:#78716c;">To be assigned</td>
+                  </tr>`
+                  }
                   <tr>
                     <td style="padding:6px 0;color:#78716c;vertical-align:top;">Where</td>
                     <td style="padding:6px 0;">
@@ -340,8 +376,17 @@ function opsBookingEmailText(input: BookingEmailInput) {
     `Reference: ${input.referenceCode}`,
     `Service: ${input.serviceName}${input.durationMinutes ? ` · ${input.durationMinutes} min` : ""}`,
     `When: ${input.scheduledDate} at ${input.scheduledTime}`,
-    `Where: ${placeType ? `${placeType} · ` : ""}${input.locationLabel}`,
   ];
+  if (input.therapistDisplayName) {
+    lines.push(
+      `Therapist: ${input.therapistDisplayName}${
+        input.therapistAssignment === "best_available" ? " (auto-assigned)" : ""
+      }`,
+    );
+  } else {
+    lines.push(`Therapist: To be assigned`);
+  }
+  lines.push(`Where: ${placeType ? `${placeType} · ` : ""}${input.locationLabel}`);
   if (input.locationDetails?.trim()) lines.push(`Details: ${input.locationDetails.trim()}`);
   lines.push(
     `Guest: ${input.customerName}`,
@@ -376,7 +421,7 @@ export async function sendNewBookingOpsEmail(input: BookingEmailInput) {
 
   return sendAppEmail({
     to: recipients,
-    subject: `New booking ${input.referenceCode} — ${input.serviceName} · ${input.scheduledDate} ${input.scheduledTime}`,
+    subject: `🔔 New RoomSpa Booking — ${input.referenceCode}`,
     html: opsBookingEmailHtml(input),
     text: opsBookingEmailText(input),
     replyTo: input.customerEmail,

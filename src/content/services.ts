@@ -41,9 +41,9 @@ export type CatalogService = {
 export const serviceCategories: ServiceCategory[] = [
   {
     id: "sensual",
-    title: "Private & sensual",
+    title: "Signature Experiences",
     summary:
-      "Consent-led bodywork for intimacy, connection, and deep body awareness — always private and professional.",
+      "Private, consent-led intimate bodywork — Tantric, Nuru, body-to-body, Yoni, Lingam, and couples sessions in your room.",
   },
   {
     id: "shared",
@@ -52,8 +52,8 @@ export const serviceCategories: ServiceCategory[] = [
   },
   {
     id: "classic",
-    title: "Classic & relaxing",
-    summary: "Soft-to-medium pressure sessions for unwind, jet lag, and everyday tension.",
+    title: "Wellness massage",
+    summary: "Classic in-room massage for unwind, jet lag, and everyday tension.",
   },
   {
     id: "therapeutic",
@@ -300,7 +300,7 @@ export const catalogServices: CatalogService[] = [
     name: "Tantric Massage",
     summary: "Slow, full-body tantric touch combining breath, presence, and energy awareness.",
     details:
-      "May include sensual full-body work depending on your stated boundaries. Ideal when you want something slower and more intentional than a classic spa massage.",
+      "May include sensual full-body work depending on your stated boundaries. Ideal when you want something slower, more present, and deeply intimate.",
     duration: "90 min",
     durationMinutes: 90,
     amountThb: 3200,
@@ -317,7 +317,7 @@ export const catalogServices: CatalogService[] = [
     duration: "90 min",
     durationMinutes: 90,
     amountThb: 4500,
-    category: "shared",
+    category: "sensual",
     featured: true,
     bookable: true,
   },
@@ -327,9 +327,24 @@ export const catalogProducts = catalogServices.filter((service) => service.booka
 
 export const featuredServices = catalogServices.filter((service) => service.featured);
 
-/** Private / sensual commercial focus (homepage, booking defaults). */
+/** Signature / intimate sessions only (Tantric, Nuru, B2B, Yoni, Lingam, couples sensual). */
+export function isSignatureExperience(service: Pick<CatalogService, "category" | "slug">) {
+  return service.category === "sensual";
+}
+
+/** @deprecated Use isSignatureExperience */
+export function isSensualExperience(service: Pick<CatalogService, "category" | "slug">) {
+  return isSignatureExperience(service);
+}
+
+/** @deprecated Use isSignatureExperience */
 export function isPrivateExperience(service: Pick<CatalogService, "category" | "slug">) {
-  return service.category === "sensual" || service.slug === "couples-sensual";
+  return isSignatureExperience(service);
+}
+
+/** Wellness = everything that is not signature. */
+export function isWellnessExperience(service: Pick<CatalogService, "category" | "slug">) {
+  return !isSignatureExperience(service);
 }
 
 export function productPriceLabel(amountThb: number) {

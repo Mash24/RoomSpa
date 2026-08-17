@@ -16,7 +16,7 @@ export default async function BookPage() {
   const products = await getPublicCatalog();
 
   return (
-    <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
+    <section className="mx-auto max-w-3xl px-4 py-10 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Book</p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         Book your in-room massage

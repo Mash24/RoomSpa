@@ -89,7 +89,13 @@ video {
 
 /* Clearance so fixed chat + WhatsApp never cover page content */
 .page-bottom-clearance {
-  padding-bottom: max(6.5rem, calc(env(safe-area-inset-bottom) + 5.5rem));
+  padding-bottom: max(7.5rem, calc(env(safe-area-inset-bottom) + 6.5rem));
+}
+
+@media (min-width: 640px) {
+  .page-bottom-clearance {
+    padding-bottom: max(7rem, calc(env(safe-area-inset-bottom) + 6rem));
+  }
 }
 
 @media (min-width: 1024px) {
@@ -98,10 +104,172 @@ video {
   }
 }
 
-
-::selection {
-  background: color-mix(in oklab, var(--accent) 35%, transparent);
+/* Minimum comfortable tap target (44px) */
+.touch-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
 }
+
+/* Horizontal scroll with fade hint on edges */
+.scroll-fade-x {
+  position: relative;
+}
+
+.scroll-fade-x::before,
+.scroll-fade-x::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.25rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.scroll-fade-x::before {
+  left: 0;
+  background: linear-gradient(to right, var(--surface-elevated), transparent);
+}
+
+.scroll-fade-x::after {
+  right: 0;
+  background: linear-gradient(to left, var(--surface-elevated), transparent);
+}
+
+/* Admin: sticky mobile action bar above safe area */
+.admin-mobile-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  margin-left: -1rem;
+  margin-right: -1rem;
+  margin-bottom: -1.5rem;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  padding: 0.75rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+  backdrop-filter: blur(8px);
+}
+
+@media (min-width: 768px) {
+  .admin-mobile-actions {
+    display: none;
+  }
+}
+
+/* Customer booking: sticky submit bar on phones */
+.booking-mobile-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface-elevated) 94%, transparent);
+  padding: 0.75rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
+}
+
+@media (min-width: 768px) {
+  .booking-mobile-bar {
+    display: none;
+  }
+}
+
+.booking-form-with-bar {
+  padding-bottom: 6.5rem;
+}
+
+@media (min-width: 768px) {
+  .booking-form-with-bar {
+    padding-bottom: 0;
+  }
+}
+
+/* Admin: hide desktop table, show cards on small screens */
+.admin-table-wrap {
+  display: none;
+}
+
+.admin-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .admin-table-wrap {
+    display: block;
+  }
+
+  .admin-card-list {
+    display: none;
+  }
+}
+
+
+/* Sensual zone — warm dark palette, separate from wellness green */
+.sensual-zone {
+  --sensual-bg: #0c0a09;
+  --sensual-surface: #161311;
+  --sensual-gold: #c9a86c;
+  --sensual-gold-soft: rgba(201, 168, 108, 0.15);
+  --sensual-text: #f5f0e8;
+  --sensual-muted: rgba(245, 240, 232, 0.62);
+  background: var(--sensual-bg);
+  color: var(--sensual-text);
+}
+
+.sensual-zone .sensual-btn-primary {
+  background: var(--sensual-gold);
+  color: #1a1510;
+}
+
+.sensual-zone .sensual-btn-primary:hover {
+  background: #d4b87a;
+}
+
+.sensual-zone .sensual-btn-outline {
+  border-color: rgba(245, 240, 232, 0.35);
+  color: var(--sensual-text);
+}
+
+/* Signature zone — alias for sensual-zone (same dark premium palette) */
+.signature-zone {
+  --sensual-bg: #0c0a09;
+  --sensual-surface: #161311;
+  --sensual-gold: #c9a86c;
+  --sensual-gold-soft: rgba(201, 168, 108, 0.15);
+  --sensual-text: #f5f0e8;
+  --sensual-muted: rgba(245, 240, 232, 0.62);
+  background: var(--sensual-bg);
+  color: var(--sensual-text);
+}
+
+.signature-zone .signature-btn-primary,
+.signature-zone .sensual-btn-primary {
+  background: var(--sensual-gold);
+  color: #1a1510;
+}
+
+.signature-zone .signature-btn-primary:hover,
+.signature-zone .sensual-btn-primary:hover {
+  background: #d4b87a;
+}
+
+.signature-zone .signature-btn-outline,
+.signature-zone .sensual-btn-outline {
+  border-color: rgba(245, 240, 232, 0.35);
+  color: var(--sensual-text);
+}
+
+.signature-zone .signature-btn-outline:hover,
+.signature-zone .sensual-btn-outline:hover {
+  border-color: var(--sensual-gold);
+  background: var(--sensual-gold-soft);
+}
+
+
 
 @keyframes fade-up {
   from {

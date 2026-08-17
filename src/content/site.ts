@@ -1,20 +1,8 @@
-/** Site content — CMS-ready shape for Phase 1 admin later */
-import { catalogServices, featuredServices } from "@/content/services";
-
-const homeServicePicks = (() => {
-  const featured = featuredServices.slice(0, 4);
-  if (featured.length >= 4) return featured;
-  const extras = catalogServices.filter(
-    (service) => !featured.some((item) => item.slug === service.slug),
-  );
-  return [...featured, ...extras].slice(0, 4);
-})();
-
 export const site = {
   name: "RoomSpa",
   tagline: "We come to you",
   description:
-    "Private in-room massage in Chiang Mai — sensual, tantric, and wellness treatments delivered discreetly to your hotel, condo, or home.",
+    "Premium private in-room massage in Chiang Mai — signature experiences and wellness massage delivered discreetly to your hotel, condo, or home.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en",
   contact: {
@@ -23,31 +11,43 @@ export const site = {
   },
   /** Primary chrome — keep short; secondary links live in the footer */
   nav: [
-    { label: "Private", href: "/services#sensual" },
-    { label: "Services", href: "/services" },
+    { label: "Wellness", href: "/services/wellness" },
+    { label: "Signature", href: "/services/signature" },
+    { label: "Therapists", href: "/therapists" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Gallery", href: "/gallery" },
+    { label: "Locations", href: "/city" },
     { label: "Reviews", href: "/reviews" },
+    { label: "Gallery", href: "/gallery" },
+    { label: "FAQ", href: "/faq" },
   ],
   hero: {
     brand: "RoomSpa",
-    headline: "Private massage, delivered to your door",
+    eyebrow: "Private in-room massage · Chiang Mai",
+    headline: "Premium massage, delivered to your room",
     support:
-      "Discreet sessions in your Chiang Mai hotel, condo, or home — from sensual and tantric bodywork to classic wellness massage.",
-    primaryCta: { label: "Book a private massage", href: "/book" },
-    secondaryCta: { label: "Private & sensual", href: "/services#sensual" },
+      "Hotel · Condo · Home — same-day when slots are open. Discreet arrival, professional therapists.",
+    primaryCta: { label: "Book a massage", href: "/book" },
+    secondaryCta: { label: "View pricing", href: "/pricing" },
+    tiers: {
+      wellness: {
+        label: "Wellness Massage",
+        href: "/services/wellness",
+        summary:
+          "Classic and therapeutic massage experiences delivered privately to your hotel, condo, or home.",
+      },
+      signature: {
+        label: "Signature Experiences",
+        href: "/services/signature",
+        summary:
+          "Private, sensual and intimate massage experiences for those looking for something beyond traditional massage.",
+      },
+    },
   },
-  services: homeServicePicks.map((service) => ({
-    slug: service.slug,
-    title: service.name,
-    summary: service.summary,
-    duration: service.duration,
-  })),
   howItWorks: [
     {
       step: "01",
-      title: "Choose a service",
-      body: "Pick the treatment and length that fits you.",
+      title: "Choose your experience",
+      body: "Wellness massage or Signature Experiences — pick what fits you.",
     },
     {
       step: "02",
