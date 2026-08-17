@@ -78,9 +78,13 @@ export function BookingForm({ products: initialProducts }: Props) {
   const [durationMinutes, setDurationMinutes] = useState<DurationMinutes>(() =>
     initialDuration(searchParams.get("duration")),
   );
-  const [coverageAreaSlug, setCoverageAreaSlug] = useState<string>(coverageAreas[0]?.slug ?? "");
+  const [coverageAreaSlug, setCoverageAreaSlug] = useState<string>(() => {
+    const fromQuery = searchParams.get("coverage");
+    if (fromQuery && coverageAreas.some((area) => area.slug === fromQuery)) return fromQuery;
+    return coverageAreas[0]?.slug ?? "";
+  });
   const [locationType, setLocationType] = useState<LocationType>("hotel");
-  const [locationLabel, setLocationLabel] = useState("");
+  const [locationLabel, setLocationLabel] = useState(searchParams.get("place") ?? "");
   const [locationDetails, setLocationDetails] = useState("");
   const [scheduledDate, setScheduledDate] = useState(todayInBangkok);
   const [scheduledTime, setScheduledTime] = useState<string | null>(null);
@@ -94,7 +98,12 @@ export function BookingForm({ products: initialProducts }: Props) {
   );
   const [bookableTherapists, setBookableTherapists] = useState<AvailableTherapist[]>([]);
   const [availabilityLoading, setAvailabilityLoading] = useState(false);
-  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
+  const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(() => {
+    const lat = Number(searchParams.get("lat"));
+    const lng = Number(searchParams.get("lng"));
+    if (Number.isFinite(lat) && Number.isFinite(lng)) return { lat, lng };
+    return null;
+  });
   const [geocoding, setGeocoding] = useState(false);
   const [paymentPreference, setPaymentPreference] = useState<PaymentPreference>("cash");
   const [submitting, setSubmitting] = useState(false);
@@ -147,7 +156,7 @@ export function BookingForm({ products: initialProducts }: Props) {
         : null;
     const timeLabel = formatSlot12h(scheduledTime);
     if (therapistName) return `${therapistName} · ${timeLabel}`;
-    if (therapistPreference === "best_available") return `Best available · ${timeLabel}`;
+    if (therapistPreference === "best_available") return `Anyone available · ${timeLabel}`;
     return timeLabel;
   }, [scheduledTime, therapistPreference, therapistRef, bookableTherapists]);
 
@@ -159,9 +168,15 @@ export function BookingForm({ products: initialProducts }: Props) {
       ? "Book & pay now"
       : "Request booking";
 
+  const initialPlace = searchParams.get("place") ?? "";
+  const hasPresetCoords = Boolean(searchParams.get("lat") && searchParams.get("lng"));
+
   useEffect(() => {
     if (!locationLabel.trim() || locationLabel.trim().length < 4) {
-      setCoords(null);
+      if (!hasPresetCoords) setCoords(null);
+      return;
+    }
+    if (hasPresetCoords && locationLabel.trim() === initialPlace.trim()) {
       return;
     }
     const t = setTimeout(() => {
@@ -181,7 +196,7 @@ export function BookingForm({ products: initialProducts }: Props) {
       })();
     }, 600);
     return () => clearTimeout(t);
-  }, [locationLabel]);
+  }, [locationLabel, hasPresetCoords, initialPlace]);
 
   useEffect(() => {
     let cancelled = false;
@@ -426,7 +441,6 @@ export function BookingForm({ products: initialProducts }: Props) {
               onChange={(e) => {
                 setScheduledDate(e.target.value);
                 setScheduledTime(null);
-                setTherapistRef(null);
               }}
               className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
             />
@@ -439,7 +453,6 @@ export function BookingForm({ products: initialProducts }: Props) {
               onChange={(e) => {
                 setCoverageAreaSlug(e.target.value);
                 setScheduledTime(null);
-                setTherapistRef(null);
               }}
               className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
             >
@@ -486,7 +499,6 @@ export function BookingForm({ products: initialProducts }: Props) {
             onChange={(e) => {
               setLocationLabel(e.target.value);
               setScheduledTime(null);
-              setTherapistRef(null);
             }}
             placeholder={locationType === "hotel" ? "e.g. Anantara Chiang Mai" : "e.g. Near Nimman Soi 9"}
             className="mt-1 w-full border border-border bg-surface-elevated px-3 py-2.5 text-foreground outline-none focus:border-accent"
@@ -494,7 +506,7 @@ export function BookingForm({ products: initialProducts }: Props) {
           {geocoding ? (
             <span className="mt-1 block text-xs text-muted">Looking up your location…</span>
           ) : coords ? (
-            <span className="mt-1 block text-xs text-accent">Location found — showing nearest available therapists</span>
+            <span className="mt-1 block text-xs text-accent">Location found — showing available times</span>
           ) : null}
         </label>
 
@@ -509,9 +521,10 @@ export function BookingForm({ products: initialProducts }: Props) {
       </fieldset>
 
       <fieldset className="space-y-4">
-        <legend className="font-display text-xl tracking-tight text-foreground xs:text-2xl">3. Choose therapist & time</legend>
+        <legend className="font-display text-xl tracking-tight text-foreground xs:text-2xl">3. Therapist & time</legend>
         <p className="text-sm text-muted">
-          Only therapists who offer your service, cover your area, and have a free slot appear below.
+          Choosing a therapist is optional. Pick a time and we can assign someone, or open a profile and book that person
+          without starting over.
         </p>
         {scheduledTime ? (
           <p className="text-sm text-accent">
@@ -519,7 +532,7 @@ export function BookingForm({ products: initialProducts }: Props) {
             <strong>
               {therapistPreference === "specific" && therapistRef
                 ? `${bookableTherapists.find((t) => t.id === therapistRef)?.displayName ?? "Therapist"} · `
-                : "Best available · "}
+                : "Anyone available · "}
               {formatSlot12h(scheduledTime)}
             </strong>
           </p>
@@ -545,6 +558,7 @@ export function BookingForm({ products: initialProducts }: Props) {
             setTherapistRef(null);
             setScheduledTime(time);
           }}
+          browseHref={`/therapists?service=${serviceSlug}`}
         />
       </fieldset>
 

@@ -38,6 +38,7 @@ export function TherapistsDirectory({ initialTherapists, serviceOptions }: Props
   const [placeLabel, setPlaceLabel] = useState<string | null>(null);
   const [locationMode, setLocationMode] = useState<PlaceSearchMode>(null);
   const [resolvedCoverage, setResolvedCoverage] = useState<ResolvedCoverage | null>(null);
+  const [searchCity, setSearchCity] = useState<string | undefined>();
   const [searchDebounced, setSearchDebounced] = useState(searchParams.get("q") || "");
 
   const serviceFilter = searchParams.get("service") || "";
@@ -58,7 +59,7 @@ export function TherapistsDirectory({ initialTherapists, serviceOptions }: Props
       search?: string;
       lat?: number;
       lng?: number;
-      inferCoverage?: boolean;
+      city?: string;
     }) => {
       setLoading(true);
       try {
@@ -70,9 +71,9 @@ export function TherapistsDirectory({ initialTherapists, serviceOptions }: Props
         if (opts.lat != null && opts.lng != null) {
           params.set("lat", String(opts.lat));
           params.set("lng", String(opts.lng));
-          params.set("radius", "25");
-          if (opts.inferCoverage) params.set("inferCoverage", "1");
         }
+        if (opts.city) params.set("city", opts.city);
+        if (opts.city || (opts.lat != null && opts.lng != null)) params.set("cityWide", "1");
         const res = await fetch(`/api/therapists?${params.toString()}`);
         const data = await res.json();
         setTherapists(data.therapists || []);
@@ -93,9 +94,20 @@ export function TherapistsDirectory({ initialTherapists, serviceOptions }: Props
       search: searchDebounced || undefined,
       lat: coords?.lat,
       lng: coords?.lng,
-      inferCoverage: locationMode === "geocode",
+      city: searchCity,
     });
-  }, [serviceFilter, coverageFilter, genderFilter, searchDebounced, coords, locationMode, fetchTherapists]);
+  }, [serviceFilter, coverageFilter, genderFilter, searchDebounced, coords, searchCity, fetchTherapists]);
+
+  const bookContext = useMemo(
+    () => ({
+      service: serviceFilter || undefined,
+      place: placeLabel || undefined,
+      lat: coords?.lat,
+      lng: coords?.lng,
+      coverage: resolvedCoverage?.slug,
+    }),
+    [serviceFilter, placeLabel, coords, resolvedCoverage],
+  );
 
   function pushParams(patch: Record<string, string>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -107,18 +119,18 @@ export function TherapistsDirectory({ initialTherapists, serviceOptions }: Props
   }
 
   const subtitle = useMemo(() => {
-    if (placeLabel && resolvedCoverage) {
-      return `Eligible therapists near ${resolvedCoverage.name} — sorted by distance, within travel radius`;
+    if (placeLabel || searchCity) {
+      return `Therapists in ${searchCity || "this city"} — everyone based here, nearest first`;
     }
-    if (nearMeActive || placeLabel) {
-      return "Sorted by distance — only therapists who can reach your location";
+    if (nearMeActive) {
+      return "Everyone in your city, nearest first";
     }
     if (serviceFilter) {
       const name = serviceOptions.find((s) => s.slug === serviceFilter)?.name;
       if (name) return `Therapists offering ${name}`;
     }
     return "Browse by service, area, or how close they are to where you are staying";
-  }, [nearMeActive, placeLabel, resolvedCoverage, serviceFilter, serviceOptions]);
+  }, [nearMeActive, placeLabel, searchCity, serviceFilter, serviceOptions]);
 
   return (
     <>
@@ -135,31 +147,36 @@ export function TherapistsDirectory({ initialTherapists, serviceOptions }: Props
         onCoverageChange={(slug) => pushParams({ coverage: slug })}
         onGenderChange={(gender) => pushParams({ gender: gender === "any" ? "" : gender })}
         onSearchChange={(q) => pushParams({ q })}
-        onNearMe={(lat, lng) => {
+        onNearMe={(lat, lng, city) => {
           setLocating(true);
           setNearMeActive(true);
           setPlaceLabel(null);
           setLocationMode("gps");
           setResolvedCoverage(null);
+          setSearchCity(city);
           setCoords({ lat, lng });
         }}
+        onNearMeStart={() => setLocating(true)}
         onClearNearMe={() => {
           setNearMeActive(false);
           setLocationMode(null);
           setResolvedCoverage(null);
+          setSearchCity(undefined);
           setCoords(null);
         }}
-        onPlaceResolved={(lat, lng, label, coverage) => {
+        onPlaceResolved={(lat, lng, label, coverage, city) => {
           setPlaceLabel(label);
           setNearMeActive(false);
           setLocationMode("geocode");
           setResolvedCoverage(coverage ?? null);
+          setSearchCity(city);
           setCoords({ lat, lng });
         }}
         onClearPlace={() => {
           setPlaceLabel(null);
           setLocationMode(null);
           setResolvedCoverage(null);
+          setSearchCity(undefined);
           setCoords(null);
         }}
         resolvedCoverage={resolvedCoverage}
@@ -183,7 +200,11 @@ export function TherapistsDirectory({ initialTherapists, serviceOptions }: Props
         <ul className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {therapists.map((therapist) => (
             <li key={therapist.id} className="h-full">
-              <TherapistCard therapist={therapist} />
+              <TherapistCard
+                therapist={therapist}
+                bookService={serviceFilter || therapist.serviceSlugs[0]}
+                bookContext={bookContext}
+              />
             </li>
           ))}
         </ul>

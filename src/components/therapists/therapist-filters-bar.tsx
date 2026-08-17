@@ -10,7 +10,7 @@ type Props = {
   coverage: string;
   gender: string;
   search: string;
-  onNearMe: (lat: number, lng: number) => void;
+  onNearMe: (lat: number, lng: number, city?: string) => void;
   onClearNearMe: () => void;
   nearMeActive: boolean;
   locating: boolean;
@@ -23,8 +23,10 @@ type Props = {
     lng: number,
     label: string,
     coverage?: ResolvedCoverage | null,
+    city?: string,
   ) => void;
   onClearPlace: () => void;
+  onNearMeStart?: () => void;
   placeLabel: string | null;
   resolvedCoverage?: ResolvedCoverage | null;
   serviceOptions: { slug: string; name: string }[];
@@ -45,6 +47,7 @@ export function TherapistFiltersBar({
   onSearchChange,
   onPlaceResolved,
   onClearPlace,
+  onNearMeStart,
   placeLabel,
   resolvedCoverage,
   serviceOptions,
@@ -66,12 +69,25 @@ export function TherapistFiltersBar({
       return;
     }
     setGeoError(null);
+    onNearMeStart?.();
     navigator.geolocation.getCurrentPosition(
-      (pos) => onNearMe(pos.coords.latitude, pos.coords.longitude),
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        void (async () => {
+          try {
+            const res = await fetch(`/api/geocode?lat=${lat}&lng=${lng}`);
+            const data = await res.json();
+            onNearMe(lat, lng, typeof data.city === "string" && data.city ? data.city : undefined);
+          } catch {
+            onNearMe(lat, lng);
+          }
+        })();
+      },
       () => setGeoError("Could not get your location. Pick an area or search your hotel below."),
       { enableHighAccuracy: true, timeout: 12000 },
     );
-  }, [nearMeActive, onClearNearMe, onClearPlace, onNearMe]);
+  }, [nearMeActive, onClearNearMe, onClearPlace, onNearMe, onNearMeStart]);
 
   async function lookupPlace(e: React.FormEvent) {
     e.preventDefault();
@@ -88,6 +104,7 @@ export function TherapistFiltersBar({
         data.lng,
         data.label as string,
         data.coverage ?? null,
+        typeof data.city === "string" && data.city ? data.city : undefined,
       );
       onClearNearMe();
     } catch (err) {
@@ -171,7 +188,7 @@ export function TherapistFiltersBar({
             disabled={placeLoading}
             className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium hover:border-accent disabled:opacity-60"
           >
-            {placeLoading ? "Searching…" : "Find nearby"}
+            {placeLoading ? "Searching…" : "Search city"}
           </button>
         </form>
         <button
@@ -188,13 +205,19 @@ export function TherapistFiltersBar({
       {placeError ? <p className="text-sm text-red-700 dark:text-red-300">{placeError}</p> : null}
       {placeLabel ? (
         <p className="text-xs text-accent">
-          Showing therapists who can reach <strong>{placeLabel}</strong>
+          Showing therapists in this city
           {resolvedCoverage ? (
             <>
               {" "}
-              (near <strong>{resolvedCoverage.name}</strong>)
+              (sorted from <strong>{placeLabel}</strong>
+              {resolvedCoverage ? ` · ${resolvedCoverage.name}` : ""})
             </>
-          ) : null}
+          ) : (
+            <>
+              {" "}
+              for <strong>{placeLabel}</strong>
+            </>
+          )}
           {" · "}
           <button type="button" onClick={onClearPlace} className="underline underline-offset-2">
             Clear
@@ -202,7 +225,7 @@ export function TherapistFiltersBar({
         </p>
       ) : null}
       {nearMeActive ? (
-        <p className="text-xs text-accent">Sorted by distance from your current location.</p>
+        <p className="text-xs text-accent">Showing everyone based in your city, nearest first.</p>
       ) : null}
     </div>
   );

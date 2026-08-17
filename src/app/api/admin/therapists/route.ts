@@ -222,18 +222,37 @@ async function syncLocation(
   body: Record<string, unknown>,
 ) {
   const loc = body.location as Record<string, unknown> | undefined;
-  if (!loc?.latitude || !loc?.longitude) return;
+  if (!loc) return;
 
-  const row = {
-    therapist_id: therapistId,
+  const hasCoords = loc.latitude != null && loc.longitude != null && loc.latitude !== "" && loc.longitude !== "";
+  const textFields = {
     city: String(loc.city || ""),
     country: String(loc.country || ""),
     region: String(loc.region || ""),
-    latitude: Number(loc.latitude),
-    longitude: Number(loc.longitude),
-    service_radius_km: Number(loc.serviceRadiusKm ?? 12),
     public_area_summary: String(loc.publicAreaSummary || ""),
     active: true,
+  };
+
+  let latitude = hasCoords ? Number(loc.latitude) : 18.7883;
+  let longitude = hasCoords ? Number(loc.longitude) : 98.9853;
+  if (!hasCoords) {
+    const { data: existing } = await supabase
+      .from("therapist_locations")
+      .select("latitude, longitude")
+      .eq("therapist_id", therapistId)
+      .maybeSingle();
+    if (existing?.latitude != null && existing?.longitude != null) {
+      latitude = Number(existing.latitude);
+      longitude = Number(existing.longitude);
+    }
+  }
+
+  const row = {
+    therapist_id: therapistId,
+    ...textFields,
+    latitude,
+    longitude,
+    service_radius_km: Number(loc.serviceRadiusKm ?? 12),
   };
 
   const { error } = await supabase.from("therapist_locations").upsert(row, { onConflict: "therapist_id" });

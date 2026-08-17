@@ -274,6 +274,7 @@ export async function ServiceDetailContent({ slug, expectedTier }: Props) {
         title={`Therapists offering ${service.name}`}
         therapists={therapists}
         viewAllHref={`/therapists?service=${service.slug}`}
+        bookService={service.slug}
       />
 
       {related.length > 0 ? (

@@ -113,10 +113,67 @@ export function geocodeBiasForHint(hint: GeocodeCityHint): { suffix: string; vie
   }
 }
 
+type NominatimAddress = {
+  city?: string;
+  town?: string;
+  village?: string;
+  municipality?: string;
+  county?: string;
+  state?: string;
+  country?: string;
+};
+
+export type GeocodedPlace = {
+  lat: number;
+  lng: number;
+  label: string;
+  city: string;
+  region: string;
+  country: string;
+  cityHint: GeocodeCityHint;
+};
+
+function cleanPlacePart(value?: string) {
+  return (value || "")
+    .replace(/\b(province|changwat|chang wat|county|district|amphoe)\b/gi, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function cityFromNominatimAddress(address?: NominatimAddress): string {
+  return (
+    cleanPlacePart(address?.city) ||
+    cleanPlacePart(address?.town) ||
+    cleanPlacePart(address?.municipality) ||
+    cleanPlacePart(address?.county) ||
+    ""
+  );
+}
+
+export function regionFromNominatimAddress(address?: NominatimAddress): string {
+  return cleanPlacePart(address?.state) || cleanPlacePart(address?.county) || "";
+}
+
+/** Map a geocoded pin to Chiang Mai / Bangkok so city-wide browse matches admin city fields. */
+export function canonicalMarketplaceCity(input: {
+  city?: string;
+  region?: string;
+  country?: string;
+  label?: string;
+  cityHint?: GeocodeCityHint;
+}): string {
+  const blob = [input.city, input.region, input.label, input.country].filter(Boolean).join(" ");
+  const hint =
+    input.cityHint && input.cityHint !== "auto" ? input.cityHint : detectGeocodeCityHint(blob);
+  if (hint === "bangkok") return "Bangkok";
+  if (hint === "chiang-mai") return "Chiang Mai";
+  return (input.city || input.region || "").trim();
+}
+
 export async function geocodePlace(
   query: string,
   hint: GeocodeCityHint = "auto",
-): Promise<{ lat: number; lng: number; label: string; cityHint: GeocodeCityHint }> {
+): Promise<GeocodedPlace> {
   const resolvedHint = hint === "auto" ? detectGeocodeCityHint(query) : hint;
   const bias = geocodeBiasForHint(resolvedHint);
 
@@ -125,6 +182,7 @@ export async function geocodePlace(
     format: "json",
     limit: "1",
     countrycodes: "th",
+    addressdetails: "1",
   });
   if (bias.viewbox) {
     params.set("viewbox", bias.viewbox);
@@ -140,16 +198,82 @@ export async function geocodePlace(
     throw new Error("Could not look up that location.");
   }
 
-  const results = (await res.json()) as { lat: string; lon: string; display_name: string }[];
+  const results = (await res.json()) as {
+    lat: string;
+    lon: string;
+    display_name: string;
+    address?: NominatimAddress;
+  }[];
   const hit = results[0];
   if (!hit) {
     throw new Error("No match found. Try a hotel name or neighbourhood.");
   }
 
+  const cityRaw = cityFromNominatimAddress(hit.address);
+  const region = regionFromNominatimAddress(hit.address);
+  const country = cleanPlacePart(hit.address?.country) || "Thailand";
+  const cityHint = resolvedHint === "auto" ? detectGeocodeCityHint(`${cityRaw} ${region} ${hit.display_name}`) : resolvedHint;
+  const city = canonicalMarketplaceCity({
+    city: cityRaw,
+    region,
+    country,
+    label: hit.display_name,
+    cityHint,
+  });
+
   return {
     lat: Number(hit.lat),
     lng: Number(hit.lon),
     label: hit.display_name.split(",").slice(0, 2).join(",").trim(),
-    cityHint: resolvedHint === "auto" ? detectGeocodeCityHint(hit.display_name) : resolvedHint,
+    city,
+    region,
+    country,
+    cityHint,
+  };
+}
+
+export async function reverseGeocode(lat: number, lng: number): Promise<GeocodedPlace | null> {
+  const params = new URLSearchParams({
+    lat: String(lat),
+    lon: String(lng),
+    format: "json",
+    addressdetails: "1",
+    zoom: "14",
+  });
+
+  const res = await fetch(`https://nominatim.openstreetmap.org/reverse?${params}`, {
+    headers: { "User-Agent": "RoomSpa/1.0 (in-room massage booking)" },
+    next: { revalidate: 86400 },
+  });
+  if (!res.ok) return null;
+
+  const hit = (await res.json()) as {
+    lat?: string;
+    lon?: string;
+    display_name?: string;
+    address?: NominatimAddress;
+  };
+  if (!hit?.address && !hit?.display_name) return null;
+
+  const cityRaw = cityFromNominatimAddress(hit.address);
+  const region = regionFromNominatimAddress(hit.address);
+  const country = cleanPlacePart(hit.address?.country) || "Thailand";
+  const cityHint = detectGeocodeCityHint(`${cityRaw} ${region} ${hit.display_name || ""}`);
+  const city = canonicalMarketplaceCity({
+    city: cityRaw,
+    region,
+    country,
+    label: hit.display_name,
+    cityHint,
+  });
+
+  return {
+    lat,
+    lng,
+    label: (hit.display_name || "").split(",").slice(0, 2).join(",").trim() || city,
+    city,
+    region,
+    country,
+    cityHint,
   };
 }

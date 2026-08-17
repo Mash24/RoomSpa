@@ -9,25 +9,36 @@ import {
   formatTherapistHeadline,
   therapistPrimaryPhoto,
 } from "@/lib/therapists/public";
+import { therapistBookHref, type TherapistBookContext } from "@/lib/therapists/booking-links";
 
 type Props = {
   therapist: PublicTherapist;
   dark?: boolean;
   compact?: boolean;
+  bookService?: string;
+  bookContext?: TherapistBookContext;
 };
 
-export function TherapistCard({ therapist, dark = false, compact = false }: Props) {
+export function TherapistCard({
+  therapist,
+  dark = false,
+  compact = false,
+  bookService,
+  bookContext,
+}: Props) {
   const photo = therapistPrimaryPhoto(therapist);
   const headline = formatTherapistHeadline(therapist);
   const locations = formatAvailableLocations(therapist);
   const distance = formatDistanceBadge(therapist.distanceKm);
+  const bookHref = therapistBookHref(therapist.id, {
+    ...bookContext,
+    service: bookService || bookContext?.service,
+    serviceFallback: therapist.serviceSlugs[0],
+  });
 
   if (compact) {
     return (
-      <Link
-        href={`/therapists/${therapist.slug}`}
-        className="group flex gap-3 rounded-sm border border-border bg-background p-3 transition hover:border-accent/40"
-      >
+      <article className="flex gap-3 rounded-sm border border-border bg-background p-3">
         <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm bg-surface">
           {photo ? (
             <Image src={photo} alt={therapist.displayName} fill sizes="64px" className="object-cover" />
@@ -40,8 +51,22 @@ export function TherapistCard({ therapist, dark = false, compact = false }: Prop
           ) : null}
           <p className="mt-1 text-xs text-muted">{locations}</p>
           {distance ? <p className="mt-1 text-xs font-medium text-accent">{distance}</p> : null}
+          <div className="mt-2 flex gap-2">
+            <Link
+              href={`/therapists/${therapist.slug}`}
+              className="inline-flex min-h-9 items-center justify-center rounded-sm border border-border px-2.5 text-xs font-medium hover:border-accent"
+            >
+              Profile
+            </Link>
+            <Link
+              href={bookHref}
+              className="inline-flex min-h-9 items-center justify-center rounded-sm bg-accent px-2.5 text-xs font-medium text-accent-foreground"
+            >
+              Book
+            </Link>
+          </div>
         </div>
-      </Link>
+      </article>
     );
   }
 
@@ -104,16 +129,24 @@ export function TherapistCard({ therapist, dark = false, compact = false }: Prop
           </p>
         ) : null}
 
-        <div className="mt-auto pt-4">
+        <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
           <Link
             href={`/therapists/${therapist.slug}`}
-            className={`inline-flex min-h-10 w-full items-center justify-center rounded-sm text-sm font-medium transition ${
+            className={`inline-flex min-h-10 items-center justify-center rounded-sm text-sm font-medium transition ${
               dark
                 ? "border border-[#c9a86c]/35 text-[#f5f0e8] hover:border-[#c9a86c]"
                 : "border border-border text-foreground hover:border-accent hover:text-accent"
             }`}
           >
-            View profile
+            Profile
+          </Link>
+          <Link
+            href={bookHref}
+            className={`inline-flex min-h-10 items-center justify-center rounded-sm text-sm font-medium ${
+              dark ? "sensual-btn-primary" : "bg-accent text-accent-foreground"
+            }`}
+          >
+            Book
           </Link>
         </div>
       </div>

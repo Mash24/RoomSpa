@@ -72,6 +72,8 @@ export type EligibilityResult = {
 export type LocationEligibilityQuery = TherapistFilters & {
   /** When true, infer coverage slug from client coordinates (hotel search). Ignored for GPS-only. */
   inferCoverageFromLocation?: boolean;
+  /** Browse by city instead of travel radius (directory / map). Booking still uses radius. */
+  cityWide?: boolean;
 };
 
 function mapTherapist(
@@ -107,6 +109,7 @@ function mapTherapist(
     bio: row.bio,
     city: location?.city ?? "",
     country: location?.country ?? "",
+    region: location?.region ?? "",
     areaSummary,
     verified: row.verified,
     featured: row.featured,
@@ -259,21 +262,47 @@ export async function findEligibleTherapists(
 ): Promise<EligibilityResult> {
   const searchRadiusKm = query.radiusKm ?? 25;
   const hasClientLocation = query.lat != null && query.lng != null;
+  const cityWide = Boolean(query.cityWide || query.city?.trim());
 
   let resolvedCoverage: ResolvedCoverage | null = null;
-  let effectiveCoverageSlug = query.coverageAreaSlug;
+  let effectiveCoverageSlug = cityWide ? undefined : query.coverageAreaSlug;
+  let cityFilter = query.city?.trim() || undefined;
 
-  if (hasClientLocation) {
+  if (hasClientLocation && !cityWide) {
     resolvedCoverage = await resolveCoverageAreaFromCoords(query.lat!, query.lng!);
     if (query.inferCoverageFromLocation && resolvedCoverage && !effectiveCoverageSlug) {
       effectiveCoverageSlug = resolvedCoverage.slug;
     }
   }
 
+  if (cityWide && hasClientLocation) {
+    const { reverseGeocode, canonicalMarketplaceCity, getActiveCoverageAreas } = await import(
+      "@/lib/therapists/coverage-areas"
+    );
+    if (!cityFilter) {
+      const reversed = await reverseGeocode(query.lat!, query.lng!);
+      cityFilter = reversed
+        ? canonicalMarketplaceCity(reversed)
+        : undefined;
+    } else {
+      cityFilter = canonicalMarketplaceCity({ city: cityFilter });
+    }
+    resolvedCoverage = (await resolveCoverageAreaFromCoords(query.lat!, query.lng!)) ?? resolvedCoverage;
+    if (!cityFilter && resolvedCoverage) {
+      const areas = await getActiveCoverageAreas();
+      cityFilter = areas.find((a) => a.slug === resolvedCoverage!.slug)?.city || undefined;
+    }
+  }
+
+  if (cityWide && hasClientLocation && !resolvedCoverage) {
+    resolvedCoverage = await resolveCoverageAreaFromCoords(query.lat!, query.lng!);
+  }
+
   const rpcFilters: TherapistFilters = {
     ...query,
-    coverageAreaSlug: effectiveCoverageSlug,
-    radiusKm: searchRadiusKm,
+    coverageAreaSlug: cityWide ? undefined : effectiveCoverageSlug,
+    radiusKm: cityWide && !cityFilter ? 800 : searchRadiusKm,
+    city: cityWide ? cityFilter : undefined,
   };
 
   const meta: EligibilityMeta = {
@@ -283,8 +312,8 @@ export async function findEligibleTherapists(
     resolvedCoverage,
     filtersApplied: {
       serviceSlug: query.serviceSlug,
-      coverageAreaSlug: effectiveCoverageSlug,
-      locationBased: hasClientLocation,
+      coverageAreaSlug: cityWide ? undefined : effectiveCoverageSlug,
+      locationBased: hasClientLocation || Boolean(cityFilter),
       searchRadiusKm,
     },
   };

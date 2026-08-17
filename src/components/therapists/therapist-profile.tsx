@@ -10,6 +10,7 @@ import {
   therapistPrimaryPhoto,
 } from "@/lib/therapists/public";
 import { getServicePath } from "@/lib/catalog/service-paths";
+import { anyoneBookHref, therapistBookHref } from "@/lib/therapists/booking-links";
 import type { PublicTherapist } from "@/lib/therapists/types";
 
 type Props = {
@@ -22,7 +23,8 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
   const primary = therapistPrimaryPhoto(therapist);
   const gallery = therapist.media.filter((m) => m.type === "photo");
   const headline = formatTherapistHeadline(therapist);
-  const bookHref = `/book?therapist=${therapist.id}${therapist.serviceSlugs[0] ? `&service=${therapist.serviceSlugs[0]}` : ""}`;
+  const bookHref = therapistBookHref(therapist.id, { serviceFallback: therapist.serviceSlugs[0] });
+  const bookAnyoneHref = anyoneBookHref({ service: therapist.serviceSlugs[0] });
 
   const textMain = dark ? "text-[#f5f0e8]" : "text-foreground";
   const textMuted = dark ? "text-[#f5f0e8]/75" : "text-muted";
@@ -88,20 +90,48 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
 
       <section className="mt-8">
         <h2 className={labelClass}>Available in</h2>
-        <ul className={`mt-3 flex flex-wrap gap-2 ${textMain}`}>
-          {[therapist.city, ...therapist.serviceAreaNames].filter(Boolean).map((area) => (
-            <li
-              key={area}
-              className={`rounded-sm px-3 py-1.5 text-sm ring-1 ${
-                dark ? "ring-[#c9a86c]/25" : "ring-border"
-              }`}
-            >
-              {area}
-            </li>
-          ))}
-        </ul>
+        <dl className={`mt-3 grid gap-3 text-base ${textMain} sm:grid-cols-2`}>
+          {therapist.city ? (
+            <div>
+              <dt className={`text-xs uppercase tracking-[0.12em] ${textMuted}`}>City</dt>
+              <dd className="mt-1">{therapist.city}</dd>
+            </div>
+          ) : null}
+          {therapist.region ? (
+            <div>
+              <dt className={`text-xs uppercase tracking-[0.12em] ${textMuted}`}>Province / state</dt>
+              <dd className="mt-1">{therapist.region}</dd>
+            </div>
+          ) : null}
+          {therapist.country ? (
+            <div>
+              <dt className={`text-xs uppercase tracking-[0.12em] ${textMuted}`}>Country</dt>
+              <dd className="mt-1">{therapist.country}</dd>
+            </div>
+          ) : null}
+        </dl>
+        {!therapist.city && !therapist.region && !therapist.country ? (
+          <p className={`mt-3 text-base ${textMain}`}>Location coming soon</p>
+        ) : null}
         {therapist.areaSummary ? (
-          <p className={`mt-2 text-sm ${textMuted}`}>{therapist.areaSummary}</p>
+          <p className={`mt-3 text-sm ${textMuted}`}>
+            <span className={`block text-xs uppercase tracking-[0.12em] ${textMuted}`}>Neighbourhood</span>
+            <span className={`mt-1 block ${textMain}`}>{therapist.areaSummary}</span>
+          </p>
+        ) : null}
+        {therapist.serviceAreaNames.length > 0 ? (
+          <ul className={`mt-3 flex flex-wrap gap-2 ${textMain}`}>
+            {therapist.serviceAreaNames.map((area) => (
+              <li
+                key={area}
+                className={`rounded-sm px-3 py-1.5 text-sm ring-1 ${
+                  dark ? "ring-[#c9a86c]/25" : "ring-border"
+                }`}
+              >
+                {area}
+              </li>
+            ))}
+          </ul>
         ) : null}
       </section>
 
@@ -149,6 +179,14 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
           }`}
         >
           Book with {therapist.displayName.split(" ")[0]}
+        </Link>
+        <Link
+          href={bookAnyoneHref}
+          className={`inline-flex min-h-12 items-center justify-center rounded-sm border px-5 py-3 text-sm ${
+            dark ? "sensual-btn-outline" : "border-border hover:border-accent"
+          }`}
+        >
+          Book anyone available
         </Link>
         <a
           href={whatsappHref}

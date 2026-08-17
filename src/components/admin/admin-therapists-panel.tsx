@@ -5,6 +5,10 @@ import { useCallback, useEffect, useState } from "react";
 import type { AdminTherapistRow } from "@/lib/therapists/types";
 import { therapistStatusLabel } from "@/lib/therapists/status";
 
+function formatAdminLocation(loc: NonNullable<AdminTherapistRow["location"]>) {
+  return [loc.publicAreaSummary, loc.city, loc.region, loc.country].filter(Boolean).join(" · ");
+}
+
 export function AdminTherapistsPanel() {
   const [therapists, setTherapists] = useState<AdminTherapistRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -72,9 +76,7 @@ export function AdminTherapistsPanel() {
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-muted">
-                  {t.location
-                    ? [t.location.publicAreaSummary, t.location.city].filter(Boolean).join(" · ")
-                    : "No location set"}
+                  {t.location ? formatAdminLocation(t.location) : "No location set"}
                 </p>
                 {t.serviceSlugs.length > 0 ? (
                   <p className="mt-2 line-clamp-2 text-xs text-muted">{t.serviceSlugs.join(", ")}</p>
@@ -108,9 +110,7 @@ export function AdminTherapistsPanel() {
                     <p className="text-xs text-muted">{t.slug}{t.featured ? " · Featured" : ""}</p>
                   </td>
                   <td className="px-3 py-3 text-foreground">
-                    {t.location
-                      ? [t.location.publicAreaSummary, t.location.city, t.location.country].filter(Boolean).join(" · ")
-                      : "—"}
+                    {t.location ? formatAdminLocation(t.location) : "—"}
                   </td>
                   <td className="px-3 py-3 text-xs text-muted">{t.serviceSlugs.join(", ") || "—"}</td>
                   <td className="px-3 py-3">

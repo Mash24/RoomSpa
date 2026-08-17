@@ -30,6 +30,7 @@ export type TherapistLocationRow = {
   therapist_id: string;
   city: string;
   country: string;
+  region: string;
   public_area_summary: string;
 };
 
@@ -63,5 +64,6 @@ export function buildTherapistFiltersRpc(filters: TherapistFilters) {
     p_lat: filters.lat ?? null,
     p_lng: filters.lng ?? null,
     p_search_radius_km: filters.radiusKm ?? 25,
+    p_city: filters.city?.trim() || null,
   };
 }

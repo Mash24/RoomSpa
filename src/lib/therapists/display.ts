@@ -18,14 +18,18 @@ export function formatTherapistHeadline(therapist: PublicTherapist): string {
   return [genderLabel(therapist.gender), therapist.age, therapist.nationality].filter(Boolean).join(" · ");
 }
 
-/** Public service coverage — never the therapist's home/base. */
+/** Public service coverage — neighbourhood, city, province, country. */
 export function formatAvailableLocations(therapist: PublicTherapist): string {
-  const cityCountry = [therapist.city, therapist.country].filter(Boolean).join(" · ");
-  const areas = therapist.serviceAreaNames.filter(Boolean);
+  const place = [therapist.areaSummary, therapist.city, therapist.region, therapist.country].filter(Boolean);
+  const uniquePlace = place.filter((part, i) => place.findIndex((p) => p.toLowerCase() === part.toLowerCase()) === i);
+  const cityCountry = uniquePlace.join(" · ");
+  const areas = therapist.serviceAreaNames.filter(
+    (name) => !uniquePlace.some((part) => part.toLowerCase() === name.toLowerCase()),
+  );
   if (cityCountry && areas.length) {
     return `${cityCountry} · ${areas.join(" · ")}`;
   }
-  return areas.join(" · ") || cityCountry || therapist.areaSummary;
+  return areas.join(" · ") || cityCountry;
 }
 
 export function formatDistanceBadge(km: number | undefined): string | null {
@@ -41,7 +45,11 @@ export function matchesTherapistSearch(therapist: PublicTherapist, query: string
     therapist.displayName.toLowerCase().includes(q) ||
     therapist.slug.toLowerCase().includes(q) ||
     therapist.serviceNames.some((n) => n.toLowerCase().includes(q)) ||
-    therapist.serviceAreaNames.some((n) => n.toLowerCase().includes(q))
+    therapist.serviceAreaNames.some((n) => n.toLowerCase().includes(q)) ||
+    therapist.areaSummary.toLowerCase().includes(q) ||
+    therapist.city.toLowerCase().includes(q) ||
+    therapist.region.toLowerCase().includes(q) ||
+    therapist.country.toLowerCase().includes(q)
   );
 }
 

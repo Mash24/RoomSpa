@@ -157,6 +157,7 @@ export function SensualServiceDetail({
           therapists={therapists}
           dark
           viewAllHref={`/therapists?service=${service.slug}`}
+          bookService={service.slug}
         />
 
         {related.length > 0 ? (

@@ -41,6 +41,7 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
   const [placeLabel, setPlaceLabel] = useState<string | null>(null);
   const [locationMode, setLocationMode] = useState<PlaceSearchMode>(null);
   const [resolvedCoverage, setResolvedCoverage] = useState<ResolvedCoverage | null>(null);
+  const [searchCity, setSearchCity] = useState<string | undefined>();
 
   useEffect(() => {
     const t = setTimeout(() => setSearchDebounced(searchFilter), 300);
@@ -55,7 +56,7 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
       search?: string;
       lat?: number;
       lng?: number;
-      inferCoverage?: boolean;
+      city?: string;
     }) => {
       setLoading(true);
       try {
@@ -67,9 +68,9 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
         if (opts.lat != null && opts.lng != null) {
           params.set("lat", String(opts.lat));
           params.set("lng", String(opts.lng));
-          params.set("radius", "25");
-          if (opts.inferCoverage) params.set("inferCoverage", "1");
         }
+        if (opts.city) params.set("city", opts.city);
+        if (opts.city || (opts.lat != null && opts.lng != null)) params.set("cityWide", "1");
         const res = await fetch(`/api/therapists?${params.toString()}`);
         const data = await res.json();
         setTherapists(data.therapists || []);
@@ -90,9 +91,9 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
       search: searchDebounced || undefined,
       lat: coords?.lat,
       lng: coords?.lng,
-      inferCoverage: locationMode === "geocode",
+      city: searchCity,
     });
-  }, [serviceFilter, coverageFilter, genderFilter, searchDebounced, coords, locationMode, fetchTherapists]);
+  }, [serviceFilter, coverageFilter, genderFilter, searchDebounced, coords, searchCity, fetchTherapists]);
 
   const preview = useMemo(() => therapists.slice(0, 3), [therapists]);
 
@@ -114,8 +115,7 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
           Massage & therapists near you
         </h2>
         <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
-          Filter by service and area, or share your location to see therapists within their travel
-          radius — only people who actually cover where you are booking.
+          Filter by service and area, or share your location to see every therapist based in that city.
         </p>
 
         <div className="mt-8">
@@ -133,31 +133,36 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
             onCoverageChange={setCoverageFilter}
             onGenderChange={setGenderFilter}
             onSearchChange={setSearchFilter}
-            onNearMe={(lat, lng) => {
+            onNearMe={(lat, lng, city) => {
               setLocating(true);
               setNearMeActive(true);
               setPlaceLabel(null);
               setLocationMode("gps");
               setResolvedCoverage(null);
+              setSearchCity(city);
               setCoords({ lat, lng });
             }}
+            onNearMeStart={() => setLocating(true)}
             onClearNearMe={() => {
               setNearMeActive(false);
               setLocationMode(null);
               setResolvedCoverage(null);
+              setSearchCity(undefined);
               setCoords(null);
             }}
-            onPlaceResolved={(lat, lng, label, coverage) => {
+            onPlaceResolved={(lat, lng, label, coverage, city) => {
               setPlaceLabel(label);
               setNearMeActive(false);
               setLocationMode("geocode");
               setResolvedCoverage(coverage ?? null);
+              setSearchCity(city);
               setCoords({ lat, lng });
             }}
             onClearPlace={() => {
               setPlaceLabel(null);
               setLocationMode(null);
               setResolvedCoverage(null);
+              setSearchCity(undefined);
               setCoords(null);
             }}
           />
@@ -176,13 +181,24 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
               <p className="text-sm text-muted">Searching therapists…</p>
             ) : preview.length === 0 ? (
               <p className="text-sm text-muted">
-                No eligible therapists for this location and service. Try another area or service.
+                No therapists in this city for these filters. Try another service or area.
               </p>
             ) : (
               <ul className="grid gap-4">
                 {preview.map((therapist) => (
                   <li key={therapist.id}>
-                    <TherapistCard therapist={therapist} compact />
+                    <TherapistCard
+                      therapist={therapist}
+                      compact
+                      bookService={serviceFilter || therapist.serviceSlugs[0]}
+                      bookContext={{
+                        service: serviceFilter || undefined,
+                        place: placeLabel || undefined,
+                        lat: coords?.lat,
+                        lng: coords?.lng,
+                        coverage: resolvedCoverage?.slug,
+                      }}
+                    />
                   </li>
                 ))}
               </ul>

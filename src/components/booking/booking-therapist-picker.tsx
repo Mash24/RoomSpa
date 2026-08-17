@@ -26,6 +26,7 @@ type Props = {
   onPreferenceChange: (pref: TherapistPreference) => void;
   onSelectTherapistSlot: (therapistId: string, time: string) => void;
   onSelectBestAvailableTime: (time: string) => void;
+  browseHref?: string;
 };
 
 function therapistHeadline(t: AvailableTherapist): string {
@@ -41,6 +42,7 @@ export function BookingTherapistPicker({
   onPreferenceChange,
   onSelectTherapistSlot,
   onSelectBestAvailableTime,
+  browseHref,
 }: Props) {
   const bookable = therapists.filter((t) => t.bookable);
 
@@ -62,7 +64,35 @@ export function BookingTherapistPicker({
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">Who would you like?</p>
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-muted">Therapist (optional)</p>
+        <p className="text-sm text-muted">
+          Skip this if you don&apos;t mind who we send. Pick a time below and we&apos;ll assign someone available.
+          {browseHref ? (
+            <>
+              {" "}
+              Or{" "}
+              <Link href={browseHref} target="_blank" className="text-accent underline-offset-2 hover:underline">
+                browse therapists
+              </Link>{" "}
+              — Book on their card and we keep them selected here.
+            </>
+          ) : null}
+        </p>
+        <label className="flex cursor-pointer items-start gap-3 rounded-sm border border-border p-3.5 text-sm transition hover:border-accent sm:p-3">
+          <input
+            type="radio"
+            name="therapistPreference"
+            checked={preference === "best_available"}
+            onChange={() => onPreferenceChange("best_available")}
+            className="mt-1"
+          />
+          <span>
+            <span className="font-medium text-foreground">Anyone available</span>
+            <span className="mt-0.5 block text-xs text-muted">
+              We assign the nearest available therapist for your time. You can still browse profiles first.
+            </span>
+          </span>
+        </label>
         <label className="flex cursor-pointer items-start gap-3 rounded-sm border border-border p-3.5 text-sm transition hover:border-accent sm:p-3">
           <input
             type="radio"
@@ -73,29 +103,14 @@ export function BookingTherapistPicker({
           />
           <span>
             <span className="font-medium text-foreground">Choose a therapist</span>
-            <span className="mt-0.5 block text-xs text-muted">Pick someone available and select their time.</span>
-          </span>
-        </label>
-        <label className="flex cursor-pointer items-start gap-3 rounded-sm border border-border p-3.5 text-sm transition hover:border-accent sm:p-3">
-          <input
-            type="radio"
-            name="therapistPreference"
-            checked={preference === "best_available"}
-            onChange={() => onPreferenceChange("best_available")}
-            className="mt-1"
-          />
-          <span>
-            <span className="font-medium text-foreground">Best available</span>
-            <span className="mt-0.5 block text-xs text-muted">
-              We assign the nearest available therapist for your selected time.
-            </span>
+            <span className="mt-0.5 block text-xs text-muted">Optional — pick someone and a time they have free.</span>
           </span>
         </label>
       </div>
 
       {preference === "best_available" ? (
         <div>
-          <p className="text-sm text-muted">Choose a time — we&apos;ll assign the nearest available therapist.</p>
+          <p className="text-sm text-muted">Choose a time — we&apos;ll assign an available therapist in your area.</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {aggregatedTimes.map((time) => {
               const selected = selectedTime === time && !selectedTherapistId;

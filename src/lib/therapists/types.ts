@@ -29,6 +29,8 @@ export type PublicTherapist = {
   bio: string;
   city: string;
   country: string;
+  /** Province / state / county — public */
+  region: string;
   /** Customer-facing summary e.g. "Usually available around Nimman, Old City" */
   areaSummary: string;
   verified: boolean;
@@ -70,6 +72,8 @@ export type TherapistFilters = {
   lat?: number;
   lng?: number;
   radiusKm?: number;
+  /** Match therapists based in this city (browse), ignoring travel radius */
+  city?: string;
   featured?: boolean;
   limit?: number;
   gender?: TherapistGender | "any";

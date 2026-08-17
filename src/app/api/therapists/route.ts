@@ -19,6 +19,9 @@ export async function GET(request: Request) {
   const search = searchParams.get("q") || undefined;
   const inferCoverage = searchParams.get("inferCoverage") === "1";
 
+  const city = searchParams.get("city") || undefined;
+  const cityWide = searchParams.get("cityWide") === "1" || Boolean(city);
+
   const result = await findEligibleTherapists({
     serviceSlug,
     coverageAreaSlug,
@@ -29,7 +32,9 @@ export async function GET(request: Request) {
     limit: limit != null ? Number(limit) : undefined,
     gender: gender && gender !== "any" ? gender : undefined,
     search,
-    inferCoverageFromLocation: inferCoverage,
+    inferCoverageFromLocation: inferCoverage && !cityWide,
+    city,
+    cityWide,
   });
 
   return NextResponse.json({

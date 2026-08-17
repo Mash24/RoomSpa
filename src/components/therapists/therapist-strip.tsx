@@ -8,6 +8,7 @@ type Props = {
   dark?: boolean;
   viewAllHref?: string;
   emptyMessage?: string;
+  bookService?: string;
 };
 
 export function TherapistStrip({
@@ -16,6 +17,7 @@ export function TherapistStrip({
   dark = false,
   viewAllHref,
   emptyMessage = "Therapists for this service will appear here soon.",
+  bookService,
 }: Props) {
   if (therapists.length === 0) return null;
 
@@ -37,7 +39,7 @@ export function TherapistStrip({
       <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {therapists.map((therapist) => (
           <li key={therapist.id}>
-            <TherapistCard therapist={therapist} dark={dark} />
+            <TherapistCard therapist={therapist} dark={dark} bookService={bookService} />
           </li>
         ))}
       </ul>

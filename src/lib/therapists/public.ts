@@ -128,6 +128,7 @@ function mapVisibleTherapist(
     bio: row.bio,
     city: relations.location?.city ?? "",
     country: relations.location?.country ?? "",
+    region: relations.location?.region ?? "",
     areaSummary,
     verified: row.verified,
     featured: row.featured,
@@ -188,7 +189,7 @@ export function therapistPrimaryPhoto(therapist: PublicTherapist): string | null
 }
 
 export function formatTherapistLocation(therapist: PublicTherapist): string {
-  const parts = [therapist.city, therapist.country].filter(Boolean);
+  const parts = [therapist.city, therapist.region, therapist.country].filter(Boolean);
   if (therapist.areaSummary) parts.unshift(therapist.areaSummary);
   return parts.join(" · ");
 }

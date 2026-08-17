@@ -34,6 +34,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
   const [bio, setBio] = useState("");
   const [city, setCity] = useState("Chiang Mai");
   const [country, setCountry] = useState("Thailand");
+  const [region, setRegion] = useState("");
   const [areaLabel, setAreaLabel] = useState("");
   const [latitude, setLatitude] = useState("");
   const [longitude, setLongitude] = useState("");
@@ -73,6 +74,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
       if (t.location) {
         setCity(t.location.city);
         setCountry(t.location.country);
+        setRegion(t.location.region ?? "");
         setAreaLabel(t.location.publicAreaSummary);
         setLatitude(String(t.location.latitude));
         setLongitude(String(t.location.longitude));
@@ -134,6 +136,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
       location: {
         city,
         country,
+        region,
         publicAreaSummary: areaLabel,
         latitude: latitude ? Number(latitude) : null,
         longitude: longitude ? Number(longitude) : null,
@@ -227,32 +230,39 @@ export function AdminTherapistEditor({ therapistId }: Props) {
       </section>
 
       <section className="space-y-4 border border-border bg-surface-elevated p-5">
-        <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Internal base location</h2>
-        <p className="text-xs text-muted">Coordinates stay admin-only. Clients see city and service areas — not the therapist&apos;s home address.</p>
+        <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Service area</h2>
+        <p className="text-xs text-muted">
+          Country, province, city, and neighbourhood are shown on the public profile. Coordinates stay admin-only
+          and are used for booking travel radius — they are never shown to guests.
+        </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
-            <span className="text-muted">City</span>
-            <input value={city} onChange={(e) => setCity(e.target.value)} className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
+            <span className="text-muted">Country</span>
+            <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Thailand" className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
           </label>
           <label className="block text-sm">
-            <span className="text-muted">Country</span>
-            <input value={country} onChange={(e) => setCountry(e.target.value)} className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
+            <span className="text-muted">Province / state / county</span>
+            <input value={region} onChange={(e) => setRegion(e.target.value)} placeholder="e.g. Chiang Mai" className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
           </label>
-          <label className="block text-sm sm:col-span-2">
-            <span className="text-muted">Neighbourhood / area (displayed to clients)</span>
+          <label className="block text-sm">
+            <span className="text-muted">City</span>
+            <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Chiang Mai" className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
+          </label>
+          <label className="block text-sm">
+            <span className="text-muted">Neighbourhood / area (shown to clients)</span>
             <input value={areaLabel} onChange={(e) => setAreaLabel(e.target.value)} placeholder="e.g. Nimman — near Maya" className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
           </label>
           <label className="block text-sm">
-            <span className="text-muted">Latitude</span>
+            <span className="text-muted">Latitude (admin only)</span>
             <input value={latitude} onChange={(e) => setLatitude(e.target.value)} placeholder="18.7990" className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
           </label>
           <label className="block text-sm">
-            <span className="text-muted">Longitude</span>
+            <span className="text-muted">Longitude (admin only)</span>
             <input value={longitude} onChange={(e) => setLongitude(e.target.value)} placeholder="98.9680" className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
           </label>
           <label className="block text-sm">
-            <span className="text-muted">Service radius (km)</span>
-            <input type="number" min={1} max={50} value={serviceRadiusKm} onChange={(e) => setServiceRadiusKm(e.target.value)} className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
+            <span className="text-muted">Travel radius for bookings (km)</span>
+            <input type="number" min={1} max={80} value={serviceRadiusKm} onChange={(e) => setServiceRadiusKm(e.target.value)} className="mt-1 w-full border border-border bg-background px-3 py-2.5" />
           </label>
         </div>
       </section>
