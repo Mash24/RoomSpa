@@ -477,15 +477,15 @@ export function AdminAnalyticsPanel() {
 
           <div className="grid gap-4 lg:grid-cols-2">
             <RankList
-              title="Visitor cities"
-              subtitle="Approx. city from IP (production only)"
+              title="IP city guess"
+              subtitle="Unreliable on mobile — Thai carriers often show Bangkok even from Chiang Mai"
               rows={data.cities ?? []}
-              empty="No city data yet — appears after production traffic."
+              empty="No city guess yet — appears after production traffic."
               barClass="bg-[#2f5d50] dark:bg-[#7eb8a4]"
             />
             <RankList
               title="Countries"
-              subtitle="Visitor country codes from IP"
+              subtitle="Usually accurate — use this over city"
               rows={data.countries ?? []}
               empty="No country data yet."
               barClass="bg-sky-600/80 dark:bg-sky-400/70"
