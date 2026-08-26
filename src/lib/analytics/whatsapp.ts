@@ -13,8 +13,8 @@ export type WhatsAppLinkOptions = {
 };
 
 /**
- * Builds a WhatsApp deep link whose prefilled text includes attribution tags
- * so ops can see source/landing/CTA in the first message.
+ * Builds a WhatsApp deep link with a clean guest-facing prefill.
+ * Attribution stays in first-party analytics events — never in the message.
  */
 export function buildWhatsAppHref(options: WhatsAppLinkOptions): string {
   const bits: string[] = [
@@ -27,20 +27,6 @@ export function buildWhatsAppHref(options: WhatsAppLinkOptions): string {
 
   if (options.serviceSlug) {
     bits.push(`Service: ${options.serviceSlug}.`);
-  }
-
-  const attr = options.attribution;
-  const tags = [
-    options.cta ? `cta=${options.cta}` : "",
-    attr?.source ? `src=${attr.source}` : "",
-    attr?.medium ? `med=${attr.medium}` : "",
-    attr?.campaign ? `cmp=${attr.campaign}` : "",
-    attr?.landingPath ? `land=${attr.landingPath}` : "",
-    options.pagePath ? `page=${options.pagePath}` : "",
-  ].filter(Boolean);
-
-  if (tags.length) {
-    bits.push(`[${tags.join(" · ")}]`);
   }
 
   const text = encodeURIComponent(bits.join(" "));
