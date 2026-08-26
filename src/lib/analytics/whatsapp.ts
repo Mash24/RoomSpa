@@ -18,13 +18,11 @@ export type WhatsAppLinkOptions = {
  */
 export function buildWhatsAppHref(options: WhatsAppLinkOptions): string {
   const bits: string[] = [
-    "Hi RoomSpa! I'm interested in a Signature experience (Tantric / Nuru / body-to-body).",
+    "Hi RoomSpa! I'd like to book a massage at my address. What openings are available?",
   ];
 
   if (options.cityHint) {
     bits.push(`I'm in / staying in ${options.cityHint}.`);
-  } else {
-    bits.push("Which cities are available?");
   }
 
   if (options.serviceSlug) {

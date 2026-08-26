@@ -68,5 +68,5 @@ const whatsappNumber = site.contact.whatsapp.replace(/\D/g, "");
 
 /** Static SSR fallback — prefer <WhatsAppLink cta="..." /> for tracked clicks. */
 export const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-  "Hi RoomSpa! I'm interested in a Signature experience (Tantric / Nuru / body-to-body). Which cities are available?",
+  "Hi RoomSpa! I'd like to book a massage at my address. What openings are available?",
 )}`;
