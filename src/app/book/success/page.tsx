@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { getStripe } from "@/lib/stripe/server";
 import { productPriceLabel } from "@/content/pricing";
 import { site } from "@/content/site";
@@ -102,14 +103,13 @@ export default async function BookingSuccessPage({ searchParams }: SuccessPagePr
       ) : null}
 
       <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noreferrer"
+        <WhatsAppLink
+          cta="booking-paid"
+          hrefOverride={whatsappHref}
           className="inline-flex items-center justify-center rounded-sm bg-[#25D366] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#20bd5b]"
         >
           Send booking details on WhatsApp
-        </a>
+        </WhatsAppLink>
         <Link
           href={
             customerEmail

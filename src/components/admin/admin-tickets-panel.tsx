@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  AdminAlert,
+  AdminEmpty,
+  AdminFilterPills,
+  AdminPageHeader,
+} from "@/components/admin/admin-ui";
 
 type TicketStatus = "open" | "in_progress" | "resolved" | "spam";
 
@@ -106,48 +112,36 @@ export function AdminTicketsPanel() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-4xl">Care chats</h1>
-        <p className="mt-2 text-sm text-muted">
-          Guests who asked for a person. Reply here — they’ll see it in the site chat (and by email
-          when they left one). Closing a chat invites an optional guest rating.
-        </p>
-      </div>
+    <div className="space-y-6 md:space-y-8">
+      <AdminPageHeader
+        eyebrow="Support"
+        title="Care chats"
+        description="Guests who asked for a person. Reply here — they see it in site chat (and by email when they left one)."
+      />
 
-      <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
-        {FILTERS.map((item) => (
-          <button
-            key={item.value}
-            type="button"
-            onClick={() => setFilter(item.value)}
-            className={`min-h-11 rounded-sm px-3 py-2.5 text-sm font-medium transition sm:px-4 ${
-              filter === item.value
-                ? "bg-accent text-accent-foreground"
-                : "border border-border text-foreground hover:border-accent hover:text-accent"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      <AdminFilterPills
+        options={FILTERS}
+        value={filter}
+        onChange={setFilter}
+        columns={2}
+      />
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <AdminAlert tone="error">{error}</AdminAlert> : null}
       {loading && !tickets.length ? <p className="text-sm text-muted">Loading…</p> : null}
       {!loading && tickets.length === 0 ? (
-        <p className="text-sm text-muted">No chats in this view.</p>
+        <AdminEmpty title="No chats in this view" description="Switch filters or wait for the next guest request." />
       ) : null}
 
-      <ul className="space-y-5">
+      <ul className="space-y-4">
         {tickets.map((ticket) => {
           const closed = Boolean(ticket.endedAt) || ticket.status === "resolved";
           return (
-            <li key={ticket.id} className="border border-border bg-surface-elevated p-4 md:p-5">
+            <li key={ticket.id} className="admin-card p-4 md:p-5">
               <div className="flex flex-wrap items-baseline justify-between gap-2">
                 <p className="font-display text-xl tracking-tight text-foreground xs:text-2xl">
                   {ticket.referenceCode}
                 </p>
-                <p className="text-xs uppercase tracking-[0.14em] text-muted">
+                <p className="rounded-full bg-surface px-2.5 py-1 text-xs uppercase tracking-[0.14em] text-muted">
                   {ticket.status.replace("_", " ")} · {formatWhen(ticket.createdAt)}
                 </p>
               </div>
@@ -220,7 +214,7 @@ export function AdminTicketsPanel() {
                           message: replyDrafts[ticket.id],
                         })
                       }
-                      className="min-h-11 rounded-sm bg-accent px-3 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-50 sm:py-2"
+                      className="min-h-11 rounded-full bg-accent px-3 py-2.5 text-sm font-medium text-accent-foreground disabled:opacity-50 sm:py-2"
                     >
                       Send reply
                     </button>

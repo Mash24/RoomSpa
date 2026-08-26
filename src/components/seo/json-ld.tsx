@@ -73,13 +73,15 @@ export function LocalBusinessJsonLd(input?: {
     telephone: site.contact.whatsapp,
     image: `${site.url}/opengraph-image`,
     priceRange: "฿฿",
-    areaServed: coverageAreas.map((area) => ({
-      "@type": "Place",
-      name: `${area.name}, ${area.city}`,
-    })),
+    areaServed: [
+      { "@type": "Country", name: "Thailand" },
+      ...coverageAreas.map((area) => ({
+        "@type": "Place",
+        name: `${area.name}, ${area.city}`,
+      })),
+    ],
     address: {
       "@type": "PostalAddress",
-      addressLocality: "Chiang Mai",
       addressCountry: "TH",
     },
     makesOffer: catalogServices
@@ -179,7 +181,7 @@ export function ServiceJsonLd(input: {
       name: site.name,
       url: site.url,
     },
-    areaServed: input.areaServed ?? "Chiang Mai, Thailand",
+    areaServed: input.areaServed ?? "Thailand",
     offers: {
       "@type": "Offer",
       priceCurrency: "THB",

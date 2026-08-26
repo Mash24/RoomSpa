@@ -5,10 +5,11 @@ import { AvailabilityBanner } from "@/components/seo/availability-banner";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { ReviewSnapshot } from "@/components/seo/review-snapshot";
 import { BreadcrumbJsonLd, FaqJsonLd, JsonLd } from "@/components/seo/json-ld";
-import { cities, getCity } from "@/content/cities";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
+import { cities, cityStatusLabel, getCity } from "@/content/cities";
 import { faqItems } from "@/content/pages";
 import { productPriceLabel } from "@/content/services";
-import { site, whatsappHref } from "@/content/site";
+import { site } from "@/content/site";
 import {
   getPublicSignatureServices,
   getPublicWellnessServices,
@@ -45,6 +46,7 @@ export default async function CityPage({ params }: PageProps) {
   if (!city) notFound();
 
   const live = city.status === "active";
+  const enquiries = city.status === "enquiries";
   const [wellnessPicks, signaturePicks] = await Promise.all([
     getPublicWellnessServices(4),
     getPublicSignatureServices(4),
@@ -54,10 +56,12 @@ export default async function CityPage({ params }: PageProps) {
   const teaser = live ? await getTodayAvailabilityTeaser() : null;
   const localFaqs = [
     {
-      question: `Do you offer in-room massage in ${city.name}?`,
+      question: `Do you offer Signature in-room massage in ${city.name}?`,
       answer: live
-        ? `Yes. We come to hotels, condos, and homes across ${city.neighborhoods.map((n) => n.name).join(", ")}.`
-        : `Coming soon in ${city.name}. WhatsApp us for updates, or book Chiang Mai today.`,
+        ? `Yes. We come to hotels, condos, and homes across ${city.neighborhoods.map((n) => n.name).join(", ")} for Signature Experiences and wellness massage.`
+        : enquiries
+          ? `We're accepting ${city.name} enquiries now. WhatsApp us with your area and preferred Signature treatment — availability varies while we grow local therapists.`
+          : `Coming soon in ${city.name}. WhatsApp us for updates, or book a live city today.`,
     },
     ...faqItems.slice(0, 3),
   ];
@@ -76,7 +80,7 @@ export default async function CityPage({ params }: PageProps) {
         data={{
           "@context": "https://schema.org",
           "@type": "Service",
-          name: `In-room massage in ${city.name}`,
+          name: `Signature in-room massage in ${city.name}`,
           description: city.summary,
           provider: { "@type": "Organization", name: site.name, url: site.url },
           areaServed: city.name,
@@ -104,7 +108,7 @@ export default async function CityPage({ params }: PageProps) {
       />
 
       <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">
-        {live ? "Live" : "Coming soon"}
+        {cityStatusLabel(city.status)}
       </p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         {city.headline}
@@ -126,20 +130,19 @@ export default async function CityPage({ params }: PageProps) {
             Book in {city.name}
           </Link>
         ) : (
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
+          <WhatsAppLink
+            cta={`city-${city.slug}`}
+            cityHint={city.name}
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
           >
-            WhatsApp us
-          </a>
+            {enquiries ? `Enquire for ${city.name}` : "WhatsApp us"}
+          </WhatsAppLink>
         )}
         <Link
-          href="/services/wellness"
+          href="/services/signature"
           className="inline-flex min-h-12 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm"
         >
-          Wellness & Signature
+          Signature menu
         </Link>
       </div>
 
@@ -164,18 +167,18 @@ export default async function CityPage({ params }: PageProps) {
 
       {live ? (
         <section className="mt-12 space-y-10">
-          {wellnessPicks.length > 0 ? (
+          {signaturePicks.length > 0 ? (
             <div>
               <div className="flex items-end justify-between gap-4">
                 <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
-                  Wellness Massage
+                  Signature Experiences
                 </h2>
-                <Link href="/services/wellness" className="text-sm text-accent hover:underline">
-                  All wellness →
+                <Link href="/services/signature" className="text-sm text-accent hover:underline">
+                  All Signature →
                 </Link>
               </div>
               <ul className="mt-4 divide-y divide-border border-y border-border">
-                {wellnessPicks.map((service) => (
+                {signaturePicks.map((service) => (
                   <li key={service.slug} className="flex items-center justify-between gap-4 py-4">
                     <Link
                       href={getServicePath(service)}
@@ -191,18 +194,18 @@ export default async function CityPage({ params }: PageProps) {
               </ul>
             </div>
           ) : null}
-          {signaturePicks.length > 0 ? (
+          {wellnessPicks.length > 0 ? (
             <div>
               <div className="flex items-end justify-between gap-4">
                 <h2 className="font-display text-2xl tracking-tight text-foreground md:text-3xl">
-                  Signature Experiences
+                  Wellness Massage
                 </h2>
-                <Link href="/services/signature" className="text-sm text-accent hover:underline">
-                  All Signature →
+                <Link href="/services/wellness" className="text-sm text-accent hover:underline">
+                  All wellness →
                 </Link>
               </div>
               <ul className="mt-4 divide-y divide-border border-y border-border">
-                {signaturePicks.map((service) => (
+                {wellnessPicks.map((service) => (
                   <li key={service.slug} className="flex items-center justify-between gap-4 py-4">
                     <Link
                       href={getServicePath(service)}

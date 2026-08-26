@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { site, whatsappHref } from "@/content/site";
+import { site } from "@/content/site";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 const secondaryLinks = [
   { label: "Locations", href: "/city" },
@@ -63,8 +64,8 @@ export function SiteHeader() {
 
   return (
     <header className={shell}>
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3.5 xs:px-5 xs:py-4 md:gap-4 md:px-8 md:py-5">
-        <Link href="/" className={`${brand} min-w-0 truncate`}>
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3.5 xs:gap-3 xs:px-5 xs:py-4 md:gap-4 md:px-8 md:py-5">
+        <Link href="/" className={`${brand} min-w-0 max-w-[46%] truncate xs:max-w-none`}>
           {site.name}
         </Link>
 
@@ -74,9 +75,9 @@ export function SiteHeader() {
               {item.label}
             </Link>
           ))}
-          <a href={whatsappHref} target="_blank" rel="noreferrer" className={link}>
+          <WhatsAppLink cta="header" className={link}>
             WhatsApp
-          </a>
+          </WhatsAppLink>
           <ThemeToggle lightOnDark={onHero} />
           <Link href="/book" className={book}>
             Book
@@ -118,15 +119,9 @@ export function SiteHeader() {
                 {item.label}
               </Link>
             ))}
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noreferrer"
-              className={mobileLink}
-              onClick={() => setOpen(false)}
-            >
+            <WhatsAppLink cta="header-mobile" className={mobileLink} onClick={() => setOpen(false)}>
               WhatsApp
-            </a>
+            </WhatsAppLink>
             <p
               className={
                 onHero

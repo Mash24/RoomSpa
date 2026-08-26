@@ -158,13 +158,13 @@ export function AdminServiceEditor({ serviceId }: Props) {
   }
 
   return (
-    <form onSubmit={onSave} className="mx-auto max-w-3xl space-y-8 pb-4 md:pb-0">
+    <form onSubmit={onSave} className="mx-auto w-full min-w-0 max-w-3xl space-y-6 pb-4 md:space-y-8 md:pb-0">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <Link href="/admin/services" className="text-sm text-accent">
             ← Services
           </Link>
-          <h1 className="mt-2 font-display text-2xl tracking-tight text-foreground xs:text-3xl">
+          <h1 className="mt-2 break-words font-display text-2xl tracking-tight text-foreground xs:text-3xl">
             {isNew ? "Add service" : "Edit service"}
           </h1>
         </div>
@@ -181,7 +181,7 @@ export function AdminServiceEditor({ serviceId }: Props) {
         <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div>
       ) : null}
 
-      <section className="space-y-4 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-4 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Basics</h2>
         <label className="block text-sm">
           <span className="text-muted">Name</span>
@@ -284,11 +284,11 @@ export function AdminServiceEditor({ serviceId }: Props) {
         onImageAltChange={setImageAlt}
       />
 
-      <section className="space-y-4 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-4 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">
           Pricing by duration
         </h2>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-4 min-[420px]:grid-cols-3">
           {(
             [
               [60, price60, setPrice60],
@@ -313,7 +313,7 @@ export function AdminServiceEditor({ serviceId }: Props) {
         </div>
       </section>
 
-      <section className="space-y-3 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-3 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Settings</h2>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={isActive} onChange={(e) => setIsActive(e.target.checked)} />
@@ -329,7 +329,7 @@ export function AdminServiceEditor({ serviceId }: Props) {
         </label>
       </section>
 
-      <section className="space-y-4 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-4 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">SEO (optional)</h2>
         <label className="block text-sm">
           <span className="text-muted">SEO title</span>

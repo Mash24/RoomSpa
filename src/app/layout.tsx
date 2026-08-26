@@ -22,6 +22,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  interactiveWidget: "resizes-content",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#eef2f0" },
     { media: "(prefers-color-scheme: dark)", color: "#121816" },
@@ -31,7 +32,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} | In-room massage Chiang Mai`,
+    default: `${site.name} | Private Signature massage Thailand`,
     template: `%s | ${site.name}`,
   },
   description: site.description,
@@ -42,13 +43,13 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     siteName: site.name,
-    title: `${site.name} | In-room massage Chiang Mai`,
+    title: `${site.name} | Private Signature massage Thailand`,
     description: site.description,
     url: site.url,
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} | In-room massage Chiang Mai`,
+    title: `${site.name} | Private Signature massage Thailand`,
     description: site.description,
   },
   robots: {

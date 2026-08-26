@@ -2,7 +2,7 @@ export const faqItems = [
   {
     question: "Where do you come?",
     answer:
-      "We travel to hotels, condos, and private homes in our Chiang Mai coverage zones (Old City, Nimman, and the Airport / Hang Dong corridor). Outside those areas, message us on WhatsApp — we often still can help with a travel fee.",
+      "RoomSpa delivers private Signature Experiences and wellness massage to hotels, condos, and homes across Thailand. Book online where therapists are live. For Bangkok, Phuket, and other cities, WhatsApp us — availability depends on local therapists.",
   },
   {
     question: "What should I prepare in the room?",
@@ -27,7 +27,7 @@ export const faqItems = [
   {
     question: "Do you offer Nuru, Yoni, Lingam, and tantric sessions?",
     answer:
-      "Yes — listed under Sensual & tantric on the Services page. These are consent-led, professional bodywork sessions with clear boundaries set before touch begins. They are not escort bookings.",
+      "Yes — these are our Signature Experiences. Consent-led, professional bodywork with clear boundaries set before touch begins. They are not escort bookings.",
   },
   {
     question: "What about privacy and discretion?",
@@ -57,26 +57,26 @@ export const faqItems = [
 
 export const aboutContent = {
   eyebrow: "About RoomSpa",
-  title: "Spa care that travels to your room",
+  title: "Private Signature massage, to your door",
   lead:
-    "RoomSpa brings professional massage to hotels, condos, and homes — for travelers who just landed, expats who want a reset, and anyone who prefers privacy over a crowded spa lobby.",
+    "RoomSpa brings consent-led Signature Experiences — and classic wellness massage when you want it — to hotels, condos, and homes. Built for privacy, not spa lobbies.",
   story: [
-    "We started with a simple idea: the best massage is the one you do not have to commute for. No traffic, no waiting room, no finding your way back afterward.",
-    "Our menu covers relaxation, therapeutic work, couples sessions, and private consent-led bodywork — all delivered where you already are.",
-    "Chiang Mai is our home. The same calm, private experience is how we show up for every booking.",
+    "We started with a simple idea: the best session is the one you do not have to commute for. No traffic, no waiting room, no finding your way back afterward.",
+    "What guests ask for most is Signature — Tantric, Nuru, body-to-body, and intimate couples work. Wellness massage remains available; it just isn’t the center of the brand.",
+    "We operate across Thailand with live booking where therapists are ready, and open enquiries as we expand. Other countries follow the same model once local therapists are onboard.",
   ],
   values: [
+    {
+      title: "Signature first",
+      body: "Private, sensual, consent-led experiences are what we’re building the brand around.",
+    },
     {
       title: "Private by default",
       body: "We come to you. Discreet arrival, calm setup, and no shared waiting areas.",
     },
     {
-      title: "Clear consent",
-      body: "Boundaries first — especially for intimate sessions — then touch.",
-    },
-    {
-      title: "Straightforward booking",
-      body: "Pick a service, time, and place. Pay by card, pay later, or cash on arrival.",
+      title: "Real cities, real supply",
+      body: "Book where therapists are live. Enquire elsewhere — we don’t fake availability.",
     },
   ],
 } as const;

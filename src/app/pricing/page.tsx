@@ -5,7 +5,7 @@ import { SignatureIntro } from "@/components/signature/signature-intro";
 import { SensualZone } from "@/components/sensual/sensual-zone";
 import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import { serviceCategories, type CatalogService } from "@/content/services";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { experienceTierLabels } from "@/lib/catalog/experience-tier";
 import { getPublicCatalog } from "@/lib/catalog/public";
 import { filterSignatureCatalog } from "@/lib/catalog/signature";
@@ -19,9 +19,9 @@ export const dynamic = "force-dynamic";
 const WELLNESS_HERO = "/media/services/stills/v-hands.jpg";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Pricing | RoomSpa Chiang Mai",
+  title: "Pricing | Signature & wellness Thailand",
   description:
-    "Wellness massage and Signature Experiences pricing — 60, 90, and 120 minute in-room sessions delivered to your hotel, condo, or home in Chiang Mai.",
+    "Signature Experiences and wellness massage pricing — 60, 90, and 120 minute private in-room sessions across Thailand.",
   path: "/pricing",
 });
 
@@ -140,14 +140,12 @@ export default async function PricingPage() {
             >
               Book a massage
             </Link>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noreferrer"
+            <WhatsAppLink
+              cta="pricing"
               className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
             >
               WhatsApp us
-            </a>
+            </WhatsAppLink>
           </div>
         </div>
       </section>

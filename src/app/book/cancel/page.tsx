@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 export const metadata: Metadata = {
   title: "Payment cancelled",
@@ -25,14 +25,12 @@ export default function BookingCancelPage() {
         >
           Manage booking
         </Link>
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noreferrer"
+        <WhatsAppLink
+          cta="book-cancel"
           className="inline-flex items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
         >
           Ask on WhatsApp
-        </a>
+        </WhatsAppLink>
       </div>
     </section>
   );

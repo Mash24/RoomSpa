@@ -6,14 +6,14 @@ import { TherapistsDirectory } from "@/components/therapists/therapists-director
 import { getPublicCatalog } from "@/lib/catalog/public";
 import { getPublicTherapists } from "@/lib/therapists/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Our therapists | In-room massage Chiang Mai",
+  title: "Our therapists | Signature massage Thailand",
   description:
-    "Meet RoomSpa therapists — view services, locations, and book the therapist nearest you in Chiang Mai.",
+    "Meet RoomSpa therapists — view Signature and wellness services, locations, and book where therapists are live across Thailand.",
   path: "/therapists",
 });
 
@@ -46,9 +46,9 @@ export default async function TherapistsPage() {
           Ready to book? Choose service & therapist →
         </Link>
         <span className="mx-2 text-muted">·</span>
-        <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-sm text-muted hover:text-accent">
+        <WhatsAppLink cta="therapists" className="text-sm text-muted hover:text-accent">
           WhatsApp
-        </a>
+        </WhatsAppLink>
       </div>
     </section>
   );

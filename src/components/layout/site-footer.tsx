@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { FooterMenus } from "@/components/layout/footer-menus";
-import { site, whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
+import { site } from "@/content/site";
 
 const legalLinks = [
   { label: "Privacy", href: "/privacy" },
@@ -42,14 +43,12 @@ export function SiteFooter() {
             >
               Book now
             </Link>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noreferrer"
+            <WhatsAppLink
+              cta="footer-cta"
               className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm border border-white/30 px-5 py-3 text-sm font-medium text-white transition hover:border-white hover:bg-white/10 sm:flex-none sm:min-w-[9rem]"
             >
               WhatsApp
-            </a>
+            </WhatsAppLink>
           </div>
         </div>
 

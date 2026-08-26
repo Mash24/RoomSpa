@@ -8,7 +8,8 @@ import { BreadcrumbJsonLd, FaqJsonLd, ServiceJsonLd } from "@/components/seo/jso
 import { getServiceFaqs } from "@/content/service-faqs";
 import { ServiceImage } from "@/components/media/service-image";
 import { getCatalogProduct, productPriceLabel } from "@/content/services";
-import { site, whatsappHref } from "@/content/site";
+import { site } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { getRelatedServicesInTier } from "@/lib/catalog/related";
 import { getPublicCatalog, getPublicCatalogProduct } from "@/lib/catalog/public";
 import { resolveServiceMedia } from "@/lib/media/resolve-service-media";
@@ -137,14 +138,14 @@ export async function ServiceLocationContent({ slug, locationSlug, expectedTier 
             {bookLabel}
           </Link>
         ) : (
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
+          <WhatsAppLink
+            cta="service-location"
+            cityHint={`${location.name}, ${location.cityName}`}
+            serviceSlug={service.slug}
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
           >
             WhatsApp us
-          </a>
+          </WhatsAppLink>
         )}
         <Link
           href={servicePath}

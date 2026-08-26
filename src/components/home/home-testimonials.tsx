@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 
 export type HomeTestimonialItem = {
+  id?: string;
   quote: string;
   name: string;
   detail: string;
@@ -73,9 +74,9 @@ export function HomeTestimonials({ items, fromGuests = false }: Props) {
         ref={scrollerRef}
         className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 scrollbar-hide xs:px-5 md:px-8"
       >
-        {shown.map((item) => (
+        {shown.map((item, index) => (
           <blockquote
-            key={`${item.name}-${item.quote.slice(0, 24)}`}
+            key={item.id ?? `${item.name}-${index}`}
             className="w-[78vw] shrink-0 snap-start border-t border-border bg-surface-elevated p-5 sm:w-[300px] md:w-[320px]"
           >
             <p className="font-display text-xl leading-snug tracking-tight text-foreground md:text-2xl">

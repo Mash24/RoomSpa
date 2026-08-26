@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { AdminAlert, AdminPageHeader } from "@/components/admin/admin-ui";
 import { categoryToTier, experienceTierLabels } from "@/lib/catalog/experience-tier";
 import { DURATION_TIER_LABELS } from "@/lib/catalog/prices";
 import type { AdminServiceRow } from "@/lib/admin/cms-types";
@@ -71,29 +72,22 @@ export function AdminServicesPanel() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-3xl md:text-4xl">
-            Services
-          </h1>
-          <p className="mt-2 text-sm text-muted">
-            Manage treatments and 60 / 90 / 2-hour pricing. Edits update the public site and booking.
-          </p>
-        </div>
-        <Link
-          href="/admin/services/new"
-          className="inline-flex min-h-11 w-full items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground sm:w-auto"
-        >
-          + Add service
-        </Link>
-      </div>
+    <div className="space-y-6 md:space-y-8">
+      <AdminPageHeader
+        eyebrow="Catalog"
+        title="Services"
+        description="Manage treatments and 60 / 90 / 2-hour pricing. Edits update the public site and booking."
+        actions={
+          <Link
+            href="/admin/services/new"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-[#1a221c] transition hover:bg-white/90 sm:w-auto"
+          >
+            + Add service
+          </Link>
+        }
+      />
 
-      {error ? (
-        <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
+      {error ? <AdminAlert tone="error">{error}</AdminAlert> : null}
 
       {loading ? (
         <p className="text-sm text-muted">Loading services…</p>
@@ -101,7 +95,7 @@ export function AdminServicesPanel() {
         <>
           <ul className="admin-card-list">
             {services.map((service) => (
-              <li key={service.id} className="border border-border bg-surface-elevated p-4">
+              <li key={service.id} className="admin-card p-4">
                 <div className="flex gap-3">
                   {service.imageUrl ? (
                     <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-sm border border-border bg-[#0c0a09]">
@@ -150,7 +144,7 @@ export function AdminServicesPanel() {
             ))}
           </ul>
 
-          <div className="admin-table-wrap overflow-x-auto border border-border bg-surface-elevated">
+          <div className="admin-table-wrap admin-table-panel overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-border bg-surface text-xs uppercase tracking-[0.12em] text-muted">
               <tr>

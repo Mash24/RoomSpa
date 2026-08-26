@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AdminAlert, AdminPageHeader } from "@/components/admin/admin-ui";
 import { readApiJson } from "@/lib/admin/api";
 import { categoryToTier, experienceTierLabels } from "@/lib/catalog/experience-tier";
 import type { AdminMediaRow } from "@/lib/admin/cms-types";
@@ -205,24 +206,16 @@ export function AdminMediaPanel() {
   }
 
   return (
-    <div className="space-y-10">
-      <div>
-        <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-3xl md:text-4xl">
-          Media library
-        </h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
-          Upload files directly to Storage, or paste a public link (MP4, YouTube, Vimeo, or X). Attach
-          only the services this clip belongs to — labels show on Gallery and service pages.
-        </p>
-      </div>
+    <div className="space-y-6 md:space-y-10">
+      <AdminPageHeader
+        eyebrow="Library"
+        title="Media"
+        description="Upload files to Storage, or paste a public link. Attach only the services each clip belongs to."
+      />
 
-      {error ? (
-        <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
+      {error ? <AdminAlert tone="error">{error}</AdminAlert> : null}
 
-      <form onSubmit={onCreate} className="space-y-4 border border-border bg-surface-elevated p-4 pb-4 md:p-6 md:pb-6">
+      <form onSubmit={onCreate} className="admin-card space-y-4 p-4 pb-4 md:p-6 md:pb-6">
         <h2 className="font-display text-xl text-foreground xs:text-2xl">Add media</h2>
         <div className="grid gap-4 md:grid-cols-2">
           <label className="block text-sm md:col-span-2">
@@ -414,7 +407,7 @@ export function AdminMediaPanel() {
           <>
             <ul className="admin-card-list mt-4">
               {media.map((item) => (
-                <li key={item.id} className="border border-border bg-surface-elevated p-4">
+                <li key={item.id} className="admin-card p-4">
                   <p className="font-medium text-foreground">{item.title}</p>
                   <p className="mt-1 text-xs uppercase tracking-wide text-muted">
                     {item.kind} · {item.status}
@@ -434,13 +427,13 @@ export function AdminMediaPanel() {
                 </li>
               ))}
               {media.length === 0 ? (
-                <li className="border border-border bg-surface-elevated px-4 py-8 text-sm text-muted">
+                <li className="admin-card px-4 py-8 text-sm text-muted">
                   No media yet. Add your first video above.
                 </li>
               ) : null}
             </ul>
 
-            <ul className="admin-table-wrap mt-4 divide-y divide-border border border-border bg-surface-elevated">
+            <ul className="admin-table-wrap admin-table-panel mt-4 divide-y divide-border">
             {media.map((item) => (
               <li
                 key={item.id}

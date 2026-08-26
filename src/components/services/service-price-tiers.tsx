@@ -29,7 +29,7 @@ export function ServicePriceTiers({
 
   return (
     <div
-      className={`grid grid-cols-1 gap-2 xs:grid-cols-3 xs:gap-1.5 sm:gap-3 ${className}`}
+      className={`grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3 ${className}`}
       role={interactive ? "radiogroup" : undefined}
       aria-label={`${service.name} duration and price`}
     >

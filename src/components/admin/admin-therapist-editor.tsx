@@ -167,11 +167,11 @@ export function AdminTherapistEditor({ therapistId }: Props) {
   if (loading) return <p className="text-sm text-muted">Loading…</p>;
 
   return (
-    <form onSubmit={onSave} className="mx-auto max-w-3xl space-y-8 pb-4 md:pb-0">
+    <form onSubmit={onSave} className="mx-auto w-full min-w-0 max-w-3xl space-y-6 pb-4 md:space-y-8 md:pb-0">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <Link href="/admin/therapists" className="text-sm text-accent">← Therapists</Link>
-          <h1 className="mt-2 font-display text-2xl tracking-tight text-foreground xs:text-3xl">
+          <h1 className="mt-2 break-words font-display text-2xl tracking-tight text-foreground xs:text-3xl">
             {isNew ? "Add therapist" : "Edit therapist"}
           </h1>
         </div>
@@ -182,7 +182,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
 
       {error ? <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800">{error}</div> : null}
 
-      <section className="space-y-4 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-4 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Profile</h2>
         <label className="block text-sm">
           <span className="text-muted">Display name</span>
@@ -229,7 +229,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
         </label>
       </section>
 
-      <section className="space-y-4 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-4 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Service area</h2>
         <p className="text-xs text-muted">
           Country, province, city, and neighbourhood are shown on the public profile. Coordinates stay admin-only
@@ -267,7 +267,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
         </div>
       </section>
 
-      <section className="space-y-4 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-4 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Photos</h2>
         <div className="flex flex-wrap gap-3">
           {photoUrls.map((url, i) => (
@@ -283,7 +283,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
         </button>
       </section>
 
-      <section className="space-y-3 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-3 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Services offered</h2>
         <div className="grid gap-2 sm:grid-cols-2">
           {services.map((s) => (
@@ -295,7 +295,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
         </div>
       </section>
 
-      <section className="space-y-3 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-3 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Service areas</h2>
         <div className="grid gap-2 sm:grid-cols-2">
           {coverageAreas.map((c) => (
@@ -307,7 +307,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
         </div>
       </section>
 
-      <section className="space-y-3 border border-border bg-surface-elevated p-5">
+      <section className="admin-card space-y-3 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Visibility</h2>
         <label className="block text-sm">
           <span className="text-muted">Status</span>

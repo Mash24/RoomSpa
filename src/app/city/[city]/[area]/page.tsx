@@ -3,8 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { BreadcrumbJsonLd, JsonLd } from "@/components/seo/json-ld";
-import { cities, coverageForNeighborhood, getNeighborhood } from "@/content/cities";
-import { site, whatsappHref } from "@/content/site";
+import { cities, cityStatusLabel, coverageForNeighborhood, getNeighborhood } from "@/content/cities";
+import { site } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import {
   getPublicSignatureServices,
   getPublicWellnessServices,
@@ -30,8 +31,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!match) return {};
   const { city, area } = match;
   return buildPageMetadata({
-    title: `${area.name} massage | In-room ${city.name}`,
-    description: `${area.summary} Book RoomSpa mobile massage in ${area.name}, ${city.name}.`,
+    title: `${area.name} Signature massage | ${city.name}`,
+    description: `${area.summary} Book RoomSpa private Signature massage near ${area.name}, ${city.name}.`,
     path: `/city/${city.slug}/${area.slug}`,
   });
 }
@@ -63,7 +64,7 @@ export default async function NeighborhoodPage({ params }: PageProps) {
         data={{
           "@context": "https://schema.org",
           "@type": "Service",
-          name: `In-room massage near ${area.name}`,
+          name: `Signature in-room massage near ${area.name}`,
           description: area.summary,
           provider: { "@type": "Organization", name: site.name },
           areaServed: `${area.name}, ${city.name}`,
@@ -81,10 +82,10 @@ export default async function NeighborhoodPage({ params }: PageProps) {
       />
 
       <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">
-        {city.name} · {live ? "Available" : "Soon"}
+        {city.name} · {cityStatusLabel(city.status)}
       </p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-        Massage near {area.name}
+        Signature massage near {area.name}
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">{area.summary}</p>
 
@@ -104,14 +105,13 @@ export default async function NeighborhoodPage({ params }: PageProps) {
             Book for {area.name}
           </Link>
         ) : (
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
+          <WhatsAppLink
+            cta={`area-${city.slug}-${area.slug}`}
+            cityHint={`${area.name}, ${city.name}`}
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground"
           >
-            WhatsApp us
-          </a>
+            {city.status === "enquiries" ? `Enquire for ${area.name}` : "WhatsApp us"}
+          </WhatsAppLink>
         )}
         <Link
           href={`/city/${city.slug}`}
@@ -123,11 +123,11 @@ export default async function NeighborhoodPage({ params }: PageProps) {
 
       {live ? (
         <section className="mt-12 space-y-8">
-          {wellnessPicks.length > 0 ? (
+          {signaturePicks.length > 0 ? (
             <div>
-              <h2 className="font-display text-2xl text-foreground">Wellness Massage</h2>
+              <h2 className="font-display text-2xl text-foreground">Signature Experiences</h2>
               <ul className="mt-4 divide-y divide-border border-y border-border">
-                {wellnessPicks.map((service) => (
+                {signaturePicks.map((service) => (
                   <li key={service.slug}>
                     <Link
                       href={getServicePath(service)}
@@ -140,11 +140,11 @@ export default async function NeighborhoodPage({ params }: PageProps) {
               </ul>
             </div>
           ) : null}
-          {signaturePicks.length > 0 ? (
+          {wellnessPicks.length > 0 ? (
             <div>
-              <h2 className="font-display text-2xl text-foreground">Signature Experiences</h2>
+              <h2 className="font-display text-2xl text-foreground">Wellness Massage</h2>
               <ul className="mt-4 divide-y divide-border border-y border-border">
-                {signaturePicks.map((service) => (
+                {wellnessPicks.map((service) => (
                   <li key={service.slug}>
                     <Link
                       href={getServicePath(service)}

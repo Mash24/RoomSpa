@@ -65,13 +65,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${base}/city/${city.slug}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
-      priority: city.status === "active" ? 0.85 : 0.5,
+      priority: city.status === "active" ? 0.85 : city.status === "enquiries" ? 0.65 : 0.5,
     },
     ...city.neighborhoods.map((area) => ({
       url: `${base}/city/${city.slug}/${area.slug}`,
       lastModified: now,
       changeFrequency: "weekly" as const,
-      priority: city.status === "active" ? 0.8 : 0.4,
+      priority: city.status === "active" ? 0.8 : city.status === "enquiries" ? 0.55 : 0.4,
     })),
   ]);
 

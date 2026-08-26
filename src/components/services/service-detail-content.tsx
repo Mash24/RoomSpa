@@ -19,7 +19,7 @@ import {
   productPriceLabel,
   serviceCategories,
 } from "@/content/services";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { TherapistStrip } from "@/components/therapists/therapist-strip";
 import { getTherapistsForService } from "@/lib/therapists/public";
 import {
@@ -191,14 +191,13 @@ export async function ServiceDetailContent({ slug, expectedTier }: Props) {
         >
           {bookLabel}
         </Link>
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noreferrer"
+        <WhatsAppLink
+          cta="service-detail"
+          serviceSlug={service.slug}
           className="inline-flex min-h-12 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
         >
           WhatsApp
-        </a>
+        </WhatsAppLink>
       </div>
       <p className="mt-2 text-xs text-muted">Same-day availability · Instant confirmation</p>
 

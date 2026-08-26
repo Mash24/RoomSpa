@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { FaqAccordion } from "@/components/faq/faq-accordion";
 import { faqItems } from "@/content/pages";
-import { whatsappHref } from "@/content/site";
 import { FaqJsonLd } from "@/components/seo/json-ld";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
@@ -34,14 +34,12 @@ export default function FaqPage() {
         >
           Book now
         </Link>
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noreferrer"
+        <WhatsAppLink
+          cta="faq"
           className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
         >
           WhatsApp us
-        </a>
+        </WhatsAppLink>
       </div>
     </section>
   );

@@ -39,17 +39,17 @@ export function HomeBookStrip({ treatments }: Props) {
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
-              Book in Chiang Mai
+              Book Signature
             </p>
             <p className="mt-2 font-display text-2xl tracking-tight text-foreground md:text-3xl">
-              Signature or wellness — we come to you
+              Private experiences — we come to you
             </p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
               <label className="block text-sm">
-                <span className="text-xs uppercase tracking-[0.14em] text-muted">City</span>
+                <span className="text-xs uppercase tracking-[0.14em] text-muted">Coverage</span>
                 <span className="mt-1.5 flex min-h-11 items-center border border-border bg-background px-3 text-sm font-medium text-foreground">
-                  Chiang Mai
+                  Thailand · live cities
                 </span>
               </label>
 

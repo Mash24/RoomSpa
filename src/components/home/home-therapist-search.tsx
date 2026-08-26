@@ -112,10 +112,11 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
       <div className="mx-auto max-w-6xl px-4 py-14 xs:px-5 md:px-8 md:py-20">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Find your therapist</p>
         <h2 className="mt-3 font-display text-3xl tracking-tight text-foreground md:text-4xl">
-          Massage & therapists near you
+          Therapists for Signature & beyond
         </h2>
         <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
-          Filter by service and area, or share your location to see every therapist based in that city.
+          Filter by service and area, or share your location to see therapists based in that city —
+          nearest first.
         </p>
 
         <div className="mt-8">

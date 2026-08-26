@@ -7,7 +7,7 @@ import {
   productPriceLabel,
   serviceCategories,
 } from "@/content/services";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { getPublicCatalog } from "@/lib/catalog/public";
 import { getServicePath } from "@/lib/catalog/service-paths";
 import { filterWellnessCatalog } from "@/lib/catalog/wellness";
@@ -168,14 +168,12 @@ export default async function WellnessServicesPage() {
               Explore Signature →
             </Link>
           </p>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
+          <WhatsAppLink
+            cta="wellness"
             className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium transition hover:border-accent hover:text-accent"
           >
             WhatsApp us
-          </a>
+          </WhatsAppLink>
         </div>
       </div>
     </div>

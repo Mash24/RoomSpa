@@ -1,6 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  AdminAlert,
+  AdminEmpty,
+  AdminFilterPills,
+  AdminPageHeader,
+  AdminPrimaryButton,
+  AdminSecondaryButton,
+} from "@/components/admin/admin-ui";
 import { formatReviewDate, starsLabel } from "@/lib/reviews/map";
 import type { AdminReview, ReviewStatus } from "@/lib/reviews/types";
 
@@ -78,50 +86,28 @@ export function AdminReviewsPanel() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-4xl tracking-tight text-foreground">Reviews</h1>
-        <p className="mt-2 text-sm text-muted">
-          Approve or reject guest submissions. Only approved reviews appear on the public site.
-        </p>
-      </div>
+    <div className="space-y-6 md:space-y-8">
+      <AdminPageHeader
+        eyebrow="Reputation"
+        title="Reviews"
+        description="Approve or reject guest submissions. Only approved reviews appear on the public site."
+      />
 
-      <div className="flex flex-wrap gap-2">
-        {FILTERS.map((item) => (
-          <button
-            key={item.value}
-            type="button"
-            onClick={() => onFilterChange(item.value)}
-            className={
-              filter === item.value
-                ? "rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-foreground"
-                : "rounded-sm border border-border px-4 py-2 text-sm text-foreground transition hover:border-accent hover:text-accent"
-            }
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      <AdminFilterPills options={FILTERS} value={filter} onChange={onFilterChange} columns={2} />
 
-      {error ? (
-        <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
+      {error ? <AdminAlert tone="error">{error}</AdminAlert> : null}
 
       {loading ? (
-        <p className="text-sm text-muted">Loading reviews...</p>
+        <p className="text-sm text-muted">Loading reviews…</p>
       ) : reviews.length === 0 ? (
-        <div className="border border-border bg-surface-elevated p-6 text-sm text-muted">
-          No reviews in this view.
-        </div>
+        <AdminEmpty title="No reviews in this view" description="New guest submissions will show up here for moderation." />
       ) : (
         <ul className="space-y-4">
           {reviews.map((review) => (
-            <li key={review.id} className="border border-border bg-surface-elevated p-5">
+            <li key={review.id} className="admin-card p-5">
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <span className="text-accent">{starsLabel(review.rating)}</span>
-                <span className="rounded-sm border border-border px-2 py-0.5 text-xs uppercase tracking-wide text-muted">
+                <span className="rounded-full border border-border px-2.5 py-0.5 text-xs uppercase tracking-wide text-muted">
                   {review.status}
                 </span>
                 <span className="text-xs text-muted">{formatReviewDate(review.createdAt)}</span>
@@ -130,7 +116,7 @@ export function AdminReviewsPanel() {
                 <p className="mt-3 font-medium text-foreground">{review.title}</p>
               ) : null}
               <p className="mt-2 text-sm leading-relaxed text-foreground/90">{review.body}</p>
-              <div className="mt-3 grid gap-1 text-sm text-muted sm:grid-cols-2">
+              <div className="mt-3 grid gap-1 rounded-xl bg-surface/80 p-3 text-sm text-muted sm:grid-cols-2">
                 <p>Guest: {review.authorName}</p>
                 <p>Email: {review.authorEmail || "—"}</p>
                 <p>Service: {review.serviceName || review.serviceSlug || "—"}</p>
@@ -138,22 +124,18 @@ export function AdminReviewsPanel() {
               </div>
               {review.status === "pending" ? (
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button
-                    type="button"
+                  <AdminPrimaryButton
                     disabled={updatingId === review.id}
                     onClick={() => moderate(review.id, "approved")}
-                    className="rounded-sm bg-accent px-4 py-2 text-sm font-medium text-accent-foreground disabled:opacity-60"
                   >
                     Approve
-                  </button>
-                  <button
-                    type="button"
+                  </AdminPrimaryButton>
+                  <AdminSecondaryButton
                     disabled={updatingId === review.id}
                     onClick={() => moderate(review.id, "rejected", "Does not meet guidelines")}
-                    className="rounded-sm border border-border px-4 py-2 text-sm disabled:opacity-60"
                   >
                     Reject
-                  </button>
+                  </AdminSecondaryButton>
                 </div>
               ) : null}
             </li>

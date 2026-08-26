@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { BookingForm } from "@/components/booking/booking-form";
-import { whatsappHref } from "@/content/site";
 import { getPublicCatalog } from "@/lib/catalog/public";
 
 export const dynamic = "force-dynamic";
@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Book Appointment",
   description:
-    "Book a RoomSpa massage at your hotel, condo, or home in Chiang Mai. Pay by card, pay later, or cash on arrival.",
+    "Book a RoomSpa Signature Experience at your hotel, condo, or home in Thailand. Pay by card, pay later, or cash on arrival.",
 };
 
 export default async function BookPage() {
@@ -27,9 +27,9 @@ export default async function BookPage() {
           pay later
         </a>
         , or cash on arrival. Prefer chat?{" "}
-        <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
+        <WhatsAppLink cta="book-intro" className="text-accent underline">
           WhatsApp
-        </a>
+        </WhatsAppLink>
         .
       </p>
 

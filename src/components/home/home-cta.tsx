@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 export function HomeCta() {
   return (
@@ -26,14 +26,12 @@ export function HomeCta() {
           >
             Book an appointment
           </Link>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
+          <WhatsAppLink
+            cta="home-cta"
             className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm border border-white/30 px-5 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10 sm:flex-none sm:px-6"
           >
             WhatsApp us
-          </a>
+          </WhatsAppLink>
         </div>
       </div>
     </section>

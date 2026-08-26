@@ -16,7 +16,7 @@ import { experienceTierLabels } from "@/lib/catalog/experience-tier";
 import { DURATION_TIER_LABELS } from "@/lib/catalog/prices";
 import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import { coverageAreas } from "@/content/coverage";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { PaymentBadges } from "@/components/payment/payment-badges";
 import { paymentMethodLabel } from "@/lib/booking/pin";
 import {
@@ -341,14 +341,13 @@ export function BookingForm({ products: initialProducts }: Props) {
         </div>
 
         <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <a
-            href={result.whatsappHref}
-            target="_blank"
-            rel="noreferrer"
+          <WhatsAppLink
+            cta="booking-confirm"
+            hrefOverride={result.whatsappHref}
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-[#25D366] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#20bd5b]"
           >
             Confirm on WhatsApp
-          </a>
+          </WhatsAppLink>
           <Link
             href={manageHref}
             className="inline-flex min-h-12 items-center justify-center rounded-sm bg-accent px-5 py-3 text-sm font-medium text-accent-foreground transition hover:opacity-90"
@@ -466,11 +465,11 @@ export function BookingForm({ products: initialProducts }: Props) {
           </label>
         </div>
 
-        <div className="grid gap-3 xs:grid-cols-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
           {(["hotel", "condo", "home"] as LocationType[]).map((type) => (
             <label
               key={type}
-              className={`flex min-h-12 cursor-pointer items-center justify-center border px-3 py-3.5 text-sm capitalize transition ${
+              className={`flex min-h-12 cursor-pointer items-center justify-center border px-1.5 py-3 text-center text-xs capitalize transition xs:px-3 xs:text-sm ${
                 locationType === type
                   ? "border-accent bg-accent-soft/40 text-foreground"
                   : "border-border bg-surface-elevated text-muted"
@@ -670,9 +669,9 @@ export function BookingForm({ products: initialProducts }: Props) {
           {error}
           <p className="mt-2">
             Prefer WhatsApp?{" "}
-            <a href={whatsappHref} target="_blank" rel="noreferrer" className="underline">
+            <WhatsAppLink cta="booking-error" className="underline">
               Message us directly
-            </a>
+            </WhatsAppLink>
             .
           </p>
         </div>

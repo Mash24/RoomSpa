@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { BreadcrumbJsonLd } from "@/components/seo/json-ld";
-import { cities } from "@/content/cities";
-import { whatsappHref } from "@/content/site";
+import { cities, cityStatusLabel } from "@/content/cities";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Locations | In-room massage Thailand",
+  title: "Locations | Signature massage Thailand",
   description:
-    "RoomSpa mobile massage by location — live in Chiang Mai. Bangkok and Phuket coming soon.",
+    "RoomSpa private Signature massage across Thailand — book live cities online; enquire for Bangkok, Phuket, and expanding coverage.",
   path: "/city",
 });
 
@@ -29,7 +29,9 @@ export default function CitiesIndexPage() {
         Where we come to you
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Booking now in Chiang Mai. Bangkok and Phuket coming soon.
+        RoomSpa is built for private Signature Experiences across Thailand. Book online where
+        therapists are live. For other cities, WhatsApp us — we&apos;re expanding with real supply,
+        not empty pages.
       </p>
 
       <ul className="mt-10 divide-y divide-border border-y border-border">
@@ -38,28 +40,29 @@ export default function CitiesIndexPage() {
             <div className="flex flex-wrap items-baseline gap-2">
               <h2 className="font-display text-2xl text-foreground">{city.name}</h2>
               <span className="text-xs uppercase tracking-[0.14em] text-muted">
-                {city.status === "active" ? "Available" : "Coming soon"}
+                {cityStatusLabel(city.status)}
               </span>
             </div>
+            <p className="mt-1 text-xs text-muted">{city.country}</p>
             <p className="mt-2 text-sm leading-relaxed text-muted">{city.summary}</p>
             <Link
               href={`/city/${city.slug}`}
               className="mt-3 inline-flex text-sm font-medium text-accent"
             >
-              {city.status === "active" ? `View ${city.name}` : `Learn more`} →
+              {city.status === "active"
+                ? `View ${city.name}`
+                : city.status === "enquiries"
+                  ? `Enquire for ${city.name}`
+                  : `Learn more`}{" "}
+              →
             </Link>
           </li>
         ))}
       </ul>
 
-      <a
-        href={whatsappHref}
-        target="_blank"
-        rel="noreferrer"
-        className="mt-8 inline-flex text-sm text-accent underline"
-      >
-        Ask about another city
-      </a>
+      <WhatsAppLink cta="cities-index" className="mt-8 inline-flex text-sm text-accent underline">
+        Ask about another city (including outside Thailand)
+      </WhatsAppLink>
     </section>
   );
 }

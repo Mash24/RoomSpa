@@ -67,14 +67,40 @@ body {
 }
 
 /* Prevent flex/grid children from forcing horizontal scroll */
-main {
+main,
+section,
+article,
+aside,
+header,
+footer,
+form,
+fieldset,
+ul,
+ol,
+li,
+table,
+pre {
   min-width: 0;
+}
+
+main {
   overflow-x: clip;
 }
 
 img,
-video {
+video,
+canvas,
+svg,
+iframe {
   max-width: 100%;
+  height: auto;
+}
+
+input,
+select,
+textarea {
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Comfortable tap targets on phones */
@@ -85,6 +111,16 @@ video {
   button {
     font-size: 16px; /* reduces iOS zoom-on-focus */
   }
+}
+
+/* Hide scrollbars on intentional horizontal rails */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 /* Clearance so fixed chat + WhatsApp never cover page content */
@@ -136,6 +172,32 @@ video {
   background: linear-gradient(to left, var(--surface-elevated), transparent);
 }
 
+/* Admin shell */
+.admin-shell {
+  min-height: 100vh;
+  min-width: 0;
+  overflow-x: clip;
+  background:
+    radial-gradient(ellipse at top left, color-mix(in srgb, var(--accent) 12%, transparent), transparent 42%),
+    radial-gradient(ellipse at bottom right, color-mix(in srgb, var(--accent-soft) 70%, transparent), transparent 45%),
+    var(--background);
+}
+
+.admin-card {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface-elevated);
+  box-shadow: 0 1px 0 rgba(15, 23, 20, 0.04);
+}
+
+.admin-table-panel {
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface-elevated);
+  box-shadow: 0 1px 0 rgba(15, 23, 20, 0.04);
+  overflow: hidden;
+}
+
 /* Admin: sticky mobile action bar above safe area */
 .admin-mobile-actions {
   position: sticky;
@@ -148,6 +210,15 @@ video {
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   padding: 0.75rem 1rem max(0.75rem, env(safe-area-inset-bottom));
   backdrop-filter: blur(8px);
+}
+
+@media (min-width: 24rem) {
+  .admin-mobile-actions {
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -189,6 +260,8 @@ video {
 /* Admin: hide desktop table, show cards on small screens */
 .admin-table-wrap {
   display: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
 }
 
 .admin-card-list {
@@ -200,6 +273,7 @@ video {
 @media (min-width: 768px) {
   .admin-table-wrap {
     display: block;
+    overflow-x: auto;
   }
 
   .admin-card-list {
@@ -326,13 +400,4 @@ video {
 
 .delay-4 {
   animation-delay: 0.6s;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
 }

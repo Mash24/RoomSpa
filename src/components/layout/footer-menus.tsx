@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { cities } from "@/content/cities";
-import { site, whatsappHref } from "@/content/site";
+import { cities, cityStatusLabel } from "@/content/cities";
+import { site } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 const bookLinks = [
-  { label: "Book a private massage", href: "/book" },
+  { label: "Book Signature", href: "/book" },
   { label: "My booking", href: "/my-booking" },
-  { label: "Wellness Massage", href: "/services/wellness" },
   { label: "Signature Experiences", href: "/services/signature" },
+  { label: "Wellness Massage", href: "/services/wellness" },
   { label: "Pricing", href: "/pricing" },
 ] as const;
 
@@ -60,11 +61,13 @@ function Column({
 }
 
 export function FooterMenus() {
-  const soonCities = cities.filter((city) => city.status === "coming_soon");
+  const expandingCities = cities.filter(
+    (city) => city.status === "enquiries" || city.status === "coming_soon",
+  );
   const whatsappDisplay = formatWhatsAppDisplay(site.contact.whatsapp);
 
   return (
-    <div className="grid grid-cols-1 gap-8 min-[400px]:grid-cols-3 min-[400px]:gap-4 xs:gap-5 md:gap-8">
+    <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-5 md:gap-8">
       <Column title="Book">
         <nav aria-label="Book" className="flex flex-col">
           {bookLinks.map((item) => (
@@ -95,27 +98,26 @@ export function FooterMenus() {
             <span className="sm:hidden">Email</span>
             <span className="hidden sm:inline">{site.contact.email}</span>
           </a>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
+          <WhatsAppLink
+            cta="footer-menu"
             className="block text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
           >
             <span className="sm:hidden">WhatsApp</span>
             <span className="hidden sm:inline">WhatsApp {whatsappDisplay}</span>
-          </a>
+          </WhatsAppLink>
           <p className="text-[0.65rem] leading-snug text-white/40 sm:text-xs">
-            Chiang Mai · 24/7
+            Thailand · Signature · 24/7 enquiries
           </p>
-          {soonCities.length > 0 ? (
+          {expandingCities.length > 0 ? (
             <p className="pt-1 text-[0.65rem] leading-snug text-white/40 sm:text-xs">
-              Coming soon:{" "}
-              {soonCities.map((city, index) => (
+              Expanding:{" "}
+              {expandingCities.map((city, index) => (
                 <span key={city.slug}>
                   {index > 0 ? " · " : ""}
                   <Link href={`/city/${city.slug}`} className="text-white/55 transition hover:text-white">
                     {city.name}
                   </Link>
+                  <span className="text-white/35"> ({cityStatusLabel(city.status)})</span>
                 </span>
               ))}
             </p>

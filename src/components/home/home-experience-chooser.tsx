@@ -12,26 +12,17 @@ export function HomeExperienceChooser() {
     <section className="border-b border-border bg-background px-4 py-14 xs:px-5 md:px-8 md:py-20">
       <div className="mx-auto max-w-6xl">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
-          Choose your experience
+          What we&apos;re known for
         </p>
         <h2 className="mt-3 max-w-xl font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-          Two paths. One booking.
+          Signature first. Wellness when you want it.
         </h2>
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted md:text-base">
-          Wellness massage for classic relaxation and recovery. Signature Experiences for something
-          more intimate and indulgent — both delivered privately to your room.
+          Most guests come for private Signature Experiences. Classic wellness massage is still
+          available — just not what leads RoomSpa.
         </p>
 
         <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-8">
-          <ExperienceCard
-            title={tiers.wellness.label}
-            summary={tiers.wellness.summary}
-            href={tiers.wellness.href}
-            cta="Explore Wellness"
-            image={WELLNESS_IMAGE}
-            imageAlt="Swedish and therapeutic in-room massage — calm, professional wellness"
-            variant="wellness"
-          />
           <ExperienceCard
             title={tiers.signature.label}
             summary={tiers.signature.summary}
@@ -40,6 +31,16 @@ export function HomeExperienceChooser() {
             image={SIGNATURE_IMAGE}
             imageAlt="Signature Experiences — private, intimate in-room massage"
             variant="signature"
+            featured
+          />
+          <ExperienceCard
+            title={tiers.wellness.label}
+            summary={tiers.wellness.summary}
+            href={tiers.wellness.href}
+            cta="Explore Wellness"
+            image={WELLNESS_IMAGE}
+            imageAlt="Swedish and therapeutic in-room massage — calm wellness"
+            variant="wellness"
           />
         </div>
       </div>
@@ -55,6 +56,7 @@ function ExperienceCard({
   image,
   imageAlt,
   variant,
+  featured = false,
 }: {
   title: string;
   summary: string;
@@ -63,6 +65,7 @@ function ExperienceCard({
   image: string;
   imageAlt: string;
   variant: "wellness" | "signature";
+  featured?: boolean;
 }) {
   const isSignature = variant === "signature";
 
@@ -71,9 +74,9 @@ function ExperienceCard({
       href={href}
       className={`group relative flex min-h-[22rem] flex-col justify-end overflow-hidden rounded-sm transition duration-500 md:min-h-[26rem] ${
         isSignature
-          ? "ring-1 ring-[#c9a86c]/25 hover:ring-[#c9a86c]/50"
+          ? "ring-1 ring-[#c9a86c]/35 hover:ring-[#c9a86c]/60 md:min-h-[28rem]"
           : "ring-1 ring-border hover:ring-accent/40"
-      }`}
+      } ${featured ? "md:col-span-1" : ""}`}
     >
       <Image
         src={image}
@@ -96,7 +99,7 @@ function ExperienceCard({
             isSignature ? "text-[#c9a86c]" : "text-white/70"
           }`}
         >
-          {isSignature ? "Signature" : "Wellness"}
+          {isSignature ? "Primary · Signature" : "Also available · Wellness"}
         </p>
         <h3
           className={`mt-2 font-display text-2xl tracking-tight md:text-3xl ${

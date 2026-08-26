@@ -12,7 +12,7 @@ import type { PublicTherapist } from "@/lib/therapists/types";
 import { TherapistStrip } from "@/components/therapists/therapist-strip";
 import type { CatalogService } from "@/content/services";
 import { getServicePriceTiers, productPriceLabel } from "@/content/services";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { getServicePath } from "@/lib/catalog/service-paths";
 import type { PublicMediaItem } from "@/lib/media/public";
 import type { PublicReview } from "@/lib/reviews/types";
@@ -99,14 +99,13 @@ export function SensualServiceDetail({
           >
             {bookLabel}
           </Link>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
+          <WhatsAppLink
+            cta="sensual-service"
+            serviceSlug={service.slug}
             className="sensual-btn-outline inline-flex min-h-12 items-center justify-center rounded-sm border px-5 py-3 text-sm font-medium"
           >
             WhatsApp — discreet
-          </a>
+          </WhatsAppLink>
         </div>
 
         {libraryMedia.length > 0 ? (

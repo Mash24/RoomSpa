@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { aboutContent } from "@/content/pages";
-import { whatsappHref } from "@/content/site";
 
 export const metadata: Metadata = {
   title: "About",
   description:
-    "RoomSpa brings professional mobile massage to hotels, condos, and homes in Chiang Mai — private, simple booking.",
+    "RoomSpa brings private Signature Experiences to hotels, condos, and homes across Thailand — consent-led, discreet, expanding city by city.",
 };
 
 export default function AboutPage() {
@@ -44,14 +44,12 @@ export default function AboutPage() {
         >
           Browse services
         </Link>
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noreferrer"
+        <WhatsAppLink
+          cta="about"
           className="inline-flex rounded-sm border border-border px-5 py-3 text-sm font-medium transition hover:border-accent hover:text-accent"
         >
           WhatsApp us
-        </a>
+        </WhatsAppLink>
       </div>
     </section>
   );

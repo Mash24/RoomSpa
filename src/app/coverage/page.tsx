@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { coverageAreas } from "@/content/coverage";
 import { formatThb } from "@/lib/currency";
-import { whatsappHref } from "@/content/site";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Coverage | Chiang Mai hotel & condo massage zones",
+  title: "Coverage zones | Live booking areas",
   description:
-    "RoomSpa mobile massage coverage in Chiang Mai — Old City, Nimman, and Airport / Hang Dong. Travel fees and booking.",
+    "Live RoomSpa booking zones today — hotels, condos, and homes. For Bangkok, Phuket, and other cities, see Locations or WhatsApp us.",
   path: "/coverage",
 });
 
@@ -17,12 +17,13 @@ export default function CoveragePage() {
     <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-28">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Coverage</p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-        Where we come to you
+        Live zones we book today
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        Hotels, condos, and homes across these Chiang Mai areas. See also{" "}
-        <Link href="/city/chiang-mai" className="text-accent underline">
-          Chiang Mai
+        These are current online-booking areas. For other cities across Thailand — including Bangkok
+        and Phuket enquiries — see{" "}
+        <Link href="/city" className="text-accent underline">
+          Locations
         </Link>
         .
       </p>
@@ -45,9 +46,9 @@ export default function CoveragePage() {
 
       <p className="mt-8 text-sm leading-relaxed text-muted">
         Outside these areas?{" "}
-        <a href={whatsappHref} target="_blank" rel="noreferrer" className="text-accent underline">
+        <WhatsAppLink cta="coverage" className="text-accent underline">
           WhatsApp us
-        </a>{" "}
+        </WhatsAppLink>{" "}
         with your hotel or neighborhood.
       </p>
 

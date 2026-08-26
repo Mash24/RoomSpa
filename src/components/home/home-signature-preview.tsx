@@ -47,11 +47,11 @@ export function HomeSignaturePreview({ services }: Props) {
             Signature Experiences
           </p>
           <h2 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-[#f5f0e8] drop-shadow-[0_2px_16px_rgba(0,0,0,0.6)] xs:text-4xl md:text-5xl">
-            A more intimate side of RoomSpa
+            What guests ask for most
           </h2>
           <p className="mt-3 max-w-md text-[0.95rem] leading-relaxed text-[#f5f0e8]/88 drop-shadow-[0_1px_10px_rgba(0,0,0,0.55)] xs:text-base">
-            Tantric, Nuru, body-to-body, and couples sessions — consent-led, discreet, and unhurried
-            in your room.
+            Tantric, Nuru, body-to-body, Yoni, Lingam, and couples — consent-led, discreet, and
+            unhurried in your room across Thailand.
           </p>
         </div>
 

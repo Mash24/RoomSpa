@@ -7,7 +7,7 @@ import { getApprovedReviews } from "@/lib/reviews/fetch";
 
 export const metadata: Metadata = {
   title: "Reviews",
-  description: "Guest reviews of RoomSpa in-room massage in Chiang Mai.",
+  description: "Guest reviews of RoomSpa private Signature and in-room massage across Thailand.",
 };
 
 export const dynamic = "force-dynamic";

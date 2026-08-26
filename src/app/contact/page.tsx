@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { site, whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
+import { site } from "@/content/site";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -21,14 +22,9 @@ export default function ContactPage() {
       <ul className="mt-12 space-y-6">
         <li className="border border-border bg-surface-elevated p-6">
           <p className="text-xs uppercase tracking-[0.14em] text-muted">WhatsApp</p>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-2 inline-block font-display text-2xl text-accent"
-          >
+          <WhatsAppLink cta="contact" className="mt-2 inline-block font-display text-2xl text-accent">
             {site.contact.whatsapp}
-          </a>
+          </WhatsAppLink>
           <p className="mt-2 text-sm text-muted">Bookings and same-day requests.</p>
         </li>
         <li className="border border-border bg-surface-elevated p-6">

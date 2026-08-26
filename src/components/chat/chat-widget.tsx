@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 type ChatLink = { label: string; href: string };
@@ -333,7 +333,7 @@ export function ChatWidget() {
       {open ? (
         <div
           id="roomspa-chat-panel"
-          className="fixed inset-x-3 bottom-[max(8.75rem,calc(env(safe-area-inset-bottom)+8rem))] z-50 flex h-[min(34rem,calc(100svh-10rem))] max-h-[calc(100dvh-10rem)] flex-col overflow-hidden rounded-sm border border-border bg-background shadow-2xl shadow-black/25 sm:inset-x-auto sm:bottom-[max(9.25rem,calc(env(safe-area-inset-bottom)+8.5rem))] sm:right-[max(1.25rem,env(safe-area-inset-right))] sm:h-[min(34rem,72svh)] sm:w-[min(24rem,calc(100vw-1.5rem))] sm:max-h-none"
+          className="fixed inset-x-2 bottom-[max(8.75rem,calc(env(safe-area-inset-bottom)+8rem))] z-50 flex h-[min(34rem,calc(100svh-10rem))] max-h-[calc(100dvh-10rem)] flex-col overflow-hidden rounded-sm border border-border bg-background shadow-2xl shadow-black/25 xs:inset-x-3 sm:inset-x-auto sm:bottom-[max(9.25rem,calc(env(safe-area-inset-bottom)+8.5rem))] sm:right-[max(1.25rem,env(safe-area-inset-right))] sm:h-[min(34rem,72svh)] sm:w-[min(24rem,calc(100vw-1.5rem))] sm:max-h-none"
         >
           <div className="border-b border-border bg-surface px-4 py-3">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">
@@ -465,14 +465,9 @@ export function ChatWidget() {
                   <span className="text-border" aria-hidden>
                     ·
                   </span>
-                  <a
-                    href={whatsappHref}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-muted transition hover:text-accent"
-                  >
+                  <WhatsAppLink cta="chat-widget" className="text-muted transition hover:text-accent">
                     WhatsApp
-                  </a>
+                  </WhatsAppLink>
                 </div>
               </form>
             </>

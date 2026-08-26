@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { featuredServices, productPriceLabel } from "@/content/services";
-import { whatsappHref } from "@/content/site";
 
 export function HomePricing() {
   return (
@@ -41,14 +41,13 @@ export function HomePricing() {
                 >
                   Book this
                 </Link>
-                <a
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noreferrer"
+                <WhatsAppLink
+                  cta="home-pricing"
+                  serviceSlug={product.slug}
                   className="inline-flex min-h-11 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm font-medium text-foreground transition hover:border-accent hover:text-accent"
                 >
                   WhatsApp
-                </a>
+                </WhatsAppLink>
               </div>
             </li>
           ))}

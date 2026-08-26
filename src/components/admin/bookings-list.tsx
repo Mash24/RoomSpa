@@ -5,6 +5,14 @@ import { formatBookingAmount } from "@/components/payment/payment-badges";
 import { formatBookingDateTime } from "@/lib/admin/dates";
 import type { AdminBooking, AdminDashboardStats, BookingFilter, BookingStatus } from "@/lib/admin/types";
 import { DashboardStats } from "@/components/admin/dashboard-stats";
+import {
+  AdminAlert,
+  AdminEmpty,
+  AdminFilterPills,
+  AdminPageHeader,
+  AdminPrimaryButton,
+  AdminSecondaryButton,
+} from "@/components/admin/admin-ui";
 
 const FILTERS: { value: BookingFilter; label: string }[] = [
   { value: "today", label: "Today" },
@@ -25,7 +33,7 @@ function statusClass(status: BookingStatus) {
     case "confirmed":
       return "bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200";
     case "completed":
-      return "bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-200";
+      return "bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200";
     case "cancelled":
     case "no_show":
       return "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-200";
@@ -49,21 +57,22 @@ type BookingsListProps = {
 export function BookingsList({ bookings, onStatusChange, updatingId }: BookingsListProps) {
   if (bookings.length === 0) {
     return (
-      <div className="border border-border bg-surface-elevated p-8 text-center text-sm text-muted">
-        No bookings in this view.
-      </div>
+      <AdminEmpty
+        title="No bookings here"
+        description="Nothing matches this filter right now. Try another window or wait for the next request."
+      />
     );
   }
 
   return (
     <ul className="space-y-4">
       {bookings.map((booking) => (
-        <li key={booking.id} className="border border-border bg-surface-elevated p-5">
+        <li key={booking.id} className="admin-card p-5">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div className="min-w-0 flex-1 space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-medium text-foreground">{booking.referenceCode}</span>
-                <span className={`rounded-sm px-2 py-0.5 text-xs font-medium ${statusClass(booking.status)}`}>
+                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusClass(booking.status)}`}>
                   {STATUS_LABELS[booking.status]}
                 </span>
                 <span className={`text-xs font-medium ${paymentClass(booking.paymentStatus)}`}>
@@ -72,7 +81,7 @@ export function BookingsList({ bookings, onStatusChange, updatingId }: BookingsL
               </div>
 
               <div>
-                <p className="font-display text-xl text-foreground">{booking.serviceName}</p>
+                <p className="font-display text-xl text-foreground md:text-2xl">{booking.serviceName}</p>
                 <p className="mt-1 text-sm text-muted">
                   {formatBookingDateTime(booking.scheduledDate, booking.scheduledTime)}
                 </p>
@@ -81,7 +90,7 @@ export function BookingsList({ bookings, onStatusChange, updatingId }: BookingsL
                 </p>
               </div>
 
-              <div className="grid gap-2 text-sm sm:grid-cols-2">
+              <div className="grid gap-2 rounded-xl bg-surface/80 p-3 text-sm sm:grid-cols-2">
                 <p>
                   <span className="text-muted">Guest: </span>
                   <span className="text-foreground">{booking.customerName}</span>
@@ -175,15 +184,17 @@ function StatusButton({
   disabled?: boolean;
   variant?: "primary" | "muted";
 }) {
-  const className =
-    variant === "primary"
-      ? "min-h-11 w-full rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:opacity-60 sm:w-auto sm:py-2"
-      : "min-h-11 w-full rounded-sm border border-border px-4 py-2.5 text-sm text-foreground transition hover:border-accent hover:text-accent disabled:opacity-60 sm:w-auto sm:py-2";
-
+  if (variant === "primary") {
+    return (
+      <AdminPrimaryButton onClick={onClick} disabled={disabled} className="w-full sm:w-auto">
+        {label}
+      </AdminPrimaryButton>
+    );
+  }
   return (
-    <button type="button" onClick={onClick} disabled={disabled} className={className}>
+    <AdminSecondaryButton onClick={onClick} disabled={disabled} className="w-full sm:w-auto">
       {label}
-    </button>
+    </AdminSecondaryButton>
   );
 }
 
@@ -294,51 +305,28 @@ export function AdminDashboardPanel() {
   }
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-4xl md:text-5xl">Dashboard</h1>
-        <p className="mt-2 text-sm text-muted">Manage appointments and track performance.</p>
-      </div>
+    <div className="space-y-6 md:space-y-8">
+      <AdminPageHeader
+        eyebrow="Bookings"
+        title="Dashboard"
+        description="Confirm appointments, track today’s load, and keep cash and card revenue in view."
+      />
 
       <DashboardStats stats={stats} loading={statsLoading} />
 
       {stats && stats.pendingCount > 0 ? (
-        <div className="border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-100">
+        <AdminAlert tone="warning">
           {stats.pendingCount} booking{stats.pendingCount === 1 ? "" : "s"} waiting for confirmation.
-        </div>
+        </AdminAlert>
       ) : null}
 
-      <div className="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap">
-        {FILTERS.map((item) => (
-          <button
-            key={item.value}
-            type="button"
-            onClick={() => onFilterChange(item.value)}
-            className={`min-h-11 rounded-sm px-3 py-2.5 text-sm font-medium transition sm:px-4 ${
-              filter === item.value
-                ? "bg-accent text-accent-foreground"
-                : "border border-border text-foreground hover:border-accent hover:text-accent"
-            }`}
-          >
-            {item.label}
-          </button>
-        ))}
-      </div>
+      <AdminFilterPills options={FILTERS} value={filter} onChange={onFilterChange} />
 
-      {error ? (
-        <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
-
-      {notice ? (
-        <div className="border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-100">
-          {notice}
-        </div>
-      ) : null}
+      {error ? <AdminAlert tone="error">{error}</AdminAlert> : null}
+      {notice ? <AdminAlert tone="success">{notice}</AdminAlert> : null}
 
       {loading ? (
-        <p className="text-sm text-muted">Loading bookings...</p>
+        <p className="text-sm text-muted">Loading bookings…</p>
       ) : (
         <BookingsList bookings={bookings} onStatusChange={onStatusChange} updatingId={updatingId} />
       )}

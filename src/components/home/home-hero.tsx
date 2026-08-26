@@ -1,71 +1,76 @@
 import Image from "next/image";
 import Link from "next/link";
-import { site, whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
+import { site } from "@/content/site";
 
-/** Neutral premium spa still — balanced brand, not signature-first. */
-const HERO_IMAGE = "/media/services/stills/v-spa.jpg";
+/** Signature-forward hero — intimate, private atmosphere. */
+const HERO_IMAGE = "/media/marketing/home-hero-sensual.jpg";
 
 export function HomeHero() {
   const { hero } = site;
 
   return (
-    <section className="relative min-h-[100svh] overflow-hidden bg-[#121816] text-white">
+    <section className="relative min-h-[100svh] overflow-hidden bg-[#0c0a09] text-[#f5f0e8]">
       <div className="absolute inset-0">
         <Image
           src={HERO_IMAGE}
-          alt="Private in-room massage — calm spa atmosphere, soft light, premium care"
+          alt="Private Signature massage — warm light, intimate atmosphere, delivered to your room"
           fill
           priority
           sizes="100vw"
-          className="object-cover object-center animate-slow-zoom"
+          className="object-cover object-[center_30%] animate-slow-zoom sm:object-[center_35%]"
         />
         <div
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(180deg, rgba(6,8,7,0.58) 0%, rgba(6,8,7,0.38) 42%, rgba(6,8,7,0.52) 78%, rgba(6,8,7,0.72) 100%), linear-gradient(105deg, rgba(6,8,7,0.5) 0%, rgba(6,8,7,0.15) 50%, rgba(6,8,7,0.45) 100%)",
+              "linear-gradient(180deg, rgba(12,10,9,0.62) 0%, rgba(12,10,9,0.4) 42%, rgba(12,10,9,0.55) 78%, rgba(12,10,9,0.78) 100%), linear-gradient(105deg, rgba(12,10,9,0.55) 0%, rgba(12,10,9,0.12) 50%, rgba(12,10,9,0.5) 100%)",
           }}
         />
         <div
-          className="absolute inset-0 opacity-[0.14] mix-blend-soft-light"
+          className="absolute inset-0 opacity-[0.12] mix-blend-soft-light"
           style={{ backgroundImage: "var(--grain)" }}
           aria-hidden
         />
       </div>
 
       <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] pt-[max(6.5rem,calc(env(safe-area-inset-top)+5rem))] xs:px-5 sm:pb-20 md:justify-center md:px-8 md:pb-24 md:pt-24">
-        <p className="animate-fade-up text-xs font-medium uppercase tracking-[0.22em] text-white/85 drop-shadow-[0_1px_8px_rgba(0,0,0,0.65)]">
+        <p className="animate-fade-up text-xs font-medium uppercase tracking-[0.22em] text-[#c9a86c] drop-shadow-[0_1px_8px_rgba(0,0,0,0.65)]">
           {hero.eyebrow}
         </p>
 
-        <p className="animate-fade-up delay-1 mt-3 font-display text-[2.35rem] leading-[0.95] tracking-tight text-white drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] min-[360px]:text-[2.75rem] xs:mt-4 xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
+        <p className="animate-fade-up delay-1 mt-3 font-display text-[2.35rem] leading-[0.95] tracking-tight text-[#f5f0e8] drop-shadow-[0_2px_16px_rgba(0,0,0,0.55)] min-[360px]:text-[2.75rem] xs:mt-4 xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl">
           {hero.brand}
         </p>
 
-        <h1 className="animate-fade-up delay-2 mt-3 max-w-xl font-display text-[1.35rem] font-normal leading-snug tracking-tight text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.55)] xs:mt-4 xs:text-2xl sm:text-3xl md:text-4xl">
+        <h1 className="animate-fade-up delay-2 mt-3 max-w-xl font-display text-[1.35rem] font-normal leading-snug tracking-tight text-[#f5f0e8] drop-shadow-[0_2px_14px_rgba(0,0,0,0.55)] xs:mt-4 xs:text-2xl sm:text-3xl md:text-4xl">
           {hero.headline}
         </h1>
 
-        <p className="animate-fade-up delay-3 mt-4 max-w-lg text-[0.9rem] leading-relaxed text-white/90 drop-shadow-[0_1px_10px_rgba(0,0,0,0.6)] xs:text-base">
+        <p className="animate-fade-up delay-3 mt-4 max-w-lg text-[0.9rem] leading-relaxed text-[#f5f0e8]/88 drop-shadow-[0_1px_10px_rgba(0,0,0,0.6)] xs:text-base">
           {hero.support}
         </p>
 
-        <div className="animate-fade-up delay-4 mt-6 flex w-full flex-col gap-2.5 xs:mt-7 xs:gap-3 sm:max-w-md sm:flex-row sm:items-center">
+        <div className="animate-fade-up delay-4 mt-6 flex w-full flex-col gap-2.5 xs:mt-7 xs:gap-3 sm:max-w-lg sm:flex-row sm:items-center">
           <Link
             href={hero.primaryCta.href}
-            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm bg-white px-5 py-3.5 text-sm font-medium text-[#1a221c] transition hover:bg-white/90 sm:flex-none"
+            className="sensual-btn-primary inline-flex min-h-12 flex-1 items-center justify-center rounded-sm px-5 py-3.5 text-sm font-medium sm:flex-none"
           >
             {hero.primaryCta.label}
           </Link>
-          <a
-            href={whatsappHref}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm border border-white/35 px-5 py-3.5 text-sm font-medium text-white transition hover:border-white hover:bg-white/10 sm:flex-none"
+          <Link
+            href={hero.secondaryCta.href}
+            className="sensual-btn-outline inline-flex min-h-12 flex-1 items-center justify-center rounded-sm border px-5 py-3.5 text-sm font-medium sm:flex-none"
           >
-            WhatsApp us
-          </a>
+            {hero.secondaryCta.label}
+          </Link>
         </div>
+        <WhatsAppLink
+          cta="hero"
+          className="animate-fade-up delay-4 mt-3 inline-flex text-sm text-[#c9a86c] underline decoration-[#c9a86c]/40 underline-offset-4 transition hover:decoration-[#c9a86c]"
+        >
+          Or WhatsApp us →
+        </WhatsAppLink>
       </div>
     </section>
   );

@@ -29,6 +29,7 @@ export default async function HomePage() {
   const aggregate = aggregateRating(allForRating);
 
   const guestItems = approved.map((review) => ({
+    id: review.id,
     quote: review.body,
     name: review.authorName,
     detail: review.serviceName || "Guest review",
@@ -50,9 +51,9 @@ export default async function HomePage() {
       <WebSiteJsonLd />
       <LocalBusinessJsonLd aggregate={aggregate} />
       <HomeHero />
-      <HomeExperienceChooser />
       <HomeBookStrip treatments={bookTreatments} />
       {signature.length > 0 ? <HomeSignaturePreview services={signature} /> : null}
+      <HomeExperienceChooser />
       <HomeTherapistSearch
         initialTherapists={therapists}
         serviceOptions={catalog.map((s) => ({ slug: s.slug, name: s.name }))}

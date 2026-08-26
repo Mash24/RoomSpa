@@ -173,7 +173,7 @@ export function TherapistFiltersBar({
       </div>
 
       <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-end">
-        <form onSubmit={lookupPlace} className="flex min-w-0 flex-1 flex-col gap-1 sm:flex-row sm:items-end">
+        <form onSubmit={lookupPlace} className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-end sm:gap-1">
           <label className="block min-w-0 flex-1 text-sm">
             <span className="text-muted">Where are you staying?</span>
             <input
@@ -186,7 +186,7 @@ export function TherapistFiltersBar({
           <button
             type="submit"
             disabled={placeLoading}
-            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium hover:border-accent disabled:opacity-60"
+            className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium hover:border-accent disabled:opacity-60 sm:w-auto"
           >
             {placeLoading ? "Searching…" : "Search city"}
           </button>
@@ -195,9 +195,9 @@ export function TherapistFiltersBar({
           type="button"
           onClick={requestNearMe}
           disabled={locating}
-          className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium transition hover:border-accent hover:text-accent disabled:opacity-60"
+          className="inline-flex min-h-11 w-full shrink-0 items-center justify-center rounded-sm border border-border px-4 py-2.5 text-sm font-medium transition hover:border-accent hover:text-accent disabled:opacity-60 sm:w-auto"
         >
-          {locating ? "Locating…" : nearMeActive ? "Clear GPS filter" : "📍 Use my location"}
+          {locating ? "Locating…" : nearMeActive ? "Clear GPS filter" : "Use my location"}
         </button>
       </div>
 

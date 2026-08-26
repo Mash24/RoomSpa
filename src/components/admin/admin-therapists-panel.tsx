@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
+import { AdminAlert, AdminPageHeader } from "@/components/admin/admin-ui";
 import type { AdminTherapistRow } from "@/lib/therapists/types";
 import { therapistStatusLabel } from "@/lib/therapists/status";
 
@@ -34,27 +35,22 @@ export function AdminTherapistsPanel() {
   }, [load]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-3xl md:text-4xl">Therapists</h1>
-          <p className="mt-2 text-sm text-muted">
-            Manage team profiles, photos, services, and coverage areas for booking filters.
-          </p>
-        </div>
-        <Link
-          href="/admin/therapists/new"
-          className="inline-flex min-h-11 w-full items-center justify-center rounded-sm bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground sm:w-auto"
-        >
-          + Add therapist
-        </Link>
-      </div>
+    <div className="space-y-6 md:space-y-8">
+      <AdminPageHeader
+        eyebrow="Team"
+        title="Therapists"
+        description="Manage team profiles, photos, services, and coverage areas for booking filters."
+        actions={
+          <Link
+            href="/admin/therapists/new"
+            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-[#1a221c] transition hover:bg-white/90 sm:w-auto"
+          >
+            + Add therapist
+          </Link>
+        }
+      />
 
-      {error ? (
-        <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
+      {error ? <AdminAlert tone="error">{error}</AdminAlert> : null}
 
       {loading ? (
         <p className="text-sm text-muted">Loading…</p>
@@ -62,7 +58,7 @@ export function AdminTherapistsPanel() {
         <>
           <ul className="admin-card-list">
             {therapists.map((t) => (
-              <li key={t.id} className="border border-border bg-surface-elevated p-4">
+              <li key={t.id} className="admin-card p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-medium text-foreground">{t.displayName}</p>
@@ -83,7 +79,7 @@ export function AdminTherapistsPanel() {
                 ) : null}
                 <Link
                   href={`/admin/therapists/${t.id}`}
-                  className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-sm bg-accent px-3 text-sm font-medium text-accent-foreground"
+                  className="mt-3 inline-flex min-h-11 w-full items-center justify-center rounded-full bg-accent px-3 text-sm font-medium text-accent-foreground"
                 >
                   Edit profile
                 </Link>
@@ -91,7 +87,7 @@ export function AdminTherapistsPanel() {
             ))}
           </ul>
 
-          <div className="admin-table-wrap overflow-x-auto border border-border bg-surface-elevated">
+          <div className="admin-table-wrap admin-table-panel overflow-x-auto">
           <table className="min-w-full text-left text-sm">
             <thead className="border-b border-border bg-surface text-xs uppercase tracking-[0.12em] text-muted">
               <tr>

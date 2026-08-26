@@ -8,7 +8,7 @@ import {
   getServicePriceTiers,
   productPriceLabel,
 } from "@/content/services";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { getPublicCatalog } from "@/lib/catalog/public";
 import { getServicePath } from "@/lib/catalog/service-paths";
 import { filterSignatureCatalog } from "@/lib/catalog/signature";
@@ -24,9 +24,9 @@ export const dynamic = "force-dynamic";
 const SIGNATURE_HERO = "/media/marketing/pricing-sensual-dark.jpg";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Signature Experiences | Private in-room Chiang Mai",
+  title: "Signature Experiences | Private massage Thailand",
   description:
-    "Tantric, Nuru, body-to-body, Yoni, Lingam, and couples sensual massage — private consent-led Signature Experiences at your hotel, condo, or home in Chiang Mai.",
+    "Tantric, Nuru, body-to-body, Yoni, Lingam, and couples sensual massage — private consent-led Signature Experiences delivered to your hotel, condo, or home across Thailand.",
   path: "/services/signature",
 });
 
@@ -79,14 +79,12 @@ export default async function SignatureExperiencesPage() {
             >
               Explore experiences
             </Link>
-            <a
-              href={whatsappHref}
-              target="_blank"
-              rel="noreferrer"
+            <WhatsAppLink
+              cta="signature-hero"
               className="sensual-btn-outline inline-flex min-h-12 items-center justify-center rounded-sm border px-6 py-3.5 text-sm font-medium transition"
             >
               WhatsApp — discreet
-            </a>
+            </WhatsAppLink>
           </div>
           <p className="animate-fade-up delay-4 mt-10 text-[0.65rem] uppercase tracking-[0.28em] text-[#f5f0e8]/45">
             Scroll to enter

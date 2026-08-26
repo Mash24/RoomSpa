@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
+import { AdminAlert, AdminPageHeader } from "@/components/admin/admin-ui";
 import { readApiJson } from "@/lib/admin/api";
 import type { AdminBlogPost } from "@/lib/admin/cms-types";
 import {
@@ -118,23 +119,16 @@ export function AdminBlogPanel() {
   }
 
   return (
-    <div className="space-y-10">
-      <div>
-        <h1 className="font-display text-2xl tracking-tight text-foreground xs:text-3xl md:text-4xl">Blog</h1>
-        <p className="mt-2 max-w-2xl text-sm text-muted">
-          Write articles about what RoomSpa does — treatments, Chiang Mai stays, wellness travel,
-          consent-led work. FAQ is for short Q&A. Published titles appear under each category on
-          the public Blog; guests open a title to read the full article.
-        </p>
-      </div>
+    <div className="space-y-6 md:space-y-10">
+      <AdminPageHeader
+        eyebrow="Content"
+        title="Blog"
+        description="Write articles about Signature experiences, stays, and consent-led work. Published titles appear under each category on the public Blog."
+      />
 
-      {error ? (
-        <div className="border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-900 dark:bg-red-950/40 dark:text-red-200">
-          {error}
-        </div>
-      ) : null}
+      {error ? <AdminAlert tone="error">{error}</AdminAlert> : null}
 
-      <form onSubmit={onSubmit} className="space-y-4 border border-border bg-surface-elevated p-4 md:p-5">
+      <form onSubmit={onSubmit} className="admin-card space-y-4 p-4 md:p-6">
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
           <h2 className="font-display text-xl text-foreground xs:text-2xl">
             {editingId ? "Edit post" : "New post"}
@@ -331,7 +325,7 @@ Second paragraph…"
                 const category =
                   BLOG_CATEGORIES.find((item) => item.slug === post.category)?.name ?? post.category;
                 return (
-                  <li key={post.id} className="border border-border bg-surface-elevated p-4">
+                  <li key={post.id} className="admin-card p-4">
                     <p className="font-medium text-foreground">{post.title}</p>
                     <p className="mt-1 text-xs text-muted">
                       {category} · {post.status} · {post.publishedAt}
@@ -358,7 +352,7 @@ Second paragraph…"
               })}
             </ul>
 
-            <ul className="admin-table-wrap mt-4 divide-y divide-border border border-border bg-surface-elevated">
+            <ul className="admin-table-wrap admin-table-panel mt-4 divide-y divide-border">
             {posts.map((post) => {
               const category =
                 BLOG_CATEGORIES.find((item) => item.slug === post.category)?.name ?? post.category;

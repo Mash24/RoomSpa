@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import type { CatalogService } from "@/content/services";
 import { productPriceLabel, getServicePriceTiers } from "@/content/services";
-import { whatsappHref } from "@/content/site";
+import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import {
   formatAvailableLocations,
   formatTherapistHeadline,
@@ -188,16 +188,14 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
         >
           Book anyone available
         </Link>
-        <a
-          href={whatsappHref}
-          target="_blank"
-          rel="noreferrer"
+        <WhatsAppLink
+          cta="therapist-profile"
           className={`inline-flex min-h-12 items-center justify-center rounded-sm border px-5 py-3 text-sm ${
             dark ? "sensual-btn-outline" : "border-border hover:border-accent"
           }`}
         >
           WhatsApp
-        </a>
+        </WhatsAppLink>
       </div>
 
       <p className={`mt-4 text-xs ${textMuted}`}>
