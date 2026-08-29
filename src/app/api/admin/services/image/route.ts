@@ -6,6 +6,9 @@ import {
   type ServiceImageTier,
 } from "@/lib/media/process-service-image";
 
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
 function sanitizeSlug(raw: string) {
   return raw
     .trim()

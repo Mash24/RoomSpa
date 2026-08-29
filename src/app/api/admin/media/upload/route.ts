@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
 
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
 /**
  * Legacy proxy upload — kept as a small-file fallback.
  * Prefer browser → Supabase Storage direct upload from the admin media panel.

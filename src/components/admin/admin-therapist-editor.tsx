@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { readApiJson } from "@/lib/admin/api";
 import type { AdminTherapistRow, TherapistGender, TherapistStatus } from "@/lib/therapists/types";
 import { THERAPIST_STATUS_OPTIONS } from "@/lib/therapists/status";
 
@@ -109,8 +110,9 @@ export function AdminTherapistEditor({ therapistId }: Props) {
       form.append("slug", slug);
       form.append("index", String(photoUrls.length));
       const res = await fetch("/api/admin/therapists/photo", { method: "POST", body: form });
-      const data = await res.json();
+      const data = await readApiJson<{ error?: string; url?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Upload failed.");
+      if (!data.url) throw new Error("Upload completed without a photo URL. Please retry.");
       setPhotoUrls((prev) => [...prev, data.url as string]);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useRef, useState } from "react";
 import type { ExperienceTier } from "@/lib/catalog/experience-tier";
+import { readApiJson } from "@/lib/admin/api";
 
 type Props = {
   slug: string;
@@ -54,8 +55,9 @@ export function AdminServiceImageField({
         method: "POST",
         body: form,
       });
-      const data = await res.json();
+      const data = await readApiJson<{ error?: string; url?: string; heroUrl?: string }>(res);
       if (!res.ok) throw new Error(data.error || "Upload failed.");
+      if (!data.url) throw new Error("Upload completed without an image URL. Please retry.");
 
       onImageUrlChange(data.url as string);
       onImageHeroUrlChange((data.heroUrl as string) || null);

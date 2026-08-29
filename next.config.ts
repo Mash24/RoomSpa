@@ -10,6 +10,9 @@ const supabaseHost = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  // sharp is a native Node dependency used by admin image upload routes.
+  // Keep it external so Vercel loads the correct Linux binary at runtime.
+  serverExternalPackages: ["sharp"],
   images: {
     remotePatterns: [
       {

@@ -27,7 +27,9 @@ export const updateSession = async (request: NextRequest) => {
   });
 
   const pathname = request.nextUrl.pathname;
-  const isAdminRoute = pathname.startsWith("/admin");
+  // API handlers return JSON auth errors themselves. Redirecting an API
+  // request to the HTML login page makes clients fail with "Unexpected token <".
+  const isAdminRoute = pathname.startsWith("/admin") && !pathname.startsWith("/api/");
   const isAdminLogin = pathname === "/admin/login";
 
   const {

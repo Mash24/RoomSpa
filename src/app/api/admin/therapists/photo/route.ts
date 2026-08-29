@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
 import { processServiceImage, validateServiceImageFile } from "@/lib/media/process-service-image";
 
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   const { supabase, error } = await requireAdminSession();
   if (error || !supabase) {
