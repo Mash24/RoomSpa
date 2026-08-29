@@ -51,9 +51,14 @@ export async function POST(request: Request) {
   try {
     const bytes = Buffer.from(await file.arrayBuffer());
     processed = await processServiceImage(bytes, tier);
-  } catch {
+  } catch (processingError) {
+    const reason = processingError instanceof Error ? processingError.message.toLowerCase() : "";
+    const formatHint =
+      reason.includes("unsupported") || reason.includes("input buffer")
+        ? " This format could not be decoded; try JPEG, PNG, WebP, GIF, AVIF, TIFF, SVG, or HEIC."
+        : "";
     return NextResponse.json(
-      { error: "Could not process this image. Try a JPEG or PNG under 20 MB." },
+      { error: `Could not process this image.${formatHint} Make sure it is a valid image under 20 MB.` },
       { status: 400 },
     );
   }

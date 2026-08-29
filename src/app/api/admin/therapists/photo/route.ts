@@ -36,8 +36,16 @@ export async function POST(request: Request) {
   try {
     const processed = await processServiceImage(Buffer.from(await file.arrayBuffer()), "signature");
     buffer = processed.card.buffer;
-  } catch {
-    return NextResponse.json({ error: "Could not process image." }, { status: 400 });
+  } catch (processingError) {
+    const reason = processingError instanceof Error ? processingError.message.toLowerCase() : "";
+    const formatHint =
+      reason.includes("unsupported") || reason.includes("input buffer")
+        ? " This format could not be decoded; try JPEG, PNG, WebP, GIF, AVIF, TIFF, SVG, or HEIC."
+        : "";
+    return NextResponse.json(
+      { error: `Could not process image.${formatHint} Make sure it is valid and under 20 MB.` },
+      { status: 400 },
+    );
   }
 
   const path = `therapist-photos/${slug}/${index}.jpg`;

@@ -135,7 +135,7 @@ export function AdminServiceImageField({
       <input
         ref={inputRef}
         type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
+        accept="image/*"
         className="hidden"
         onChange={(e) => void onFileChange(e)}
       />

@@ -21,6 +21,28 @@ function sanitizeFileName(name: string) {
     .slice(0, 80);
 }
 
+const IMAGE_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "jfif",
+  "png",
+  "webp",
+  "gif",
+  "avif",
+  "heic",
+  "heif",
+  "tif",
+  "tiff",
+  "svg",
+  "jp2",
+  "jxl",
+]);
+const VIDEO_EXTENSIONS = new Set(["mp4", "webm", "mov", "m4v", "avi", "mkv", "ogv"]);
+
+function fileExtension(name: string) {
+  return name.split(".").pop()?.toLowerCase() || "";
+}
+
 export function AdminMediaPanel() {
   const [media, setMedia] = useState<AdminMediaRow[]>([]);
   const [services, setServices] = useState<ServiceOption[]>([]);
@@ -86,8 +108,9 @@ export function AdminMediaPanel() {
     setError(null);
     setUploadProgress(null);
     try {
-      const isVideo = file.type.startsWith("video/");
-      const isImage = file.type.startsWith("image/");
+      const extension = fileExtension(file.name);
+      const isVideo = file.type.startsWith("video/") || VIDEO_EXTENSIONS.has(extension);
+      const isImage = file.type.startsWith("image/") || IMAGE_EXTENSIONS.has(extension);
       if (!isVideo && !isImage) {
         throw new Error("Only video or image files are supported.");
       }
@@ -115,7 +138,8 @@ export function AdminMediaPanel() {
 
       setUploadProgress(`Uploading ${file.name}…`);
       const { error: uploadError } = await supabase.storage.from("media-library").upload(path, file, {
-        contentType: file.type || "application/octet-stream",
+        contentType:
+          file.type || (isVideo ? "video/mp4" : isImage ? "image/jpeg" : "application/octet-stream"),
         upsert: false,
       });
 

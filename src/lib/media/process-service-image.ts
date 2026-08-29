@@ -14,19 +14,29 @@ const FRAMES: Record<ServiceImageTier, { width: number; height: number }> = {
 const HERO_FRAME = { width: 1600, height: 1000 };
 
 const MAX_INPUT_BYTES = 20 * 1024 * 1024;
-const ALLOWED_MIME = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-  "image/avif",
-  "image/heic",
-  "image/heif",
+const SUPPORTED_EXTENSIONS = new Set([
+  "jpg",
+  "jpeg",
+  "jfif",
+  "png",
+  "webp",
+  "gif",
+  "avif",
+  "heic",
+  "heif",
+  "tif",
+  "tiff",
+  "svg",
+  "jp2",
+  "j2k",
+  "jxl",
 ]);
 
 export function validateServiceImageFile(file: File) {
-  if (!file.type.startsWith("image/") && !ALLOWED_MIME.has(file.type)) {
-    return "Only image files are supported (JPEG, PNG, WebP, GIF, AVIF).";
+  const extension = file.name.split(".").pop()?.toLowerCase() || "";
+  const looksLikeImage = file.type.startsWith("image/") || SUPPORTED_EXTENSIONS.has(extension);
+  if (!looksLikeImage) {
+    return "Only image files are supported. Common formats include JPEG, PNG, WebP, GIF, AVIF, TIFF, SVG, and HEIC.";
   }
   if (file.size > MAX_INPUT_BYTES) {
     return "Images must be 20 MB or smaller.";
