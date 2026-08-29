@@ -5,6 +5,11 @@ import { processServiceImage, validateServiceImageFile } from "@/lib/media/proce
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
+function safeExtension(file: File) {
+  const extension = file.name.split(".").pop()?.toLowerCase() || "";
+  return /^[a-z0-9]{1,8}$/.test(extension) ? extension : "img";
+}
+
 export async function POST(request: Request) {
   const { supabase, error } = await requireAdminSession();
   if (error || !supabase) {
@@ -42,6 +47,22 @@ export async function POST(request: Request) {
       reason.includes("unsupported") || reason.includes("input buffer")
         ? " This format could not be decoded; try JPEG, PNG, WebP, GIF, AVIF, TIFF, SVG, or HEIC."
         : "";
+
+    const originalPath = `therapist-photos/${slug}/${index}-original-${Date.now()}.${safeExtension(file)}`;
+    const { error: originalUploadError } = await supabase.storage
+      .from("media-library")
+      .upload(originalPath, new Uint8Array(await file.arrayBuffer()), {
+        contentType: file.type || "application/octet-stream",
+        upsert: true,
+      });
+    if (!originalUploadError) {
+      const originalUrl = supabase.storage.from("media-library").getPublicUrl(originalPath).data.publicUrl;
+      return NextResponse.json({
+        url: `${originalUrl}?v=${Date.now()}`,
+        fallbackOriginal: true,
+      });
+    }
+
     return NextResponse.json(
       { error: `Could not process image.${formatHint} Make sure it is valid and under 20 MB.` },
       { status: 400 },

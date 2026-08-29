@@ -55,16 +55,23 @@ export function AdminServiceImageField({
         method: "POST",
         body: form,
       });
-      const data = await readApiJson<{ error?: string; url?: string; heroUrl?: string }>(res);
+      const data = await readApiJson<{
+        error?: string;
+        url?: string;
+        heroUrl?: string;
+        fallbackOriginal?: boolean;
+      }>(res);
       if (!res.ok) throw new Error(data.error || "Upload failed.");
       if (!data.url) throw new Error("Upload completed without an image URL. Please retry.");
 
       onImageUrlChange(data.url as string);
       onImageHeroUrlChange((data.heroUrl as string) || null);
       setUploadNote(
-        isSignature
-          ? "Smart-cropped to fit Signature cards (3:4) and detail hero (16:10)."
-          : "Smart-cropped to fit wellness cards (4:3) and detail hero (16:10).",
+        data.fallbackOriginal
+          ? "Uploaded successfully. This format could not be smart-cropped, so the original image is being used."
+          : isSignature
+            ? "Smart-cropped to fit Signature cards (3:4) and detail hero (16:10)."
+            : "Smart-cropped to fit wellness cards (4:3) and detail hero (16:10).",
       );
       if (!imageAlt.trim()) {
         onImageAltChange(`${slug.replace(/-/g, " ")} — RoomSpa in-room session`);

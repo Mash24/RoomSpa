@@ -17,6 +17,11 @@ function sanitizeSlug(raw: string) {
     .replace(/^-|-$/g, "");
 }
 
+function safeExtension(file: File) {
+  const extension = file.name.split(".").pop()?.toLowerCase() || "";
+  return /^[a-z0-9]{1,8}$/.test(extension) ? extension : "img";
+}
+
 export async function POST(request: Request) {
   const { supabase, error } = await requireAdminSession();
   if (error || !supabase) {
@@ -57,6 +62,27 @@ export async function POST(request: Request) {
       reason.includes("unsupported") || reason.includes("input buffer")
         ? " This format could not be decoded; try JPEG, PNG, WebP, GIF, AVIF, TIFF, SVG, or HEIC."
         : "";
+
+    // Keep valid image uploads usable even when a particular format cannot be
+    // smart-cropped by sharp. The public cards already use object-cover, so
+    // the original can still render without blocking the admin workflow.
+    const originalPath = `service-heroes/${slug}/original-${Date.now()}.${safeExtension(file)}`;
+    const { error: originalUploadError } = await supabase.storage
+      .from("media-library")
+      .upload(originalPath, new Uint8Array(await file.arrayBuffer()), {
+        contentType: file.type || "application/octet-stream",
+        upsert: true,
+      });
+    if (!originalUploadError) {
+      const originalUrl = supabase.storage.from("media-library").getPublicUrl(originalPath).data.publicUrl;
+      return NextResponse.json({
+        url: `${originalUrl}?v=${Date.now()}`,
+        heroUrl: `${originalUrl}?v=${Date.now()}`,
+        imageFit: "cover" as const,
+        fallbackOriginal: true,
+      });
+    }
+
     return NextResponse.json(
       { error: `Could not process this image.${formatHint} Make sure it is a valid image under 20 MB.` },
       { status: 400 },
