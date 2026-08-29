@@ -1,5 +1,3 @@
-import sharp from "sharp";
-
 export type ServiceImageTier = "signature" | "wellness";
 
 /**
@@ -37,6 +35,10 @@ export function validateServiceImageFile(file: File) {
 }
 
 async function cropToFrame(input: Buffer, width: number, height: number) {
+  // Load sharp only when an authenticated upload actually needs processing.
+  // A top-level native import can crash the whole Vercel function during
+  // initialization before the route has a chance to return JSON.
+  const { default: sharp } = await import("sharp");
   return sharp(input)
     .rotate()
     .resize(width, height, {
