@@ -48,7 +48,7 @@ export function TherapistPhotoGallery({ photos, displayName, dark = false }: Pro
           }`}
         >
           {photos.map((photo, index) => (
-            <li key={photo.id} className="relative min-w-full snap-center aspect-[3/4] bg-[#0c0a09]">
+            <li key={photo.id} className="relative w-full shrink-0 snap-center aspect-[3/4] bg-[#0c0a09]">
               <Image
                 src={photo.url}
                 alt={photo.altText || `${displayName} — photo ${index + 1}`}
