@@ -45,7 +45,7 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
       <div className="mt-8">
         {primary ? (
           <div
-            className={`relative aspect-[4/5] overflow-hidden rounded-sm sm:aspect-[16/10] ${
+            className={`relative aspect-[3/4] overflow-hidden rounded-sm ${
               dark ? "bg-[#161311] ring-1 ring-[#c9a86c]/20" : "bg-surface ring-1 ring-border"
             }`}
           >

@@ -21,6 +21,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadNote, setUploadNote] = useState<string | null>(null);
   const [services, setServices] = useState<ServiceOption[]>([]);
   const [coverageAreas, setCoverageAreas] = useState<CoverageOption[]>([]);
 
@@ -104,16 +105,22 @@ export function AdminTherapistEditor({ therapistId }: Props) {
     }
     setUploading(true);
     setError(null);
+    setUploadNote(null);
     try {
       const form = new FormData();
       form.append("file", file);
       form.append("slug", slug);
       form.append("index", String(photoUrls.length));
       const res = await fetch("/api/admin/therapists/photo", { method: "POST", body: form });
-      const data = await readApiJson<{ error?: string; url?: string }>(res);
+      const data = await readApiJson<{ error?: string; url?: string; fallbackOriginal?: boolean }>(res);
       if (!res.ok) throw new Error(data.error || "Upload failed.");
       if (!data.url) throw new Error("Upload completed without a photo URL. Please retry.");
       setPhotoUrls((prev) => [...prev, data.url as string]);
+      setUploadNote(
+        data.fallbackOriginal
+          ? "Uploaded using the original file because this format could not be smart-cropped."
+          : "Uploaded and smart-cropped for the portrait layout.",
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed.");
     } finally {
@@ -271,9 +278,13 @@ export function AdminTherapistEditor({ therapistId }: Props) {
 
       <section className="admin-card space-y-4 p-4 xs:p-5">
         <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-muted">Photos</h2>
+        <p className="text-xs text-muted">
+          Upload any size or aspect ratio. Photos are auto-rotated and smart-cropped to a consistent portrait frame.
+          Click <strong>Save therapist</strong> after adding photos to publish them.
+        </p>
         <div className="flex flex-wrap gap-3">
           {photoUrls.map((url, i) => (
-            <div key={url} className="relative h-24 w-20 overflow-hidden rounded-sm border border-border">
+            <div key={url} className="relative aspect-[3/4] w-20 overflow-hidden rounded-sm border border-border">
               <Image src={url} alt="" fill sizes="80px" className="object-cover" />
               <button type="button" onClick={() => setPhotoUrls((p) => p.filter((_, j) => j !== i))} className="absolute right-0 top-0 bg-background/90 px-1 text-xs">×</button>
             </div>
@@ -283,6 +294,7 @@ export function AdminTherapistEditor({ therapistId }: Props) {
         <button type="button" disabled={uploading} onClick={() => fileRef.current?.click()} className="rounded-sm border border-border px-4 py-2 text-sm hover:border-accent disabled:opacity-50">
           {uploading ? "Uploading…" : "Add photo"}
         </button>
+        {uploadNote ? <p className="text-xs text-accent">{uploadNote}</p> : null}
       </section>
 
       <section className="admin-card space-y-3 p-4 xs:p-5">

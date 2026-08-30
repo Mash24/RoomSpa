@@ -6,6 +6,7 @@ import {
   formatWeightKg,
 } from "@/lib/therapists/profile";
 import {
+  loadTherapistMedia,
   mapMediaRow,
   type TherapistLocationRow,
   type TherapistMediaRow,
@@ -14,7 +15,6 @@ import {
 import { COVERAGE_CENTROIDS, haversineKm } from "@/lib/therapists/geo";
 import type {
   PublicTherapist,
-  PublicTherapistMedia,
   TherapistFilters,
 } from "@/lib/therapists/types";
 
@@ -38,12 +38,8 @@ export async function getPublicTherapists(filters: TherapistFilters = {}): Promi
 async function loadVisibleTherapistRelations(therapistId: string) {
   const supabase = createAdminishAnonClient();
 
-  const [mediaRes, servicesRes, areasRes, locationRes] = await Promise.all([
-    supabase
-      .from("therapist_media")
-      .select("id, therapist_id, url, media_type, thumbnail_url, alt_text, sort_order, is_primary")
-      .eq("therapist_id", therapistId)
-      .order("sort_order", { ascending: true }),
+  const [mediaRows, servicesRes, areasRes, locationRes] = await Promise.all([
+    loadTherapistMedia(supabase, [therapistId]),
     supabase
       .from("therapist_services")
       .select("therapist_id, services!inner(slug, name)")
@@ -57,7 +53,7 @@ async function loadVisibleTherapistRelations(therapistId: string) {
     supabase.rpc("get_therapist_public_locations", { p_therapist_ids: [therapistId] }),
   ]);
 
-  const media = ((mediaRes.data || []) as TherapistMediaRow[]).map(mapMediaRow);
+  const media = (mediaRows as TherapistMediaRow[]).map(mapMediaRow);
   const serviceSlugs: string[] = [];
   const serviceNames: string[] = [];
   for (const row of servicesRes.data || []) {

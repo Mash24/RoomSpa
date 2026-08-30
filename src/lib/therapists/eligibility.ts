@@ -28,6 +28,7 @@ import {
 } from "@/lib/therapists/profile";
 import {
   buildTherapistFiltersRpc,
+  loadTherapistMedia,
   mapMediaRow,
   type EligibleTherapistRow,
   type TherapistLocationRow,
@@ -183,12 +184,8 @@ async function loadTherapistRelations(therapistIds: string[]) {
     };
   }
 
-  const [mediaRes, servicesRes, areasRes, locationByTherapist] = await Promise.all([
-    supabase
-      .from("therapist_media")
-      .select("id, therapist_id, url, media_type, thumbnail_url, alt_text, sort_order, is_primary")
-      .in("therapist_id", therapistIds)
-      .order("sort_order", { ascending: true }),
+  const [mediaRows, servicesRes, areasRes, locationByTherapist] = await Promise.all([
+    loadTherapistMedia(supabase, therapistIds),
     supabase
       .from("therapist_services")
       .select("therapist_id, services!inner(slug, name)")
@@ -203,7 +200,7 @@ async function loadTherapistRelations(therapistIds: string[]) {
   ]);
 
   const mediaByTherapist = new Map<string, PublicTherapistMedia[]>();
-  for (const row of (mediaRes.data || []) as TherapistMediaRow[]) {
+  for (const row of mediaRows as TherapistMediaRow[]) {
     const tid = String(row.therapist_id);
     const list = mediaByTherapist.get(tid) || [];
     list.push(mapMediaRow(row));

@@ -211,7 +211,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: insertError?.message || "Could not create therapist." }, { status: 400 });
   }
 
-  await syncRelations(supabase, therapist.id, body);
+  const relationError = await syncRelations(supabase, therapist.id, body);
+  if (relationError) {
+    return NextResponse.json({ error: relationError }, { status: 400 });
+  }
 
   return NextResponse.json({ id: therapist.id }, { status: 201 });
 }
@@ -272,43 +275,70 @@ export async function syncRelations(
   supabase: NonNullable<Awaited<ReturnType<typeof requireAdminSession>>["supabase"]>,
   therapistId: string,
   body: Record<string, unknown>,
-) {
+): Promise<string | null> {
   const mediaTbl = await mediaTable(supabase);
   const areasTbl = await serviceAreasTable(supabase);
 
   const photoUrls = (body.photoUrls as string[]) || (body.mediaUrls as string[]) || [];
-  await supabase.from(mediaTbl).delete().eq("therapist_id", therapistId);
+  const mediaDelete = await supabase.from(mediaTbl).delete().eq("therapist_id", therapistId);
+  if (mediaDelete.error) {
+    return `Could not update therapist photos: ${mediaDelete.error.message}`;
+  }
   if (photoUrls.length) {
-    const payload = photoUrls.map((url, i) => ({
-      therapist_id: therapistId,
-      url,
-      photo_url: url,
-      media_type: "photo",
-      sort_order: i,
-      is_primary: i === 0,
-    }));
-    await supabase.from(mediaTbl).insert(payload);
+    const payload = photoUrls.map((url, i) =>
+      mediaTbl === "therapist_media"
+        ? {
+            therapist_id: therapistId,
+            url,
+            media_type: "photo",
+            sort_order: i,
+            is_primary: i === 0,
+          }
+        : {
+            therapist_id: therapistId,
+            photo_url: url,
+            sort_order: i,
+            is_primary: i === 0,
+          },
+    );
+    const mediaInsert = await supabase.from(mediaTbl).insert(payload);
+    if (mediaInsert.error) {
+      return `Could not save therapist photos: ${mediaInsert.error.message}`;
+    }
   }
 
   const serviceIds = (body.serviceIds as string[]) || [];
-  await supabase.from("therapist_services").delete().eq("therapist_id", therapistId);
+  const serviceDelete = await supabase.from("therapist_services").delete().eq("therapist_id", therapistId);
+  if (serviceDelete.error) {
+    return `Could not update therapist services: ${serviceDelete.error.message}`;
+  }
   if (serviceIds.length) {
-    await supabase.from("therapist_services").insert(
+    const serviceInsert = await supabase.from("therapist_services").insert(
       serviceIds.map((service_id) => ({ therapist_id: therapistId, service_id, active: true })),
     );
+    if (serviceInsert.error) {
+      return `Could not save therapist services: ${serviceInsert.error.message}`;
+    }
   }
 
   const serviceAreaIds = (body.serviceAreaIds as string[]) || (body.coverageAreaIds as string[]) || [];
-  await supabase.from(areasTbl).delete().eq("therapist_id", therapistId);
+  const areaDelete = await supabase.from(areasTbl).delete().eq("therapist_id", therapistId);
+  if (areaDelete.error) {
+    return `Could not update therapist service areas: ${areaDelete.error.message}`;
+  }
   if (serviceAreaIds.length) {
-    await supabase.from(areasTbl).insert(
+    const areaInsert = await supabase.from(areasTbl).insert(
       serviceAreaIds.map((coverage_area_id) => ({
         therapist_id: therapistId,
         coverage_area_id,
         active: true,
       })),
     );
+    if (areaInsert.error) {
+      return `Could not save therapist service areas: ${areaInsert.error.message}`;
+    }
   }
 
   await syncLocation(supabase, therapistId, body);
+  return null;
 }

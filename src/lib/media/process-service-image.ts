@@ -54,8 +54,10 @@ async function cropToFrame(input: Buffer, width: number, height: number) {
     .resize(width, height, {
       fit: "cover",
       position: "attention",
+      kernel: "lanczos3",
+      fastShrinkOnLoad: false,
     })
-    .jpeg({ quality: 86, mozjpeg: true })
+    .jpeg({ quality: 92, chromaSubsampling: "4:4:4", mozjpeg: true })
     .toBuffer();
 }
 

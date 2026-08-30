@@ -53,7 +53,10 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   if (body.photoUrls || body.mediaUrls || body.serviceIds || body.serviceAreaIds || body.coverageAreaIds || body.location) {
     const { syncRelations } = await import("../route");
-    await syncRelations(supabase, id, body);
+    const relationError = await syncRelations(supabase, id, body);
+    if (relationError) {
+      return NextResponse.json({ error: relationError }, { status: 400 });
+    }
   }
 
   return NextResponse.json({ ok: true });

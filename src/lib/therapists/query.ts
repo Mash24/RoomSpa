@@ -1,4 +1,5 @@
-import type { PublicTherapist, PublicTherapistMedia, TherapistFilters } from "@/lib/therapists/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { PublicTherapistMedia, TherapistFilters } from "@/lib/therapists/types";
 
 export type EligibleTherapistRow = {
   therapist_id: string;
@@ -55,6 +56,50 @@ export function mapMediaRow(row: TherapistMediaRow): PublicTherapistMedia {
     isPrimary: row.is_primary,
     sortOrder: row.sort_order,
   };
+}
+
+/**
+ * Reads the current media table, with a read-only fallback for databases that
+ * have not yet run the therapist media rename migration.
+ */
+export async function loadTherapistMedia(
+  supabase: SupabaseClient,
+  therapistIds: string[],
+): Promise<TherapistMediaRow[]> {
+  if (!therapistIds.length) return [];
+
+  const current = await supabase
+    .from("therapist_media")
+    .select("id, therapist_id, url, media_type, thumbnail_url, alt_text, sort_order, is_primary")
+    .in("therapist_id", therapistIds)
+    .order("sort_order", { ascending: true });
+
+  if (!current.error) {
+    return (current.data || []) as TherapistMediaRow[];
+  }
+
+  const legacy = await supabase
+    .from("therapist_photos")
+    .select("id, therapist_id, photo_url, sort_order, is_primary")
+    .in("therapist_id", therapistIds)
+    .order("sort_order", { ascending: true });
+
+  return ((legacy.data || []) as Array<{
+    id: string;
+    therapist_id: string;
+    photo_url: string;
+    sort_order: number;
+    is_primary: boolean;
+  }>).map((row) => ({
+    id: row.id,
+    therapist_id: row.therapist_id,
+    url: row.photo_url,
+    media_type: "photo",
+    thumbnail_url: null,
+    alt_text: null,
+    sort_order: row.sort_order,
+    is_primary: row.is_primary,
+  }));
 }
 
 export function buildTherapistFiltersRpc(filters: TherapistFilters) {
