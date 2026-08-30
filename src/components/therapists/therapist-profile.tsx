@@ -1,13 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
+import { TherapistPhotoGallery } from "@/components/therapists/therapist-photo-gallery";
 import type { CatalogService } from "@/content/services";
 import { productPriceLabel, getServicePriceTiers } from "@/content/services";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import {
-  formatAvailableLocations,
   formatTherapistHeadline,
-  therapistPrimaryPhoto,
 } from "@/lib/therapists/public";
 import { getServicePath } from "@/lib/catalog/service-paths";
 import { anyoneBookHref, therapistBookHref } from "@/lib/therapists/booking-links";
@@ -20,7 +18,6 @@ type Props = {
 };
 
 export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
-  const primary = therapistPrimaryPhoto(therapist);
   const gallery = therapist.media.filter((m) => m.type === "photo");
   const headline = formatTherapistHeadline(therapist);
   const bookHref = therapistBookHref(therapist.id, { serviceFallback: therapist.serviceSlugs[0] });
@@ -43,36 +40,7 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
 
       {/* Gallery */}
       <div className="mt-8">
-        {primary ? (
-          <div
-            className={`relative aspect-[3/4] overflow-hidden rounded-sm ${
-              dark ? "bg-[#161311] ring-1 ring-[#c9a86c]/20" : "bg-surface ring-1 ring-border"
-            }`}
-          >
-            <Image
-              src={primary}
-              alt={therapist.displayName}
-              fill
-              sizes="(max-width: 768px) 100vw, 720px"
-              className="object-cover"
-              priority
-            />
-          </div>
-        ) : null}
-        {gallery.length > 1 ? (
-          <ul className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">
-            {gallery.slice(0, 5).map((photo) => (
-              <li
-                key={photo.id}
-                className={`relative aspect-square overflow-hidden rounded-sm ${
-                  dark ? "ring-1 ring-[#c9a86c]/15" : "ring-1 ring-border"
-                }`}
-              >
-                <Image src={photo.url} alt="" fill sizes="100px" className="object-cover" />
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        <TherapistPhotoGallery photos={gallery} displayName={therapist.displayName} dark={dark} />
       </div>
 
       <header className="mt-8">
@@ -163,14 +131,6 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
         </ul>
       </section>
 
-      <section className={`mt-10 rounded-sm border p-5 ${dark ? "border-[#c9a86c]/20 bg-[#161311]/50" : "border-border bg-surface-elevated/50"}`}>
-        <h2 className={labelClass}>Availability</h2>
-        <p className={`mt-2 text-sm ${textMuted}`}>
-          Per-slot availability is coming soon. Book now and we&apos;ll confirm your therapist and time — or
-          message us on WhatsApp for same-day requests.
-        </p>
-      </section>
-
       <div className="mt-10 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap">
         <Link
           href={bookHref}
@@ -197,10 +157,6 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
           WhatsApp
         </WhatsAppLink>
       </div>
-
-      <p className={`mt-4 text-xs ${textMuted}`}>
-        Coverage: {formatAvailableLocations(therapist)}. Your exact address is never shared with other clients.
-      </p>
     </article>
   );
 }
