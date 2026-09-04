@@ -3,7 +3,7 @@ import { GalleryGrid } from "@/components/media/gallery-grid";
 import { getPublishedGalleryMedia } from "@/lib/media/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Gallery | In-room massage Chiang Mai",

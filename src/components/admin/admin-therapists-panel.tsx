@@ -3,24 +3,19 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { AdminAlert, AdminPageHeader } from "@/components/admin/admin-ui";
-import {
-  ATTENTION_LABELS,
-  isPublicReady,
-  therapistAttentionReasons,
-} from "@/lib/therapists/admin-ops";
 import type { AdminTherapistRow } from "@/lib/therapists/types";
 
 function formatCity(loc: NonNullable<AdminTherapistRow["location"]>) {
   return loc.city || loc.country || "—";
 }
 
-type Filter = "attention" | "all" | "public" | "hidden";
+type Filter = "all" | "visible" | "hidden";
 
 export function AdminTherapistsPanel() {
   const [therapists, setTherapists] = useState<AdminTherapistRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filter, setFilter] = useState<Filter>("attention");
+  const [filter, setFilter] = useState<Filter>("all");
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -68,32 +63,16 @@ export function AdminTherapistsPanel() {
     }
   }
 
-  const withMeta = useMemo(
-    () =>
-      therapists.map((t) => ({
-        therapist: t,
-        reasons: therapistAttentionReasons(t),
-        ready: isPublicReady(t),
-      })),
-    [therapists],
-  );
-
   const filtered = useMemo(() => {
     switch (filter) {
-      case "attention":
-        return withMeta.filter((row) => row.reasons.length > 0 && row.therapist.showOnGallery);
-      case "public":
-        return withMeta.filter((row) => row.ready);
+      case "visible":
+        return therapists.filter((t) => t.showOnGallery);
       case "hidden":
-        return withMeta.filter((row) => !row.therapist.showOnGallery);
+        return therapists.filter((t) => !t.showOnGallery);
       default:
-        return withMeta;
+        return therapists;
     }
-  }, [filter, withMeta]);
-
-  const attentionCount = withMeta.filter(
-    (r) => r.reasons.length > 0 && r.therapist.showOnGallery,
-  ).length;
+  }, [filter, therapists]);
 
   return (
     <div className="space-y-6 md:space-y-8">
@@ -116,9 +95,8 @@ export function AdminTherapistsPanel() {
       <div className="flex flex-wrap gap-2">
         {(
           [
-            ["attention", `Needs attention (${attentionCount})`],
             ["all", "All"],
-            ["public", "Public ready"],
+            ["visible", "Visible"],
             ["hidden", "Hidden"],
           ] as const
         ).map(([value, label]) => (
@@ -142,18 +120,13 @@ export function AdminTherapistsPanel() {
       ) : (
         <>
           <ul className="admin-card-list">
-            {filtered.map(({ therapist: t, reasons, ready }) => (
+            {filtered.map((t) => (
               <li key={t.id} className="admin-card p-4">
                 <p className="font-medium text-foreground">{t.displayName}</p>
                 <p className="mt-1 text-sm text-muted">
                   {t.showOnGallery ? "Visible" : "Hidden"} ·{" "}
                   {t.acceptingBookings ? "Accepting" : "Not accepting"} ·{" "}
                   {t.location ? formatCity(t.location) : "—"}
-                </p>
-                <p className="mt-1 text-xs text-amber-800">
-                  {ready
-                    ? "✓ Public ready"
-                    : reasons.map((r) => ATTENTION_LABELS[r]).join(" · ") || "Not ready"}
                 </p>
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <button
@@ -162,11 +135,7 @@ export function AdminTherapistsPanel() {
                     onClick={() => void toggleGallery(t)}
                     className="inline-flex min-h-11 items-center justify-center rounded-full border border-border px-3 text-sm font-medium disabled:opacity-60"
                   >
-                    {togglingId === t.id
-                      ? "…"
-                      : t.showOnGallery
-                        ? "Hide"
-                        : "Show"}
+                    {togglingId === t.id ? "…" : t.showOnGallery ? "Hide" : "Show"}
                   </button>
                   <Link
                     href={`/admin/therapists/${t.id}`}
@@ -186,13 +155,12 @@ export function AdminTherapistsPanel() {
                   <th className="px-4 py-3 font-medium">Therapist</th>
                   <th className="px-3 py-3 font-medium">Gallery</th>
                   <th className="px-3 py-3 font-medium">Booking</th>
-                  <th className="px-3 py-3 font-medium">Readiness</th>
                   <th className="px-3 py-3 font-medium">Location</th>
                   <th className="px-4 py-3 font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {filtered.map(({ therapist: t, reasons, ready }) => (
+                {filtered.map((t) => (
                   <tr key={t.id} className="border-b border-border last:border-b-0">
                     <td className="px-4 py-3">
                       <p className="font-medium text-foreground">{t.displayName}</p>
@@ -212,15 +180,6 @@ export function AdminTherapistsPanel() {
                         <span className="text-muted">Not accepting</span>
                       )}
                     </td>
-                    <td className="px-3 py-3 text-xs">
-                      {ready ? (
-                        <span className="text-accent">✓ Public ready</span>
-                      ) : (
-                        <span className="text-amber-800">
-                          {reasons.map((r) => ATTENTION_LABELS[r]).join(" · ") || "Not ready"}
-                        </span>
-                      )}
-                    </td>
                     <td className="px-3 py-3 text-foreground">
                       {t.location ? formatCity(t.location) : "—"}
                     </td>
@@ -232,11 +191,7 @@ export function AdminTherapistsPanel() {
                           onClick={() => void toggleGallery(t)}
                           className="text-sm text-muted underline-offset-2 hover:text-foreground hover:underline disabled:opacity-60"
                         >
-                          {togglingId === t.id
-                            ? "…"
-                            : t.showOnGallery
-                              ? "Hide"
-                              : "Show"}
+                          {togglingId === t.id ? "…" : t.showOnGallery ? "Hide" : "Show"}
                         </button>
                         <Link
                           href={`/admin/therapists/${t.id}`}

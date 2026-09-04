@@ -4,7 +4,7 @@ import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { ServicesHashRedirect } from "@/components/services/services-hash-redirect";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Services | Signature & wellness Thailand",

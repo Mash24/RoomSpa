@@ -18,7 +18,7 @@ import {
 } from "@/lib/media/resolve-service-media";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const WELLNESS_HERO = "/media/services/stills/v-spa.jpg";
 
@@ -30,9 +30,12 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function WellnessServicesPage() {
-  const catalog = await getPublicCatalog();
+  const [catalog, imageRows] = await Promise.all([
+    getPublicCatalog(),
+    getServiceImageRows(),
+  ]);
   const wellness = filterWellnessCatalog(catalog);
-  const imageMap = buildServiceImageMap(await getServiceImageRows());
+  const imageMap = buildServiceImageMap(imageRows);
   const wellnessCategories = serviceCategories.filter(
     (category) => category.id !== "sensual" && wellness.some((s) => s.category === category.id),
   );

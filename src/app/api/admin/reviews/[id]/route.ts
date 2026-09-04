@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
+import { revalidatePublicReviews } from "@/lib/cache/revalidate";
 import type { ReviewStatus } from "@/lib/reviews/types";
 
 const VALID_STATUSES: ReviewStatus[] = ["pending", "approved", "rejected"];
@@ -43,5 +44,6 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: dbError.message }, { status: 400 });
   }
 
+  revalidatePublicReviews();
   return NextResponse.json({ review: data });
 }

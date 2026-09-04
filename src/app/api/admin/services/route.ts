@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
+import { revalidatePublicCatalog } from "@/lib/cache/revalidate";
 import { buildPriceTiers, DURATION_TIERS } from "@/lib/catalog/prices";
 import type { AdminServiceRow } from "@/lib/admin/cms-types";
 
@@ -151,5 +152,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: priceError.message }, { status: 400 });
   }
 
+  revalidatePublicCatalog();
   return NextResponse.json({ id: service.id }, { status: 201 });
 }

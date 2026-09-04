@@ -19,7 +19,7 @@ import {
 } from "@/lib/media/resolve-service-media";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const SIGNATURE_HERO = "/media/marketing/pricing-sensual-dark.jpg";
 
@@ -31,9 +31,12 @@ export const metadata: Metadata = buildPageMetadata({
 });
 
 export default async function SignatureExperiencesPage() {
-  const catalog = await getPublicCatalog();
+  const [catalog, imageRows] = await Promise.all([
+    getPublicCatalog(),
+    getServiceImageRows(),
+  ]);
   const signature = filterSignatureCatalog(catalog);
-  const imageMap = buildServiceImageMap(await getServiceImageRows());
+  const imageMap = buildServiceImageMap(imageRows);
 
   return (
     <SensualZone>

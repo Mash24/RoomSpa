@@ -6,7 +6,7 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 /** Legacy flat URLs → /services/{tier}/{slug} */
 export default async function LegacyServiceRedirectPage({ params }: PageProps) {

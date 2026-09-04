@@ -1,4 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
+import { PUBLIC_REVALIDATE_SECONDS } from "@/lib/cache/public";
 import { getAllBlogPosts, type BlogPost } from "@/content/blog";
 import {
   getBlogCategory,
@@ -64,49 +66,61 @@ function mapRow(row: Record<string, unknown>): PublicBlogPost | null {
 }
 
 /** Published posts from CMS, or static guides if the table is empty / not migrated. */
-export async function getPublishedBlogPosts(): Promise<PublicBlogPost[]> {
-  try {
-    const supabase = createAdminishAnonClient();
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select(
-        "id, slug, title, description, category, body, status, published_at, primary_cta_label, primary_cta_href, secondary_cta_label, secondary_cta_href, sort_order",
-      )
-      .eq("status", "published")
-      .order("published_at", { ascending: false })
-      .order("sort_order", { ascending: true });
+export const getPublishedBlogPosts = unstable_cache(
+  async (): Promise<PublicBlogPost[]> => {
+    try {
+      const supabase = createAdminishAnonClient();
+      const { data, error } = await supabase
+        .from("blog_posts")
+        .select(
+          "id, slug, title, description, category, body, status, published_at, primary_cta_label, primary_cta_href, secondary_cta_label, secondary_cta_href, sort_order",
+        )
+        .eq("status", "published")
+        .order("published_at", { ascending: false })
+        .order("sort_order", { ascending: true });
 
-    if (error || !data?.length) {
+      if (error || !data?.length) {
+        return getAllBlogPosts().map(mapStatic);
+      }
+
+      return data
+        .map((row) => mapRow(row as Record<string, unknown>))
+        .filter(Boolean) as PublicBlogPost[];
+    } catch {
       return getAllBlogPosts().map(mapStatic);
     }
-
-    return data.map((row) => mapRow(row as Record<string, unknown>)).filter(Boolean) as PublicBlogPost[];
-  } catch {
-    return getAllBlogPosts().map(mapStatic);
-  }
-}
+  },
+  ["published-blog-posts"],
+  { revalidate: PUBLIC_REVALIDATE_SECONDS, tags: ["blog"] },
+);
 
 export async function getPublishedBlogPost(slug: string): Promise<PublicBlogPost | null> {
-  try {
-    const supabase = createAdminishAnonClient();
-    const { data, error } = await supabase
-      .from("blog_posts")
-      .select(
-        "id, slug, title, description, category, body, status, published_at, primary_cta_label, primary_cta_href, secondary_cta_label, secondary_cta_href",
-      )
-      .eq("slug", slug)
-      .eq("status", "published")
-      .maybeSingle();
+  return unstable_cache(
+    async (postSlug: string): Promise<PublicBlogPost | null> => {
+      try {
+        const supabase = createAdminishAnonClient();
+        const { data, error } = await supabase
+          .from("blog_posts")
+          .select(
+            "id, slug, title, description, category, body, status, published_at, primary_cta_label, primary_cta_href, secondary_cta_label, secondary_cta_href",
+          )
+          .eq("slug", postSlug)
+          .eq("status", "published")
+          .maybeSingle();
 
-    if (!error && data) {
-      return mapRow(data as Record<string, unknown>);
-    }
-  } catch {
-    // fall through
-  }
+        if (!error && data) {
+          return mapRow(data as Record<string, unknown>);
+        }
+      } catch {
+        // fall through
+      }
 
-  const fallback = getAllBlogPosts().find((post) => post.slug === slug);
-  return fallback ? mapStatic(fallback) : null;
+      const fallback = getAllBlogPosts().find((post) => post.slug === postSlug);
+      return fallback ? mapStatic(fallback) : null;
+    },
+    ["published-blog-post"],
+    { revalidate: PUBLIC_REVALIDATE_SECONDS, tags: ["blog"] },
+  )(slug);
 }
 
 export async function getPublishedBlogSlugs(): Promise<string[]> {

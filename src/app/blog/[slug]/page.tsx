@@ -10,7 +10,7 @@ import {
 } from "@/lib/blog/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 type PageProps = {
   params: Promise<{ slug: string }>;

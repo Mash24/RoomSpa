@@ -1,4 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
+import { PUBLIC_REVALIDATE_SECONDS } from "@/lib/cache/public";
 import { findEligibleTherapists } from "@/lib/therapists/eligibility";
 import {
   computeAgeFromDob,
@@ -35,10 +37,38 @@ export type {
   ResolvedCoverage,
 } from "@/lib/therapists/eligibility";
 
+function isCacheableTherapistFilter(filters: TherapistFilters) {
+  return !filters.lat && !filters.lng && !filters.coverageAreaSlug && !filters.search;
+}
+
+const getCachedPublicTherapists = unstable_cache(
+  async (key: string): Promise<PublicTherapist[]> => {
+    const filters = JSON.parse(key) as TherapistFilters;
+    const result = await findEligibleTherapists(filters);
+    return result.therapists;
+  },
+  ["public-therapists"],
+  { revalidate: PUBLIC_REVALIDATE_SECONDS, tags: ["therapists"] },
+);
+
 /** Eligible therapists — service + coverage + distance (Phase 10C). */
 export async function getPublicTherapists(filters: TherapistFilters = {}): Promise<PublicTherapist[]> {
-  const result = await findEligibleTherapists(filters);
-  return result.therapists;
+  if (!isCacheableTherapistFilter(filters)) {
+    const result = await findEligibleTherapists(filters);
+    return result.therapists;
+  }
+
+  const key = JSON.stringify({
+    serviceSlug: filters.serviceSlug ?? null,
+    featured: filters.featured ?? null,
+    limit: filters.limit ?? null,
+    gender: filters.gender ?? null,
+    city: filters.city ?? null,
+    radiusKm: filters.radiusKm ?? null,
+    experienceTier: filters.experienceTier ?? null,
+  });
+
+  return getCachedPublicTherapists(key);
 }
 
 async function loadVisibleTherapistRelations(therapistId: string) {
@@ -201,26 +231,32 @@ export async function getTherapistProfileAccess(slug: string): Promise<
   | { state: "unavailable"; displayName: string }
   | { state: "ok"; therapist: PublicTherapist }
 > {
-  const supabase = createAdminishAnonClient();
-  const { data: row, error } = await supabase
-    .from("therapists")
-    .select(THERAPIST_PUBLIC_SELECT)
-    .eq("slug", slug)
-    .maybeSingle();
+  return unstable_cache(
+    async (therapistSlug: string) => {
+      const supabase = createAdminishAnonClient();
+      const { data: row, error } = await supabase
+        .from("therapists")
+        .select(THERAPIST_PUBLIC_SELECT)
+        .eq("slug", therapistSlug)
+        .maybeSingle();
 
-  if (error || !row) return { state: "missing" };
+      if (error || !row) return { state: "missing" as const };
 
-  const typed = row as TherapistQueryRow;
-  if (typed.status === "suspended" || typed.status === "inactive") {
-    return { state: "unavailable", displayName: typed.display_name };
-  }
+      const typed = row as TherapistQueryRow;
+      if (typed.status === "suspended" || typed.status === "inactive") {
+        return { state: "unavailable" as const, displayName: typed.display_name };
+      }
 
-  const relations = await loadVisibleTherapistRelations(typed.id);
-  const therapist = mapVisibleTherapist(typed, relations);
-  if (!therapist) {
-    return { state: "unavailable", displayName: typed.display_name };
-  }
-  return { state: "ok", therapist };
+      const relations = await loadVisibleTherapistRelations(typed.id);
+      const therapist = mapVisibleTherapist(typed, relations);
+      if (!therapist) {
+        return { state: "unavailable" as const, displayName: typed.display_name };
+      }
+      return { state: "ok" as const, therapist };
+    },
+    ["therapist-profile-access"],
+    { revalidate: PUBLIC_REVALIDATE_SECONDS, tags: ["therapists"] },
+  )(slug);
 }
 
 /** @deprecated Alias — use getVisibleTherapistBySlug for profile pages. */

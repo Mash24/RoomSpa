@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
+import { revalidatePublicTherapists } from "@/lib/cache/revalidate";
 import { scoreOrNull } from "@/lib/therapists/admin-ops";
 import { therapistStatusFlags } from "@/lib/therapists/status";
 import type { TherapistStatus } from "@/lib/therapists/types";
@@ -101,6 +102,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
+  revalidatePublicTherapists();
   return NextResponse.json({ ok: true });
 }
 
@@ -126,5 +128,6 @@ export async function DELETE(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: updateError.message }, { status: 400 });
   }
 
+  revalidatePublicTherapists();
   return NextResponse.json({ ok: true });
 }

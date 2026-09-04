@@ -5,7 +5,7 @@ import { getPublicTherapists } from "@/lib/therapists/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Meet Your RoomSpa Therapists",

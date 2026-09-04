@@ -4,7 +4,7 @@ import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { BookingForm } from "@/components/booking/booking-form";
 import { getPublicCatalog } from "@/lib/catalog/public";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Book Appointment",

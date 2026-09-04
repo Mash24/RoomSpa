@@ -14,7 +14,7 @@ import { formatThb } from "@/lib/currency";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { getServicePath } from "@/lib/catalog/service-paths";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 const WELLNESS_HERO = "/media/services/stills/v-hands.jpg";
 

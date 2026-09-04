@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
+import { revalidatePublicCatalog } from "@/lib/cache/revalidate";
 import { buildPriceTiers, DURATION_TIERS } from "@/lib/catalog/prices";
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -67,6 +68,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     }
   }
 
+  revalidatePublicCatalog();
   return NextResponse.json({ ok: true });
 }
 
@@ -88,5 +90,6 @@ export async function DELETE(_request: Request, context: RouteContext) {
     return NextResponse.json({ error: updateError.message }, { status: 400 });
   }
 
+  revalidatePublicCatalog();
   return NextResponse.json({ ok: true });
 }

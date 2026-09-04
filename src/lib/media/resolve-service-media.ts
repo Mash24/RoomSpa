@@ -1,4 +1,6 @@
+import { unstable_cache } from "next/cache";
 import { getServiceMedia, type ServiceMedia } from "@/content/service-media";
+import { PUBLIC_REVALIDATE_SECONDS } from "@/lib/cache/public";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 
 export type ServiceImageRow = {
@@ -9,27 +11,31 @@ export type ServiceImageRow = {
   imageFocus: string | null;
 };
 
-export async function getServiceImageRows(): Promise<ServiceImageRow[]> {
-  try {
-    const supabase = createAdminishAnonClient();
-    const { data, error } = await supabase
-      .from("services")
-      .select("slug, image_url, image_hero_url, image_alt, image_focus")
-      .not("image_url", "is", null);
+export const getServiceImageRows = unstable_cache(
+  async (): Promise<ServiceImageRow[]> => {
+    try {
+      const supabase = createAdminishAnonClient();
+      const { data, error } = await supabase
+        .from("services")
+        .select("slug, image_url, image_hero_url, image_alt, image_focus")
+        .not("image_url", "is", null);
 
-    if (error || !data?.length) return [];
+      if (error || !data?.length) return [];
 
-    return data.map((row) => ({
-      slug: String(row.slug),
-      imageUrl: (row.image_url as string | null) ?? null,
-      imageHeroUrl: (row.image_hero_url as string | null) ?? null,
-      imageAlt: (row.image_alt as string | null) ?? null,
-      imageFocus: (row.image_focus as string | null) ?? null,
-    }));
-  } catch {
-    return [];
-  }
-}
+      return data.map((row) => ({
+        slug: String(row.slug),
+        imageUrl: (row.image_url as string | null) ?? null,
+        imageHeroUrl: (row.image_hero_url as string | null) ?? null,
+        imageAlt: (row.image_alt as string | null) ?? null,
+        imageFocus: (row.image_focus as string | null) ?? null,
+      }));
+    } catch {
+      return [];
+    }
+  },
+  ["service-image-rows"],
+  { revalidate: PUBLIC_REVALIDATE_SECONDS, tags: ["catalog"] },
+);
 
 export function buildServiceImageMap(rows: ServiceImageRow[]) {
   const map = new Map<string, ServiceImageRow>();

@@ -6,7 +6,7 @@ import { BLOG_CATEGORIES } from "@/lib/blog/categories";
 import { getPublishedBlogPosts } from "@/lib/blog/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export const metadata: Metadata = buildPageMetadata({
   title: "Blog | Massage articles Chiang Mai",

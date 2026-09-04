@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import {
   catalogServices,
   isSignatureExperience,
@@ -12,6 +13,7 @@ import {
   type DurationMinutes,
 } from "@/lib/catalog/prices";
 import type { BookStripTreatment } from "@/lib/catalog/book-strip-types";
+import { PUBLIC_REVALIDATE_SECONDS } from "@/lib/cache/public";
 import { createAdminishAnonClient } from "@/lib/supabase/anon";
 
 type DbService = {
@@ -85,41 +87,45 @@ function mapService(row: DbService, priceRows: DbPrice[]): CatalogService {
 }
 
 /** Active + bookable services from Supabase CMS. Falls back to static catalog if DB is empty. */
-export async function getPublicCatalog(): Promise<CatalogService[]> {
-  try {
-    const supabase = createAdminishAnonClient();
-    const { data: rows, error } = await supabase
-      .from("services")
-      .select(
-        "id, slug, name, summary, details, category, duration_minutes, duration_label, price_thb, featured, bookable, is_active, sort_order",
-      )
-      .eq("is_active", true)
-      .eq("bookable", true)
-      .order("sort_order", { ascending: true });
+export const getPublicCatalog = unstable_cache(
+  async (): Promise<CatalogService[]> => {
+    try {
+      const supabase = createAdminishAnonClient();
+      const { data: rows, error } = await supabase
+        .from("services")
+        .select(
+          "id, slug, name, summary, details, category, duration_minutes, duration_label, price_thb, featured, bookable, is_active, sort_order",
+        )
+        .eq("is_active", true)
+        .eq("bookable", true)
+        .order("sort_order", { ascending: true });
 
-    if (error || !rows?.length) {
+      if (error || !rows?.length) {
+        return catalogServices.filter((service) => service.bookable);
+      }
+
+      const ids = rows.map((row) => row.id as string);
+      const { data: priceRows } = await supabase
+        .from("service_prices")
+        .select("service_id, duration_minutes, price_thb, is_active")
+        .in("service_id", ids)
+        .eq("is_active", true);
+
+      const byService = new Map<string, DbPrice[]>();
+      for (const price of (priceRows || []) as DbPrice[]) {
+        const list = byService.get(price.service_id) || [];
+        list.push(price);
+        byService.set(price.service_id, list);
+      }
+
+      return (rows as DbService[]).map((row) => mapService(row, byService.get(row.id) || []));
+    } catch {
       return catalogServices.filter((service) => service.bookable);
     }
-
-    const ids = rows.map((row) => row.id as string);
-    const { data: priceRows } = await supabase
-      .from("service_prices")
-      .select("service_id, duration_minutes, price_thb, is_active")
-      .in("service_id", ids)
-      .eq("is_active", true);
-
-    const byService = new Map<string, DbPrice[]>();
-    for (const price of (priceRows || []) as DbPrice[]) {
-      const list = byService.get(price.service_id) || [];
-      list.push(price);
-      byService.set(price.service_id, list);
-    }
-
-    return (rows as DbService[]).map((row) => mapService(row, byService.get(row.id) || []));
-  } catch {
-    return catalogServices.filter((service) => service.bookable);
-  }
-}
+  },
+  ["public-catalog"],
+  { revalidate: PUBLIC_REVALIDATE_SECONDS, tags: ["catalog"] },
+);
 
 export async function getPublicCatalogProduct(slug: string) {
   const catalog = await getPublicCatalog();

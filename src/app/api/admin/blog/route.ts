@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
 import type { AdminBlogPost } from "@/lib/admin/cms-types";
 import { isBlogCategorySlug, slugifyBlogTitle } from "@/lib/blog/categories";
+import { revalidatePublicBlog } from "@/lib/cache/revalidate";
 
 function mapBlog(row: Record<string, unknown>): AdminBlogPost {
   return {
@@ -98,5 +99,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: message }, { status: 400 });
   }
 
+  revalidatePublicBlog();
   return NextResponse.json({ post: mapBlog(data as Record<string, unknown>) });
 }

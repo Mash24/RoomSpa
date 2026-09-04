@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   description: "Guest reviews of RoomSpa private Signature and in-room massage across Thailand.",
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function ReviewsPage() {
   const reviews = await getApprovedReviews();

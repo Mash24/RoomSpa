@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
+import { revalidatePublicTherapists } from "@/lib/cache/revalidate";
 import {
   mapAdminMedia,
   mapAdminTherapistRow,
@@ -231,6 +232,7 @@ export async function POST(request: Request) {
     }
   }
 
+  revalidatePublicTherapists();
   return NextResponse.json({ id: therapist.id }, { status: 201 });
 }
 

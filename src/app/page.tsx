@@ -15,17 +15,18 @@ import {
 import { getPublicTherapists } from "@/lib/therapists/public";
 import { aggregateRating, getApprovedReviews } from "@/lib/reviews/fetch";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export default async function HomePage() {
-  const [signature, bookTreatments, therapists, catalog] = await Promise.all([
-    getPublicSignatureServices(4),
-    getBookStripTreatments(),
-    getPublicTherapists({ limit: 12 }),
-    getPublicCatalog(),
-  ]);
-  const approved = await getApprovedReviews(12);
-  const allForRating = await getApprovedReviews(50);
+  const [signature, bookTreatments, therapists, catalog, approved, allForRating] =
+    await Promise.all([
+      getPublicSignatureServices(4),
+      getBookStripTreatments(),
+      getPublicTherapists({ limit: 12 }),
+      getPublicCatalog(),
+      getApprovedReviews(12),
+      getApprovedReviews(50),
+    ]);
   const aggregate = aggregateRating(allForRating);
 
   const guestItems = approved.map((review) => ({

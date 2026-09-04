@@ -17,7 +17,7 @@ type PageProps = {
   params: Promise<{ city: string; area: string }>;
 };
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
 
 export function generateStaticParams() {
   return cities.flatMap((city) =>
