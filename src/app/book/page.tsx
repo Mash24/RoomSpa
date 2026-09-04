@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Book Appointment",
   description:
-    "Book a RoomSpa Signature Experience at your hotel, condo, or home in Thailand. Pay by card, pay later, or cash on arrival.",
+    "Book a RoomSpa massage at your hotel, condo, or home. Choose your experience, tell us when and where, and we’ll take care of the rest.",
 };
 
 export default async function BookPage() {
@@ -19,14 +19,10 @@ export default async function BookPage() {
     <section className="mx-auto max-w-3xl px-4 py-10 xs:px-5 md:px-8 md:py-20">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Book</p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-        Book your in-room massage
+        Book your massage
       </h1>
       <p className="mt-3 max-w-xl text-sm leading-relaxed text-muted xs:mt-4 xs:text-base md:text-lg">
-        Pick a service, time, and place. Pay by card now,{" "}
-        <a href="/my-booking" className="text-accent underline">
-          pay later
-        </a>
-        , or cash on arrival. Prefer chat?{" "}
+        Choose your experience, tell us when and where, and we&apos;ll take care of the rest. Prefer chat?{" "}
         <WhatsAppLink cta="book-intro" className="text-accent underline">
           WhatsApp
         </WhatsAppLink>

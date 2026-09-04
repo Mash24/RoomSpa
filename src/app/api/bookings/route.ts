@@ -222,21 +222,16 @@ export async function POST(request: Request) {
       therapistId = therapist.id;
       therapistDisplayName = therapist.display_name as string;
     } else {
+      // Prefer an available match, but never block the booking if supply is thin —
+      // ops can confirm a therapist after the request lands.
       const assigned = await assignBestAvailableTherapist({
         ...availabilityQuery,
         scheduledTime,
       });
-      if (!assigned) {
-        return NextResponse.json(
-          {
-            error:
-              "That time was just taken. Please choose another available time.",
-          },
-          { status: 409 },
-        );
+      if (assigned) {
+        therapistId = assigned.therapistId;
+        therapistDisplayName = assigned.displayName;
       }
-      therapistId = assigned.therapistId;
-      therapistDisplayName = assigned.displayName;
     }
 
     const bookingId = randomUUID();

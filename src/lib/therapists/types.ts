@@ -2,6 +2,8 @@ export type TherapistGender = "female" | "male" | "nonbinary" | "unspecified";
 
 export type TherapistMediaType = "photo" | "video";
 
+export type MediaApprovalStatus = "pending" | "approved" | "rejected";
+
 export type PublicTherapistMedia = {
   id: string;
   url: string;
@@ -27,13 +29,20 @@ export type PublicTherapist = {
   nationality: string | null;
   ethnicity: string | null;
   bio: string;
+  languages: string[];
+  yearsExperience: number | null;
+  training: string | null;
   city: string;
   country: string;
   /** Province / state / county — public */
   region: string;
   /** Customer-facing summary e.g. "Usually available around Nimman, Old City" */
   areaSummary: string;
+  /** Derived from ops eligibility — not a free-form admin toggle */
   verified: boolean;
+  /** Show on /therapists gallery */
+  showOnGallery?: boolean;
+  acceptingBookings: boolean;
   featured: boolean;
   media: PublicTherapistMedia[];
   serviceSlugs: string[];
@@ -59,12 +68,25 @@ export type PublicTherapistLegacy = PublicTherapist & {
 };
 
 export type TherapistStatus =
+  | "applicant"
+  | "interviewed"
+  | "skills_verified"
+  | "trial"
   | "draft"
   | "active"
+  | "fully_booked"
   | "temporarily_unavailable"
   | "on_leave"
   | "suspended"
   | "inactive";
+
+export type ServiceQualification = {
+  serviceId: string;
+  claimed: boolean;
+  tested: boolean;
+  approved: boolean;
+  active: boolean;
+};
 
 export type TherapistFilters = {
   serviceSlug?: string;
@@ -78,6 +100,12 @@ export type TherapistFilters = {
   limit?: number;
   gender?: TherapistGender | "any";
   search?: string;
+  /** Signature vs wellness gallery filter */
+  experienceTier?: "signature" | "wellness" | "any";
+};
+
+export type AdminTherapistMedia = PublicTherapistMedia & {
+  approvalStatus: MediaApprovalStatus;
 };
 
 export type AdminTherapistRow = {
@@ -91,7 +119,13 @@ export type AdminTherapistRow = {
   nationality: string | null;
   ethnicity: string | null;
   bio: string;
+  languages: string[];
+  yearsExperience: number | null;
+  training: string;
+  showOnGallery: boolean;
+  acceptingBookings: boolean;
   status: TherapistStatus;
+  /** Derived for display; computed from ops state on read */
   verified: boolean;
   showAge: boolean;
   showHeight: boolean;
@@ -100,6 +134,14 @@ export type AdminTherapistRow = {
   showNationality: boolean;
   featured: boolean;
   sortOrder: number;
+  phone: string | null;
+  internalNotes: string;
+  skillScore: number | null;
+  professionalismScore: number | null;
+  communicationScore: number | null;
+  reliabilityScore: number | null;
+  punctualityScore: number | null;
+  feedbackScore: number | null;
   /** Internal — admin only */
   location: {
     city: string;
@@ -110,9 +152,10 @@ export type AdminTherapistRow = {
     serviceRadiusKm: number;
     publicAreaSummary: string;
   } | null;
-  media: PublicTherapistMedia[];
+  media: AdminTherapistMedia[];
   serviceIds: string[];
   serviceSlugs: string[];
+  serviceQualifications: ServiceQualification[];
   serviceAreaIds: string[];
   serviceAreaSlugs: string[];
 };

@@ -1,5 +1,5 @@
-import { AdminTherapistEditor } from "@/components/admin/admin-therapist-editor";
+import { AdminTherapistCreate } from "@/components/admin/admin-therapist-create";
 
 export default function NewTherapistPage() {
-  return <AdminTherapistEditor />;
+  return <AdminTherapistCreate />;
 }

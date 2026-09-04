@@ -3,7 +3,6 @@ import { cities } from "@/content/cities";
 import { catalogServices } from "@/content/services";
 import { site } from "@/content/site";
 import { getPublishedBlogPosts } from "@/lib/blog/public";
-import { getPublicTherapists } from "@/lib/therapists/public";
 import { getServicePath, getServiceLocationPath } from "@/lib/catalog/service-paths";
 import { getServiceLocationParams } from "@/lib/seo/locations";
 
@@ -16,7 +15,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/services",
     "/services/wellness",
     "/services/signature",
-    "/therapists",
     "/pricing",
     "/about",
     "/book",
@@ -76,13 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]);
 
   const blogPosts = await getPublishedBlogPosts();
-  const therapists = await getPublicTherapists({});
-  const therapistRoutes: MetadataRoute.Sitemap = therapists.map((t) => ({
-    url: `${base}/therapists/${t.slug}`,
-    lastModified: now,
-    changeFrequency: "weekly" as const,
-    priority: 0.75,
-  }));
 
   const blogRoutes: MetadataRoute.Sitemap = blogPosts.map((post) => ({
     url: `${base}/blog/${post.slug}`,
@@ -96,7 +87,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...serviceRoutes,
     ...serviceLocationRoutes,
     ...cityRoutes,
-    ...therapistRoutes,
     ...blogRoutes,
   ];
 }

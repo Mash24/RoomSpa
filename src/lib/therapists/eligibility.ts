@@ -30,6 +30,7 @@ import {
   buildTherapistFiltersRpc,
   loadTherapistMedia,
   mapMediaRow,
+  THERAPIST_PUBLIC_SELECT,
   type EligibleTherapistRow,
   type TherapistLocationRow,
   type TherapistMediaRow,
@@ -40,6 +41,11 @@ import type {
   PublicTherapistMedia,
   TherapistFilters,
 } from "@/lib/therapists/types";
+import {
+  deriveTherapistVerified,
+  isPubliclyEligibleTherapist,
+} from "@/lib/therapists/visibility";
+import { isSignatureExperience, getCatalogProduct } from "@/content/services";
 
 export type ClientLocation = {
   lat: number;
@@ -87,7 +93,23 @@ function mapTherapist(
   serviceAreaNames: string[],
   mapCoords: { lat: number; lng: number } | null,
   distanceKm?: number,
-): PublicTherapist {
+  eligibility?: {
+    media: Array<{ approvalStatus?: "pending" | "approved" | "rejected"; isPrimary: boolean; type?: string }>;
+    services: Array<{ approved: boolean; active?: boolean }>;
+  },
+): PublicTherapist | null {
+  const eligibilityInput = {
+    showOnGallery: row.show_on_gallery === true,
+    acceptingBookings: row.accepting_bookings !== false,
+    suspended: row.status === "suspended" || row.status === "inactive",
+    media: eligibility?.media ?? media.map((m) => ({ isPrimary: m.isPrimary, type: m.type, approvalStatus: "approved" as const })),
+    services: eligibility?.services ?? serviceSlugs.map(() => ({ approved: true, active: true })),
+  };
+
+  if (!isPubliclyEligibleTherapist(eligibilityInput)) {
+    return null;
+  }
+
   const sortedMedia = [...media].sort((a, b) => {
     if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
     return a.sortOrder - b.sortOrder;
@@ -108,11 +130,16 @@ function mapTherapist(
     nationality: row.show_nationality ? row.nationality : null,
     ethnicity: row.show_ethnicity ? row.ethnicity : null,
     bio: row.bio,
+    languages: Array.isArray(row.languages) ? row.languages.filter(Boolean) : [],
+    yearsExperience: row.years_experience != null ? Number(row.years_experience) : null,
+    training: row.training?.trim() || null,
     city: location?.city ?? "",
     country: location?.country ?? "",
     region: location?.region ?? "",
     areaSummary,
-    verified: row.verified,
+    verified: deriveTherapistVerified(eligibilityInput),
+    showOnGallery: row.show_on_gallery === true,
+    acceptingBookings: row.accepting_bookings !== false,
     featured: row.featured,
     media: sortedMedia,
     serviceSlugs,
@@ -177,7 +204,14 @@ async function loadTherapistRelations(therapistIds: string[]) {
   if (!therapistIds.length) {
     return {
       mediaByTherapist: new Map<string, PublicTherapistMedia[]>(),
-      servicesByTherapist: new Map<string, { slugs: string[]; names: string[] }>(),
+      mediaMetaByTherapist: new Map<
+        string,
+        Array<{ approvalStatus?: "pending" | "approved" | "rejected"; isPrimary: boolean; type?: string }>
+      >(),
+      servicesByTherapist: new Map<
+        string,
+        { slugs: string[]; names: string[]; meta: Array<{ approved: boolean; active: boolean }> }
+      >(),
       serviceAreasByTherapist: new Map<string, { slugs: string[]; names: string[] }>(),
       locationByTherapist: new Map<string, TherapistLocationRow>(),
       areaRecords: [] as { slug: string; lat: number; lng: number }[],
@@ -185,10 +219,10 @@ async function loadTherapistRelations(therapistIds: string[]) {
   }
 
   const [mediaRows, servicesRes, areasRes, locationByTherapist] = await Promise.all([
-    loadTherapistMedia(supabase, therapistIds),
+    loadTherapistMedia(supabase, therapistIds, { approvedOnly: false }),
     supabase
       .from("therapist_services")
-      .select("therapist_id, services!inner(slug, name)")
+      .select("therapist_id, approved, active, services!inner(slug, name)")
       .eq("active", true)
       .in("therapist_id", therapistIds),
     supabase
@@ -200,22 +234,40 @@ async function loadTherapistRelations(therapistIds: string[]) {
   ]);
 
   const mediaByTherapist = new Map<string, PublicTherapistMedia[]>();
+  const mediaMetaByTherapist = new Map<
+    string,
+    Array<{ approvalStatus?: "pending" | "approved" | "rejected"; isPrimary: boolean; type?: string }>
+  >();
   for (const row of mediaRows as TherapistMediaRow[]) {
     const tid = String(row.therapist_id);
+    const mapped = mapMediaRow(row);
+    if (mapped.approvalStatus === "rejected") continue;
+    const { approvalStatus, ...publicMedia } = mapped;
     const list = mediaByTherapist.get(tid) || [];
-    list.push(mapMediaRow(row));
+    list.push(publicMedia);
     mediaByTherapist.set(tid, list);
+    const meta = mediaMetaByTherapist.get(tid) || [];
+    meta.push({
+      approvalStatus,
+      isPrimary: mapped.isPrimary,
+      type: mapped.type,
+    });
+    mediaMetaByTherapist.set(tid, meta);
   }
 
-  const servicesByTherapist = new Map<string, { slugs: string[]; names: string[] }>();
+  const servicesByTherapist = new Map<
+    string,
+    { slugs: string[]; names: string[]; meta: Array<{ approved: boolean; active: boolean }> }
+  >();
   for (const row of servicesRes.data || []) {
     const tid = String(row.therapist_id);
     const svc = row.services as { slug: string; name: string } | { slug: string; name: string }[];
     const service = Array.isArray(svc) ? svc[0] : svc;
     if (!service) continue;
-    const entry = servicesByTherapist.get(tid) || { slugs: [], names: [] };
+    const entry = servicesByTherapist.get(tid) || { slugs: [], names: [], meta: [] };
     entry.slugs.push(service.slug);
     entry.names.push(service.name);
+    entry.meta.push({ approved: Boolean(row.approved), active: row.active !== false });
     servicesByTherapist.set(tid, entry);
   }
 
@@ -237,7 +289,14 @@ async function loadTherapistRelations(therapistIds: string[]) {
     }
   }
 
-  return { mediaByTherapist, servicesByTherapist, serviceAreasByTherapist, locationByTherapist, areaRecords };
+  return {
+    mediaByTherapist,
+    mediaMetaByTherapist,
+    servicesByTherapist,
+    serviceAreasByTherapist,
+    locationByTherapist,
+    areaRecords,
+  };
 }
 
 function applyDiscoveryFilters(list: PublicTherapist[], filters: TherapistFilters): PublicTherapist[] {
@@ -342,9 +401,7 @@ export async function findEligibleTherapists(
 
     const { data: rows, error } = await supabase
       .from("therapists")
-      .select(
-        "id, slug, display_name, gender, date_of_birth, height_cm, weight_kg, nationality, ethnicity, bio, featured, sort_order, show_age, show_height, show_weight, show_ethnicity, show_nationality, verified",
-      )
+      .select(THERAPIST_PUBLIC_SELECT)
       .in("id", ids)
       .order("sort_order", { ascending: true });
 
@@ -356,13 +413,19 @@ export async function findEligibleTherapists(
       ids = rows.filter((r) => r.featured).map((r) => r.id as string);
     }
 
-    const { mediaByTherapist, servicesByTherapist, serviceAreasByTherapist, locationByTherapist, areaRecords = [] } =
-      await loadTherapistRelations(ids);
+    const {
+      mediaByTherapist,
+      mediaMetaByTherapist,
+      servicesByTherapist,
+      serviceAreasByTherapist,
+      locationByTherapist,
+      areaRecords = [],
+    } = await loadTherapistRelations(ids);
 
     let mapped = (rows as TherapistQueryRow[])
       .filter((row) => ids.includes(row.id))
       .map((row) => {
-        const svc = servicesByTherapist.get(row.id) || { slugs: [], names: [] };
+        const svc = servicesByTherapist.get(row.id) || { slugs: [], names: [], meta: [] };
         const areas = serviceAreasByTherapist.get(row.id) || { slugs: [], names: [] };
         const mapCoords = resolveMapCoords(areas.slugs, areaRecords, query.lat, query.lng);
         return mapTherapist(
@@ -375,14 +438,30 @@ export async function findEligibleTherapists(
           areas.names,
           mapCoords,
           distanceById.get(row.id),
+          {
+            media: mediaMetaByTherapist.get(row.id) || [],
+            services: svc.meta,
+          },
         );
-      });
+      })
+      .filter((t): t is PublicTherapist => Boolean(t));
 
     if (hasClientLocation) {
       mapped = mapped.sort((a, b) => (a.distanceKm ?? 999) - (b.distanceKm ?? 999));
     }
 
     mapped = applyDiscoveryFilters(mapped, query);
+
+    if (query.experienceTier && query.experienceTier !== "any") {
+      mapped = mapped.filter((t) => {
+        const wantsSignature = query.experienceTier === "signature";
+        return t.serviceSlugs.some((slug) => {
+          const product = getCatalogProduct(slug);
+          if (!product) return !wantsSignature;
+          return wantsSignature ? isSignatureExperience(product) : !isSignatureExperience(product);
+        });
+      });
+    }
 
     if (query.limit) {
       mapped = mapped.slice(0, query.limit);

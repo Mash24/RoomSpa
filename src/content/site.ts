@@ -13,7 +13,6 @@ export const site = {
   nav: [
     { label: "Signature", href: "/services/signature" },
     { label: "Wellness", href: "/services/wellness" },
-    { label: "Therapists", href: "/therapists" },
     { label: "Pricing", href: "/pricing" },
     { label: "Locations", href: "/city" },
     { label: "Reviews", href: "/reviews" },

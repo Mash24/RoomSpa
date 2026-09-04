@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";

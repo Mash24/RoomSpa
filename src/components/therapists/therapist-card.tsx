@@ -2,14 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import type { TherapistBookContext } from "@/lib/therapists/booking-links";
+import { therapistBookHref } from "@/lib/therapists/booking-links";
 import type { PublicTherapist } from "@/lib/therapists/types";
-import {
-  formatAvailableLocations,
-  formatDistanceBadge,
-  formatTherapistHeadline,
-  therapistPrimaryPhoto,
-} from "@/lib/therapists/public";
-import { therapistBookHref, type TherapistBookContext } from "@/lib/therapists/booking-links";
+import { therapistPrimaryPhoto } from "@/lib/therapists/public";
 
 type Props = {
   therapist: PublicTherapist;
@@ -17,6 +13,7 @@ type Props = {
   compact?: boolean;
   bookService?: string;
   bookContext?: TherapistBookContext;
+  galleryMode?: boolean;
 };
 
 export function TherapistCard({
@@ -25,57 +22,107 @@ export function TherapistCard({
   compact = false,
   bookService,
   bookContext,
+  galleryMode = false,
 }: Props) {
   const photo = therapistPrimaryPhoto(therapist);
-  const headline = formatTherapistHeadline(therapist);
-  const locations = formatAvailableLocations(therapist);
-  const distance = formatDistanceBadge(therapist.distanceKm);
-  const bookHref = therapistBookHref(therapist.id, {
+  const requestHref = therapistBookHref(therapist.id, {
     ...bookContext,
-    service: bookService || bookContext?.service,
-    serviceFallback: therapist.serviceSlugs[0],
+    service: bookContext?.service || bookService,
+    serviceFallback: bookService || therapist.serviceSlugs[0],
   });
 
-  if (compact) {
+  if (galleryMode) {
     return (
-      <article className="flex gap-3 rounded-sm border border-border bg-background p-3">
-        <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm bg-surface">
-          {photo ? (
-            <Image src={photo} alt={therapist.displayName} fill sizes="64px" className="object-cover" />
-          ) : null}
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="font-display text-lg tracking-tight text-foreground">{therapist.displayName}</p>
-          {therapist.serviceNames.length > 0 ? (
-            <p className="mt-0.5 line-clamp-1 text-xs text-accent">{therapist.serviceNames.slice(0, 3).join(" · ")}</p>
-          ) : null}
-          <p className="mt-1 text-xs text-muted">{locations}</p>
-          {distance ? <p className="mt-1 text-xs font-medium text-accent">{distance}</p> : null}
-          <div className="mt-2 flex gap-2">
-            <Link
-              href={`/therapists/${therapist.slug}`}
-              className="inline-flex min-h-9 items-center justify-center rounded-sm border border-border px-2.5 text-xs font-medium hover:border-accent"
-            >
-              Profile
-            </Link>
-            <Link
-              href={bookHref}
-              className="inline-flex min-h-9 items-center justify-center rounded-sm bg-accent px-2.5 text-xs font-medium text-accent-foreground"
-            >
-              Book
-            </Link>
+      <Link
+        href={`/therapists/${therapist.slug}`}
+        className="group block"
+      >
+        <article>
+          <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-[#191715]">
+            {photo ? (
+              <Image
+                src={photo}
+                alt={therapist.displayName}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                className="object-cover transition duration-700 ease-out group-hover:scale-[1.03]"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center text-sm text-[#B8B0A3]">
+                Photo coming soon
+              </div>
+            )}
           </div>
+          <div className="pt-4">
+            <h3 className="font-display text-2xl tracking-tight text-[#F5F1E8] transition group-hover:text-[#C8A96B] md:text-[1.65rem]">
+              {therapist.displayName}
+            </h3>
+            {therapist.city ? (
+              <p className="mt-1 text-sm tracking-wide text-[#B8B0A3]">{therapist.city}</p>
+            ) : null}
+          </div>
+        </article>
+      </Link>
+    );
+  }
+
+  if (dark && !compact) {
+    return (
+      <article className="group flex h-full flex-col overflow-hidden rounded-sm bg-[#211F1C] ring-1 ring-[rgba(200,169,107,0.18)] transition hover:ring-[rgba(200,169,107,0.4)]">
+        <Link href={`/therapists/${therapist.slug}`} className="relative block aspect-[4/5] overflow-hidden bg-[#191715]">
+          {photo ? (
+            <Image
+              src={photo}
+              alt={therapist.displayName}
+              fill
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover transition duration-500 group-hover:scale-[1.02]"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center text-sm text-[#B8B0A3]">Photo coming soon</div>
+          )}
+        </Link>
+        <div className="flex flex-1 flex-col p-4">
+          <h3 className="font-display text-2xl tracking-tight text-[#F5F1E8]">{therapist.displayName}</h3>
+          {therapist.city ? <p className="mt-1 text-sm text-[#B8B0A3]">{therapist.city}</p> : null}
+          <Link
+            href={`/therapists/${therapist.slug}`}
+            className="mt-auto pt-5 text-sm font-medium text-[#C8A96B] underline-offset-4 hover:underline"
+          >
+            View profile →
+          </Link>
         </div>
       </article>
     );
   }
 
-  const ring = dark ? "ring-[#c9a86c]/15 hover:ring-[#c9a86c]/40" : "ring-border hover:ring-accent/40";
-  const bg = dark ? "bg-[#161311]" : "bg-surface-elevated";
+  if (compact) {
+    return (
+      <article className="flex gap-3 rounded-sm border border-border bg-background p-3">
+        <Link href={`/therapists/${therapist.slug}`} className="relative h-16 w-16 shrink-0 overflow-hidden rounded-sm bg-surface">
+          {photo ? (
+            <Image src={photo} alt={therapist.displayName} fill sizes="64px" className="object-cover" />
+          ) : null}
+        </Link>
+        <div className="min-w-0 flex-1">
+          <Link href={`/therapists/${therapist.slug}`} className="font-display text-lg tracking-tight text-foreground hover:underline">
+            {therapist.displayName}
+          </Link>
+          {therapist.serviceNames.length > 0 ? (
+            <p className="mt-0.5 line-clamp-1 text-xs text-accent">{therapist.serviceNames.slice(0, 3).join(" · ")}</p>
+          ) : null}
+          <p className="mt-1 text-xs text-muted">{therapist.city}</p>
+          <Link href={requestHref} className="mt-2 inline-block text-xs font-medium text-accent hover:underline">
+            Request →
+          </Link>
+        </div>
+      </article>
+    );
+  }
 
   return (
-    <article className={`flex h-full flex-col overflow-hidden rounded-sm ring-1 transition ${ring} ${bg}`}>
-      <div className={`relative aspect-[3/4] shrink-0 ${dark ? "bg-[#0c0a09]" : "bg-surface"}`}>
+    <article className="flex h-full flex-col overflow-hidden rounded-sm bg-surface-elevated ring-1 ring-border transition hover:ring-accent/40">
+      <div className="relative aspect-[3/4] shrink-0 bg-surface">
         {photo ? (
           <Image
             src={photo}
@@ -87,66 +134,24 @@ export function TherapistCard({
         ) : (
           <div className="flex h-full items-center justify-center text-sm text-muted">Photo coming soon</div>
         )}
-        {distance ? (
-          <span
-            className={`absolute left-3 top-3 rounded-sm px-2 py-1 text-[0.65rem] font-semibold uppercase tracking-wider ${
-              dark ? "bg-[#0c0a09]/90 text-[#c9a86c]" : "bg-background/95 text-accent"
-            }`}
-          >
-            {distance}
-          </span>
-        ) : null}
       </div>
-
       <div className="flex flex-1 flex-col p-4">
-        <div className="flex flex-wrap items-center gap-2">
-          <h3 className={`font-display text-xl tracking-tight ${dark ? "text-[#f5f0e8]" : "text-foreground"}`}>
-            {therapist.displayName}
-          </h3>
-          {therapist.verified ? (
-            <span className={`text-xs font-medium ${dark ? "text-[#c9a86c]" : "text-accent"}`}>✓ Verified</span>
-          ) : null}
-        </div>
-
-        {headline ? (
-          <p className={`mt-1 text-sm ${dark ? "text-[#f5f0e8]/70" : "text-muted"}`}>{headline}</p>
-        ) : null}
-
-        {therapist.height ? (
-          <p className={`mt-0.5 text-sm ${dark ? "text-[#f5f0e8]/55" : "text-muted"}`}>{therapist.height}</p>
-        ) : null}
-
+        <h3 className="font-display text-xl tracking-tight text-foreground">{therapist.displayName}</h3>
         {therapist.serviceNames.length > 0 ? (
-          <p className={`mt-3 line-clamp-2 text-sm leading-snug ${dark ? "text-[#c9a86c]/95" : "text-accent"}`}>
-            {therapist.serviceNames.join(" · ")}
-          </p>
+          <p className="mt-3 line-clamp-2 text-sm text-accent">{therapist.serviceNames.join(" · ")}</p>
         ) : null}
-
-        {locations ? (
-          <p className={`mt-2 text-sm leading-snug ${dark ? "text-[#f5f0e8]/75" : "text-muted"}`}>
-            <span aria-hidden>📍 </span>
-            {locations}
-          </p>
-        ) : null}
-
         <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
           <Link
             href={`/therapists/${therapist.slug}`}
-            className={`inline-flex min-h-10 items-center justify-center rounded-sm text-sm font-medium transition ${
-              dark
-                ? "border border-[#c9a86c]/35 text-[#f5f0e8] hover:border-[#c9a86c]"
-                : "border border-border text-foreground hover:border-accent hover:text-accent"
-            }`}
+            className="inline-flex min-h-10 items-center justify-center rounded-sm border border-border text-sm font-medium hover:border-accent"
           >
             Profile
           </Link>
           <Link
-            href={bookHref}
-            className={`inline-flex min-h-10 items-center justify-center rounded-sm text-sm font-medium ${
-              dark ? "sensual-btn-primary" : "bg-accent text-accent-foreground"
-            }`}
+            href={requestHref}
+            className="inline-flex min-h-10 items-center justify-center rounded-sm bg-accent text-sm font-medium text-accent-foreground"
           >
-            Book
+            Request
           </Link>
         </div>
       </div>

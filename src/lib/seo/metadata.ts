@@ -45,7 +45,7 @@ export function buildPageMetadata({
       ...(ogImage ? { images: [ogImage] } : {}),
     },
     ...(noIndex
-      ? { robots: { index: false, follow: false } }
+      ? { robots: { index: false, follow: true } }
       : { robots: { index: true, follow: true } }),
   };
 }

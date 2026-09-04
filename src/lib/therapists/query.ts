@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { PublicTherapistMedia, TherapistFilters } from "@/lib/therapists/types";
+import type { MediaApprovalStatus, PublicTherapistMedia, TherapistFilters } from "@/lib/therapists/types";
 
 export type EligibleTherapistRow = {
   therapist_id: string;
@@ -17,6 +17,12 @@ export type TherapistQueryRow = {
   nationality: string | null;
   ethnicity: string | null;
   bio: string;
+  languages: string[] | null;
+  years_experience: number | null;
+  training: string | null;
+  accepting_bookings: boolean;
+  show_on_gallery: boolean;
+  status: string;
   featured: boolean;
   sort_order: number;
   show_age: boolean;
@@ -24,7 +30,6 @@ export type TherapistQueryRow = {
   show_weight: boolean;
   show_ethnicity: boolean;
   show_nationality: boolean;
-  verified: boolean;
 };
 
 export type TherapistLocationRow = {
@@ -44,9 +49,20 @@ export type TherapistMediaRow = {
   alt_text: string | null;
   sort_order: number;
   is_primary: boolean;
+  approval_status?: MediaApprovalStatus | string | null;
 };
 
-export function mapMediaRow(row: TherapistMediaRow): PublicTherapistMedia {
+export type TherapistServiceLinkRow = {
+  therapist_id: string;
+  service_id?: string;
+  approved?: boolean | null;
+  active?: boolean | null;
+  claimed?: boolean | null;
+  tested?: boolean | null;
+  services?: { slug: string; name: string } | { slug: string; name: string }[] | null;
+};
+
+export function mapMediaRow(row: TherapistMediaRow): PublicTherapistMedia & { approvalStatus: MediaApprovalStatus } {
   return {
     id: row.id,
     url: row.url,
@@ -55,6 +71,7 @@ export function mapMediaRow(row: TherapistMediaRow): PublicTherapistMedia {
     altText: row.alt_text,
     isPrimary: row.is_primary,
     sortOrder: row.sort_order,
+    approvalStatus: (row.approval_status as MediaApprovalStatus) || "approved",
   };
 }
 
@@ -65,14 +82,21 @@ export function mapMediaRow(row: TherapistMediaRow): PublicTherapistMedia {
 export async function loadTherapistMedia(
   supabase: SupabaseClient,
   therapistIds: string[],
+  options?: { approvedOnly?: boolean },
 ): Promise<TherapistMediaRow[]> {
   if (!therapistIds.length) return [];
 
-  const current = await supabase
+  let query = supabase
     .from("therapist_media")
-    .select("id, therapist_id, url, media_type, thumbnail_url, alt_text, sort_order, is_primary")
+    .select("id, therapist_id, url, media_type, thumbnail_url, alt_text, sort_order, is_primary, approval_status")
     .in("therapist_id", therapistIds)
     .order("sort_order", { ascending: true });
+
+  if (options?.approvedOnly) {
+    query = query.eq("approval_status", "approved");
+  }
+
+  const current = await query;
 
   if (!current.error) {
     return (current.data || []) as TherapistMediaRow[];
@@ -99,8 +123,12 @@ export async function loadTherapistMedia(
     alt_text: null,
     sort_order: row.sort_order,
     is_primary: row.is_primary,
+    approval_status: "approved" as const,
   }));
 }
+
+export const THERAPIST_PUBLIC_SELECT =
+  "id, slug, display_name, gender, date_of_birth, height_cm, weight_kg, nationality, ethnicity, bio, languages, years_experience, training, accepting_bookings, show_on_gallery, status, featured, sort_order, show_age, show_height, show_weight, show_ethnicity, show_nationality";
 
 export function buildTherapistFiltersRpc(filters: TherapistFilters) {
   return {

@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { TherapistsDirectory } from "@/components/therapists/therapists-directory";
-import { getPublicCatalog } from "@/lib/catalog/public";
 import { getPublicTherapists } from "@/lib/therapists/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
@@ -11,45 +8,44 @@ import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Our therapists | Signature massage Thailand",
+  title: "Meet Your RoomSpa Therapists",
   description:
-    "Meet RoomSpa therapists — view Signature and wellness services, locations, and book where therapists are live across Thailand.",
+    "Meet the therapists behind RoomSpa — carefully selected for private experiences at your hotel, residence, or villa.",
   path: "/therapists",
+  noIndex: true,
 });
 
 export default async function TherapistsPage() {
-  const [therapists, catalog] = await Promise.all([getPublicTherapists({}), getPublicCatalog()]);
-
-  const serviceOptions = catalog.map((s) => ({ slug: s.slug, name: s.name }));
+  const therapists = await getPublicTherapists({});
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-12 xs:px-5 md:px-8 md:py-20">
-      <Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Therapists" }]} />
+    <div className="therapist-gallery-shell min-h-screen">
+      <section className="mx-auto max-w-6xl px-4 pb-20 pt-14 xs:px-5 md:px-8 md:pb-28 md:pt-24">
+        <p className="text-xs font-medium uppercase tracking-[0.28em] text-[#C8A96B]">RoomSpa</p>
+        <h1 className="mt-5 max-w-3xl font-display text-[2.35rem] leading-[1.05] tracking-tight text-[#F5F1E8] xs:text-5xl md:text-6xl">
+          Our therapists
+        </h1>
+        <p className="mt-5 max-w-xl text-base leading-relaxed text-[#B8B0A3] md:text-lg">
+          The people who make RoomSpa feel personal — selected with care for quiet, private sessions
+          wherever you’re staying.
+        </p>
 
-      <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">Our team</p>
-      <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-        Meet our therapists
-      </h1>
-      <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted">
-        Browse RoomSpa therapists by experience, service, and how close they are to where you are staying.
-        Only therapists who offer your chosen service and cover your area appear — never a cross-city mismatch.
-      </p>
-
-      <Suspense fallback={<p className="mt-8 text-sm text-muted">Loading filters…</p>}>
-        <div className="mt-8">
-          <TherapistsDirectory initialTherapists={therapists} serviceOptions={serviceOptions} />
+        <div className="mt-14 md:mt-16">
+          <TherapistsDirectory initialTherapists={therapists} galleryMode />
         </div>
-      </Suspense>
 
-      <div className="mt-14 border-t border-border pt-8">
-        <Link href="/book" className="text-sm font-medium text-accent underline-offset-4 hover:underline">
-          Ready to book? Choose service & therapist →
-        </Link>
-        <span className="mx-2 text-muted">·</span>
-        <WhatsAppLink cta="therapists" className="text-sm text-muted hover:text-accent">
-          WhatsApp
-        </WhatsAppLink>
-      </div>
-    </section>
+        <div className="mt-20 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[rgba(200,169,107,0.16)] pt-8">
+          <Link
+            href="/book"
+            className="text-sm font-medium text-[#C8A96B] underline-offset-4 hover:underline"
+          >
+            Request a booking →
+          </Link>
+          <WhatsAppLink cta="therapists" className="text-sm text-[#B8B0A3] hover:text-[#C8A96B]">
+            WhatsApp
+          </WhatsAppLink>
+        </div>
+      </section>
+    </div>
   );
 }

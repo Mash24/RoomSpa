@@ -343,7 +343,13 @@ textarea {
   background: var(--sensual-gold-soft);
 }
 
-
+/* Unlisted therapist gallery — hospitality dark shell */
+.therapist-gallery-shell {
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(200, 169, 107, 0.08), transparent 55%),
+    #11100f;
+  color: #f5f1e8;
+}
 
 @keyframes fade-up {
   from {

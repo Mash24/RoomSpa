@@ -5,6 +5,7 @@ import { formatBookingAmount } from "@/components/payment/payment-badges";
 import { formatBookingDateTime } from "@/lib/admin/dates";
 import type { AdminBooking, AdminDashboardStats, BookingFilter, BookingStatus } from "@/lib/admin/types";
 import { DashboardStats } from "@/components/admin/dashboard-stats";
+import { TherapistOpsAttention } from "@/components/admin/therapist-ops-attention";
 import {
   AdminAlert,
   AdminEmpty,
@@ -311,6 +312,8 @@ export function AdminDashboardPanel() {
         title="Dashboard"
         description="Confirm appointments, track today’s load, and keep cash and card revenue in view."
       />
+
+      <TherapistOpsAttention />
 
       <DashboardStats stats={stats} loading={statsLoading} />
 

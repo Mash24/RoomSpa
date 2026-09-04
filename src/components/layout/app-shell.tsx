@@ -11,6 +11,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
   const isBooking = pathname.startsWith("/book");
+  const isTherapistGallery = pathname === "/therapists" || pathname.startsWith("/therapists/");
 
   if (isAdmin) {
     return <>{children}</>;
@@ -20,10 +21,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <>
       <AttributionBootstrap />
       <SiteHeader />
-      <main className={`flex-1 ${isBooking ? "" : "page-bottom-clearance"}`}>{children}</main>
+      <main className={`flex-1 ${isBooking || isTherapistGallery ? "" : "page-bottom-clearance"}`}>{children}</main>
       {!isBooking ? <ChatWidget /> : null}
       {!isBooking ? <WhatsAppFloat /> : null}
-      <SiteFooter />
+      {!isTherapistGallery ? <SiteFooter /> : null}
     </>
   );
 }

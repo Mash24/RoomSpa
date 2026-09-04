@@ -2,11 +2,8 @@ import Link from "next/link";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { TherapistPhotoGallery } from "@/components/therapists/therapist-photo-gallery";
 import type { CatalogService } from "@/content/services";
-import { productPriceLabel, getServicePriceTiers } from "@/content/services";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
-import {
-  formatTherapistHeadline,
-} from "@/lib/therapists/public";
+import { formatTherapistHeadline } from "@/lib/therapists/public";
 import { getServicePath } from "@/lib/catalog/service-paths";
 import { anyoneBookHref, therapistBookHref } from "@/lib/therapists/booking-links";
 import type { PublicTherapist } from "@/lib/therapists/types";
@@ -20,16 +17,23 @@ type Props = {
 export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
   const gallery = therapist.media.filter((m) => m.type === "photo");
   const headline = formatTherapistHeadline(therapist);
+  const firstName = therapist.displayName.split(" ")[0] || therapist.displayName;
   const bookHref = therapistBookHref(therapist.id, { serviceFallback: therapist.serviceSlugs[0] });
   const bookAnyoneHref = anyoneBookHref({ service: therapist.serviceSlugs[0] });
+  const languages = therapist.languages?.length ? therapist.languages.join(" · ") : null;
+  const experience =
+    therapist.yearsExperience != null
+      ? `${therapist.yearsExperience} year${therapist.yearsExperience === 1 ? "" : "s"} experience`
+      : null;
 
-  const textMain = dark ? "text-[#f5f0e8]" : "text-foreground";
-  const textMuted = dark ? "text-[#f5f0e8]/75" : "text-muted";
-  const textAccent = dark ? "text-[#c9a86c]" : "text-accent";
-  const labelClass = `text-xs font-medium uppercase tracking-[0.16em] ${dark ? "text-[#c9a86c]" : "text-muted"}`;
+  const textMain = dark ? "text-[#F5F1E8]" : "text-foreground";
+  const textMuted = dark ? "text-[#B8B0A3]" : "text-muted";
+  const textAccent = dark ? "text-[#C8A96B]" : "text-accent";
+  const labelClass = `text-xs font-medium uppercase tracking-[0.16em] ${dark ? "text-[#C8A96B]" : "text-muted"}`;
+  const ring = dark ? "ring-[rgba(200,169,107,0.25)]" : "ring-border";
 
   return (
-    <article className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-16">
+    <article className="mx-auto max-w-3xl px-4 pb-28 pt-12 xs:px-5 md:px-8 md:pb-24 md:pt-16">
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
@@ -38,7 +42,6 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
         ]}
       />
 
-      {/* Gallery */}
       <div className="mt-8">
         <TherapistPhotoGallery photos={gallery} displayName={therapist.displayName} dark={dark} />
       </div>
@@ -49,11 +52,15 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
             {therapist.displayName}
           </h1>
           {therapist.verified ? (
-            <span className={`text-sm font-medium ${textAccent}`}>✓ Verified</span>
+            <span className={`text-sm font-medium ${textAccent}`}>Verified</span>
           ) : null}
         </div>
         {headline ? <p className={`mt-2 text-base ${textMuted}`}>{headline}</p> : null}
-        {therapist.height ? <p className={`mt-1 text-sm ${textMuted}`}>{therapist.height}</p> : null}
+        <div className={`mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm ${textMuted}`}>
+          {languages ? <span>{languages}</span> : null}
+          {experience ? <span>{experience}</span> : null}
+          {therapist.height ? <span>{therapist.height}</span> : null}
+        </div>
       </header>
 
       <section className="mt-8">
@@ -90,12 +97,7 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
         {therapist.serviceAreaNames.length > 0 ? (
           <ul className={`mt-3 flex flex-wrap gap-2 ${textMain}`}>
             {therapist.serviceAreaNames.map((area) => (
-              <li
-                key={area}
-                className={`rounded-sm px-3 py-1.5 text-sm ring-1 ${
-                  dark ? "ring-[#c9a86c]/25" : "ring-border"
-                }`}
-              >
+              <li key={area} className={`rounded-sm px-3 py-1.5 text-sm ring-1 ${ring}`}>
                 {area}
               </li>
             ))}
@@ -110,12 +112,18 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
         </section>
       ) : null}
 
+      {therapist.training ? (
+        <section className="mt-8">
+          <h2 className={labelClass}>Training</h2>
+          <p className={`mt-3 text-sm leading-relaxed ${textMuted}`}>{therapist.training}</p>
+        </section>
+      ) : null}
+
       <section className="mt-10">
         <h2 className={labelClass}>Services</h2>
-        <ul className={`mt-4 divide-y ${dark ? "divide-[#c9a86c]/15" : "divide-border"}`}>
+        <ul className={`mt-4 divide-y ${dark ? "divide-[rgba(200,169,107,0.15)]" : "divide-border"}`}>
           {therapist.serviceSlugs.map((slug, i) => {
             const svc = catalog.find((c) => c.slug === slug);
-            const from = svc ? productPriceLabel(getServicePriceTiers(svc)[60]) : null;
             return (
               <li key={slug} className="flex items-center justify-between gap-4 py-3">
                 <Link
@@ -124,29 +132,42 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
                 >
                   {therapist.serviceNames[i] ?? slug}
                 </Link>
-                {from ? <span className={`text-sm ${textAccent}`}>From {from}</span> : null}
               </li>
             );
           })}
         </ul>
+        <p className={`mt-3 text-sm ${textMuted}`}>
+          Availability is confirmed when you request a booking — we don’t show live calendars here.
+        </p>
       </section>
 
-      <div className="mt-10 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap">
-        <Link
-          href={bookHref}
-          className={`inline-flex min-h-12 items-center justify-center rounded-sm px-5 py-3 text-sm font-medium ${
-            dark ? "sensual-btn-primary" : "bg-accent text-accent-foreground"
-          }`}
-        >
-          Book with {therapist.displayName.split(" ")[0]}
-        </Link>
+      {/* Desktop CTAs */}
+      <div className="mt-10 hidden flex-col gap-2.5 md:flex md:flex-row md:flex-wrap">
+        {therapist.acceptingBookings ? (
+          <Link
+            href={bookHref}
+            className={`inline-flex min-h-12 items-center justify-center rounded-sm px-5 py-3 text-sm font-medium ${
+              dark ? "sensual-btn-primary" : "bg-accent text-accent-foreground"
+            }`}
+          >
+            Request this therapist
+          </Link>
+        ) : (
+          <p
+            className={`inline-flex min-h-12 items-center rounded-sm border px-5 py-3 text-sm ${
+              dark ? "border-[rgba(200,169,107,0.25)] text-[#B8B0A3]" : "border-border text-muted"
+            }`}
+          >
+            Currently not accepting bookings
+          </p>
+        )}
         <Link
           href={bookAnyoneHref}
           className={`inline-flex min-h-12 items-center justify-center rounded-sm border px-5 py-3 text-sm ${
             dark ? "sensual-btn-outline" : "border-border hover:border-accent"
           }`}
         >
-          Book anyone available
+          Match me with anyone
         </Link>
         <WhatsAppLink
           cta="therapist-profile"
@@ -156,6 +177,30 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
         >
           WhatsApp
         </WhatsAppLink>
+      </div>
+
+      {/* Sticky mobile CTA */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-40 border-t px-4 py-3 md:hidden ${
+          dark
+            ? "border-[rgba(200,169,107,0.2)] bg-[#11100F]/95 backdrop-blur-md"
+            : "border-border bg-background/95 backdrop-blur-md"
+        }`}
+      >
+        {therapist.acceptingBookings ? (
+          <Link
+            href={bookHref}
+            className={`flex min-h-12 w-full items-center justify-center rounded-sm text-sm font-medium ${
+              dark ? "sensual-btn-primary" : "bg-accent text-accent-foreground"
+            }`}
+          >
+            Request {firstName}
+          </Link>
+        ) : (
+          <p className={`py-3 text-center text-sm ${dark ? "text-[#B8B0A3]" : "text-muted"}`}>
+            Currently not accepting bookings
+          </p>
+        )}
       </div>
     </article>
   );

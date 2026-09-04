@@ -8,6 +8,7 @@ import {
 import {
   loadTherapistMedia,
   mapMediaRow,
+  THERAPIST_PUBLIC_SELECT,
   type TherapistLocationRow,
   type TherapistMediaRow,
   type TherapistQueryRow,
@@ -17,6 +18,11 @@ import type {
   PublicTherapist,
   TherapistFilters,
 } from "@/lib/therapists/types";
+import {
+  deriveTherapistVerified,
+  filterApprovedPublicMedia,
+  isPubliclyEligibleTherapist,
+} from "@/lib/therapists/visibility";
 
 export { findEligibleTherapists } from "@/lib/therapists/eligibility";
 export { assignBestAvailableTherapist } from "@/lib/therapists/assignment";
@@ -39,10 +45,10 @@ async function loadVisibleTherapistRelations(therapistId: string) {
   const supabase = createAdminishAnonClient();
 
   const [mediaRows, servicesRes, areasRes, locationRes] = await Promise.all([
-    loadTherapistMedia(supabase, [therapistId]),
+    loadTherapistMedia(supabase, [therapistId], { approvedOnly: false }),
     supabase
       .from("therapist_services")
-      .select("therapist_id, services!inner(slug, name)")
+      .select("therapist_id, approved, active, services!inner(slug, name)")
       .eq("active", true)
       .eq("therapist_id", therapistId),
     supabase
@@ -53,15 +59,18 @@ async function loadVisibleTherapistRelations(therapistId: string) {
     supabase.rpc("get_therapist_public_locations", { p_therapist_ids: [therapistId] }),
   ]);
 
-  const media = (mediaRows as TherapistMediaRow[]).map(mapMediaRow);
+  const mediaWithApproval = (mediaRows as TherapistMediaRow[]).map(mapMediaRow);
+  const media = filterApprovedPublicMedia(mediaWithApproval);
   const serviceSlugs: string[] = [];
   const serviceNames: string[] = [];
+  const serviceMeta: { approved: boolean; active: boolean }[] = [];
   for (const row of servicesRes.data || []) {
     const svc = row.services as { slug: string; name: string } | { slug: string; name: string }[];
     const service = Array.isArray(svc) ? svc[0] : svc;
     if (!service) continue;
     serviceSlugs.push(service.slug);
     serviceNames.push(service.name);
+    serviceMeta.push({ approved: Boolean(row.approved), active: row.active !== false });
   }
 
   const serviceAreaSlugs: string[] = [];
@@ -93,13 +102,39 @@ async function loadVisibleTherapistRelations(therapistId: string) {
     mapCoords = fromDb ?? fromStatic ?? null;
   }
 
-  return { media, serviceSlugs, serviceNames, serviceAreaSlugs, serviceAreaNames, location, mapCoords };
+  return {
+    media,
+    mediaWithApproval,
+    serviceSlugs,
+    serviceNames,
+    serviceMeta,
+    serviceAreaSlugs,
+    serviceAreaNames,
+    location,
+    mapCoords,
+  };
 }
 
 function mapVisibleTherapist(
   row: TherapistQueryRow,
   relations: Awaited<ReturnType<typeof loadVisibleTherapistRelations>>,
-): PublicTherapist {
+): PublicTherapist | null {
+  const eligibilityInput = {
+    showOnGallery: row.show_on_gallery === true,
+    acceptingBookings: row.accepting_bookings !== false,
+    suspended: row.status === "suspended" || row.status === "inactive",
+    media: relations.mediaWithApproval.map((m) => ({
+      approvalStatus: (m as { approvalStatus?: "pending" | "approved" | "rejected" }).approvalStatus,
+      isPrimary: m.isPrimary,
+      type: m.type,
+    })),
+    services: relations.serviceMeta,
+  };
+
+  if (!isPubliclyEligibleTherapist(eligibilityInput)) {
+    return null;
+  }
+
   const sortedMedia = [...relations.media].sort((a, b) => {
     if (a.isPrimary !== b.isPrimary) return a.isPrimary ? -1 : 1;
     return a.sortOrder - b.sortOrder;
@@ -122,11 +157,16 @@ function mapVisibleTherapist(
     nationality: row.show_nationality ? row.nationality : null,
     ethnicity: row.show_ethnicity ? row.ethnicity : null,
     bio: row.bio,
+    languages: Array.isArray(row.languages) ? row.languages.filter(Boolean) : [],
+    yearsExperience: row.years_experience != null ? Number(row.years_experience) : null,
+    training: row.training?.trim() || null,
     city: relations.location?.city ?? "",
     country: relations.location?.country ?? "",
     region: relations.location?.region ?? "",
     areaSummary,
-    verified: row.verified,
+    verified: deriveTherapistVerified(eligibilityInput),
+    showOnGallery: row.show_on_gallery === true,
+    acceptingBookings: row.accepting_bookings !== false,
     featured: row.featured,
     media: sortedMedia,
     serviceSlugs: relations.serviceSlugs,
@@ -139,16 +179,13 @@ function mapVisibleTherapist(
 }
 
 /**
- * Visible therapist profile — does not require location eligibility.
- * Bookability at a specific time is checked separately (Phase 10D).
+ * Gallery-ready therapist profile — show_on_gallery + approved photo + approved service.
  */
 export async function getVisibleTherapistBySlug(slug: string): Promise<PublicTherapist | null> {
   const supabase = createAdminishAnonClient();
   const { data: row, error } = await supabase
     .from("therapists")
-    .select(
-      "id, slug, display_name, gender, date_of_birth, height_cm, weight_kg, nationality, ethnicity, bio, featured, sort_order, show_age, show_height, show_weight, show_ethnicity, show_nationality, verified",
-    )
+    .select(THERAPIST_PUBLIC_SELECT)
     .eq("slug", slug)
     .maybeSingle();
 
@@ -156,6 +193,34 @@ export async function getVisibleTherapistBySlug(slug: string): Promise<PublicThe
 
   const relations = await loadVisibleTherapistRelations(row.id as string);
   return mapVisibleTherapist(row as TherapistQueryRow, relations);
+}
+
+/** Profile URL lookup — exists but may be hidden from the gallery. */
+export async function getTherapistProfileAccess(slug: string): Promise<
+  | { state: "missing" }
+  | { state: "unavailable"; displayName: string }
+  | { state: "ok"; therapist: PublicTherapist }
+> {
+  const supabase = createAdminishAnonClient();
+  const { data: row, error } = await supabase
+    .from("therapists")
+    .select(THERAPIST_PUBLIC_SELECT)
+    .eq("slug", slug)
+    .maybeSingle();
+
+  if (error || !row) return { state: "missing" };
+
+  const typed = row as TherapistQueryRow;
+  if (typed.status === "suspended" || typed.status === "inactive") {
+    return { state: "unavailable", displayName: typed.display_name };
+  }
+
+  const relations = await loadVisibleTherapistRelations(typed.id);
+  const therapist = mapVisibleTherapist(typed, relations);
+  if (!therapist) {
+    return { state: "unavailable", displayName: typed.display_name };
+  }
+  return { state: "ok", therapist };
 }
 
 /** @deprecated Alias — use getVisibleTherapistBySlug for profile pages. */

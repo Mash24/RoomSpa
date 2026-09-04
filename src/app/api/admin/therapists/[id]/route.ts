@@ -1,9 +1,23 @@
 import { NextResponse } from "next/server";
 import { requireAdminSession } from "@/lib/admin/auth";
+import { scoreOrNull } from "@/lib/therapists/admin-ops";
 import { therapistStatusFlags } from "@/lib/therapists/status";
 import type { TherapistStatus } from "@/lib/therapists/types";
 
 type RouteContext = { params: Promise<{ id: string }> };
+
+function parseLanguages(raw: unknown): string[] {
+  if (Array.isArray(raw)) {
+    return raw.map(String).map((s) => s.trim()).filter(Boolean);
+  }
+  if (typeof raw === "string") {
+    return raw
+      .split(/[,|/]/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
 
 export async function PATCH(request: Request, context: RouteContext) {
   const { supabase, error } = await requireAdminSession();
@@ -27,6 +41,24 @@ export async function PATCH(request: Request, context: RouteContext) {
   if (body.nationality !== undefined) patch.nationality = body.nationality || null;
   if (body.ethnicity != null) patch.ethnicity = String(body.ethnicity);
   if (body.bio != null) patch.bio = String(body.bio);
+  if (body.languages !== undefined) patch.languages = parseLanguages(body.languages);
+  if (body.yearsExperience !== undefined) {
+    patch.years_experience =
+      body.yearsExperience != null && body.yearsExperience !== ""
+        ? Number(body.yearsExperience)
+        : null;
+  }
+  if (body.training !== undefined) patch.training = String(body.training || "");
+  if (body.acceptingBookings != null) patch.accepting_bookings = Boolean(body.acceptingBookings);
+  if (body.showOnGallery != null) patch.show_on_gallery = Boolean(body.showOnGallery);
+  if (body.internalNotes !== undefined) patch.internal_notes = String(body.internalNotes || "");
+  if (body.phone !== undefined) patch.phone = body.phone || null;
+  if (body.skillScore !== undefined) patch.skill_score = scoreOrNull(body.skillScore);
+  if (body.professionalismScore !== undefined) patch.professionalism_score = scoreOrNull(body.professionalismScore);
+  if (body.communicationScore !== undefined) patch.communication_score = scoreOrNull(body.communicationScore);
+  if (body.reliabilityScore !== undefined) patch.reliability_score = scoreOrNull(body.reliabilityScore);
+  if (body.punctualityScore !== undefined) patch.punctuality_score = scoreOrNull(body.punctualityScore);
+  if (body.feedbackScore !== undefined) patch.feedback_score = scoreOrNull(body.feedbackScore);
   if (body.status != null) {
     const nextStatus = body.status as TherapistStatus;
     patch.status = nextStatus;
@@ -37,7 +69,7 @@ export async function PATCH(request: Request, context: RouteContext) {
     patch.status = body.isActive ? "active" : "inactive";
   }
   if (body.isBookable != null) patch.is_bookable = Boolean(body.isBookable);
-  if (body.verified != null) patch.verified = Boolean(body.verified);
+  // verified is derived — ignore manual toggles
   if (body.showAge != null) patch.show_age = Boolean(body.showAge);
   if (body.showHeight != null) patch.show_height = Boolean(body.showHeight);
   if (body.showWeight != null) patch.show_weight = Boolean(body.showWeight);
@@ -51,7 +83,17 @@ export async function PATCH(request: Request, context: RouteContext) {
     return NextResponse.json({ error: updateError.message }, { status: 400 });
   }
 
-  if (body.photoUrls || body.mediaUrls || body.serviceIds || body.serviceAreaIds || body.coverageAreaIds || body.location) {
+  if (
+    body.photoUrls ||
+    body.mediaUrls ||
+    body.mediaApprovals ||
+    body.primaryPhotoUrl ||
+    body.serviceIds ||
+    body.serviceQualifications ||
+    body.serviceAreaIds ||
+    body.coverageAreaIds ||
+    body.location
+  ) {
     const { syncRelations } = await import("../route");
     const relationError = await syncRelations(supabase, id, body);
     if (relationError) {
@@ -75,6 +117,7 @@ export async function DELETE(_request: Request, context: RouteContext) {
       status: "inactive",
       is_active: false,
       is_bookable: false,
+      accepting_bookings: false,
       updated_at: new Date().toISOString(),
     })
     .eq("id", id);
