@@ -3,6 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import {
+  IconEye,
+  IconEyeOff,
+  IconPen,
+  IconProfile,
+  IconTrash,
+} from "@/components/admin/admin-icons";
 import { AdminAlert, AdminPageHeader } from "@/components/admin/admin-ui";
 import type { AdminTherapistRow } from "@/lib/therapists/types";
 
@@ -14,55 +21,6 @@ function primaryPhotoUrl(t: AdminTherapistRow): string | null {
   const photos = t.media.filter((m) => m.type === "photo");
   const primary = photos.find((m) => m.isPrimary);
   return primary?.url ?? photos[0]?.url ?? null;
-}
-
-function IconEye({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12s-3.75 6.75-9.75 6.75S2.25 12 2.25 12Z"
-      />
-      <circle cx="12" cy="12" r="2.75" />
-    </svg>
-  );
-}
-
-function IconEyeOff({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M3.75 3.75l16.5 16.5M9.88 9.94A2.75 2.75 0 0 0 14.06 14.1M6.6 6.74C4.3 8.2 2.7 10.4 2.25 12c0 0 3.75 6.75 9.75 6.75 1.7 0 3.2-.4 4.5-1.02M10.4 5.4A10.4 10.4 0 0 1 12 5.25c6 0 9.75 6.75 9.75 6.75a17.4 17.4 0 0 1-2.4 3.05"
-      />
-    </svg>
-  );
-}
-
-function IconPen({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M16.86 3.86a2.12 2.12 0 0 1 3 3L8.25 18.47 4.5 19.5l1.03-3.75L16.86 3.86Z"
-      />
-    </svg>
-  );
-}
-
-function IconTrash({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M4.5 7.5h15M9.75 7.5V5.25A1.5 1.5 0 0 1 11.25 3.75h1.5a1.5 1.5 0 0 1 1.5 1.5V7.5m2.25 0V18a1.5 1.5 0 0 1-1.5 1.5h-7.5A1.5 1.5 0 0 1 6 18V7.5h12Z"
-      />
-    </svg>
-  );
 }
 
 const iconBtn =
@@ -155,6 +113,81 @@ export function AdminTherapistsPanel() {
     }
   }, [filter, therapists]);
 
+  function actionButtons(t: AdminTherapistRow, compact = false) {
+    const busy = togglingId === t.id || deletingId === t.id;
+    const btn = compact
+      ? "inline-flex h-8 w-8 items-center justify-center rounded-full transition disabled:opacity-60"
+      : iconBtn;
+    const ic = compact ? "h-4 w-4" : iconClass;
+
+    return (
+      <div className={`flex flex-wrap items-center ${compact ? "gap-1.5 xs:gap-2" : "gap-1.5 xs:gap-2"}`}>
+        <Link
+          href={`/admin/therapists/${t.id}/view`}
+          title="View profile"
+          aria-label={`View ${t.displayName}`}
+          className={
+            compact
+              ? `${btn} text-foreground hover:bg-surface`
+              : `${btn} border-border text-foreground hover:bg-surface`
+          }
+        >
+          <IconProfile className={ic} />
+        </Link>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void toggleGallery(t)}
+          title={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
+          aria-label={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
+          className={
+            compact
+              ? `${btn} text-muted hover:bg-surface hover:text-foreground`
+              : `${btn} border-border text-muted hover:text-foreground`
+          }
+        >
+          {togglingId === t.id ? (
+            <span className="text-xs">…</span>
+          ) : t.showOnGallery ? (
+            <IconEye className={ic} />
+          ) : (
+            <IconEyeOff className={ic} />
+          )}
+        </button>
+        <Link
+          href={`/admin/therapists/${t.id}`}
+          title="Edit"
+          aria-label={`Edit ${t.displayName}`}
+          className={
+            compact
+              ? `${btn} text-accent hover:bg-surface`
+              : `${btn} border-transparent bg-accent text-accent-foreground`
+          }
+        >
+          <IconPen className={ic} />
+        </Link>
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void removeTherapist(t)}
+          title="Delete permanently"
+          aria-label={`Delete ${t.displayName}`}
+          className={
+            compact
+              ? `${btn} text-red-700 hover:bg-red-50`
+              : `${btn} border-red-300 text-red-700`
+          }
+        >
+          {deletingId === t.id ? (
+            <span className="text-xs">…</span>
+          ) : (
+            <IconTrash className={ic} />
+          )}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 md:space-y-8">
       <AdminPageHeader
@@ -203,7 +236,6 @@ export function AdminTherapistsPanel() {
           <ul className="admin-card-list">
             {filtered.map((t) => {
               const photo = primaryPhotoUrl(t);
-              const busy = togglingId === t.id || deletingId === t.id;
               return (
                 <li key={t.id} className="admin-card p-4">
                   <div className="flex gap-2.5 xs:gap-3">
@@ -231,46 +263,7 @@ export function AdminTherapistsPanel() {
                       </p>
                     </div>
                   </div>
-                  <div className="mt-3 flex items-center gap-1.5 xs:gap-2">
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => void toggleGallery(t)}
-                      title={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
-                      aria-label={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
-                      className={`${iconBtn} border-border text-muted hover:text-foreground`}
-                    >
-                      {togglingId === t.id ? (
-                        <span className="text-xs">…</span>
-                      ) : t.showOnGallery ? (
-                        <IconEye className={iconClass} />
-                      ) : (
-                        <IconEyeOff className={iconClass} />
-                      )}
-                    </button>
-                    <Link
-                      href={`/admin/therapists/${t.id}`}
-                      title="Edit"
-                      aria-label={`Edit ${t.displayName}`}
-                      className={`${iconBtn} border-transparent bg-accent text-accent-foreground`}
-                    >
-                      <IconPen className={iconClass} />
-                    </Link>
-                    <button
-                      type="button"
-                      disabled={busy}
-                      onClick={() => void removeTherapist(t)}
-                      title="Delete permanently"
-                      aria-label={`Delete ${t.displayName}`}
-                      className={`${iconBtn} border-red-300 text-red-700`}
-                    >
-                      {deletingId === t.id ? (
-                        <span className="text-xs">…</span>
-                      ) : (
-                        <IconTrash className={iconClass} />
-                      )}
-                    </button>
-                  </div>
+                  <div className="mt-3">{actionButtons(t)}</div>
                 </li>
               );
             })}
@@ -290,7 +283,6 @@ export function AdminTherapistsPanel() {
               <tbody>
                 {filtered.map((t) => {
                   const photo = primaryPhotoUrl(t);
-                  const busy = togglingId === t.id || deletingId === t.id;
                   return (
                     <tr key={t.id} className="border-b border-border last:border-b-0">
                       <td className="px-4 py-3">
@@ -333,48 +325,7 @@ export function AdminTherapistsPanel() {
                       <td className="px-3 py-3 text-foreground">
                         {t.location ? formatCity(t.location) : "—"}
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex flex-wrap items-center gap-1.5 xs:gap-2">
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => void toggleGallery(t)}
-                            title={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
-                            aria-label={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted transition hover:bg-surface hover:text-foreground disabled:opacity-60"
-                          >
-                            {togglingId === t.id ? (
-                              <span className="text-xs">…</span>
-                            ) : t.showOnGallery ? (
-                              <IconEye className="h-4 w-4" />
-                            ) : (
-                              <IconEyeOff className="h-4 w-4" />
-                            )}
-                          </button>
-                          <Link
-                            href={`/admin/therapists/${t.id}`}
-                            title="Edit"
-                            aria-label={`Edit ${t.displayName}`}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-accent transition hover:bg-surface"
-                          >
-                            <IconPen className="h-4 w-4" />
-                          </Link>
-                          <button
-                            type="button"
-                            disabled={busy}
-                            onClick={() => void removeTherapist(t)}
-                            title="Delete permanently"
-                            aria-label={`Delete ${t.displayName}`}
-                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-red-700 transition hover:bg-red-50 disabled:opacity-60"
-                          >
-                            {deletingId === t.id ? (
-                              <span className="text-xs">…</span>
-                            ) : (
-                              <IconTrash className="h-4 w-4" />
-                            )}
-                          </button>
-                        </div>
-                      </td>
+                      <td className="px-4 py-3">{actionButtons(t, true)}</td>
                     </tr>
                   );
                 })}
