@@ -16,6 +16,59 @@ function primaryPhotoUrl(t: AdminTherapistRow): string | null {
   return primary?.url ?? photos[0]?.url ?? null;
 }
 
+function IconEye({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12s-3.75 6.75-9.75 6.75S2.25 12 2.25 12Z"
+      />
+      <circle cx="12" cy="12" r="2.75" />
+    </svg>
+  );
+}
+
+function IconEyeOff({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M3.75 3.75l16.5 16.5M9.88 9.94A2.75 2.75 0 0 0 14.06 14.1M6.6 6.74C4.3 8.2 2.7 10.4 2.25 12c0 0 3.75 6.75 9.75 6.75 1.7 0 3.2-.4 4.5-1.02M10.4 5.4A10.4 10.4 0 0 1 12 5.25c6 0 9.75 6.75 9.75 6.75a17.4 17.4 0 0 1-2.4 3.05"
+      />
+    </svg>
+  );
+}
+
+function IconPen({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16.86 3.86a2.12 2.12 0 0 1 3 3L8.25 18.47 4.5 19.5l1.03-3.75L16.86 3.86Z"
+      />
+    </svg>
+  );
+}
+
+function IconTrash({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className} aria-hidden>
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M4.5 7.5h15M9.75 7.5V5.25A1.5 1.5 0 0 1 11.25 3.75h1.5a1.5 1.5 0 0 1 1.5 1.5V7.5m2.25 0V18a1.5 1.5 0 0 1-1.5 1.5h-7.5A1.5 1.5 0 0 1 6 18V7.5h12Z"
+      />
+    </svg>
+  );
+}
+
+const iconBtn =
+  "inline-flex min-h-9 min-w-9 items-center justify-center rounded-full border disabled:opacity-60 xs:min-h-10 xs:min-w-10 sm:min-h-11 sm:min-w-11";
+const iconClass = "h-4 w-4 xs:h-[1.05rem] xs:w-[1.05rem] sm:h-5 sm:w-5";
+
 type Filter = "all" | "visible" | "hidden";
 
 export function AdminTherapistsPanel() {
@@ -178,28 +231,44 @@ export function AdminTherapistsPanel() {
                       </p>
                     </div>
                   </div>
-                  <div className="mt-3 grid grid-cols-3 gap-1.5 xs:gap-2">
+                  <div className="mt-3 flex items-center gap-1.5 xs:gap-2">
                     <button
                       type="button"
                       disabled={busy}
                       onClick={() => void toggleGallery(t)}
-                      className="inline-flex min-h-9 items-center justify-center rounded-full border border-border px-2 text-xs font-medium disabled:opacity-60 xs:min-h-10 xs:px-3 xs:text-sm sm:min-h-11"
+                      title={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
+                      aria-label={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
+                      className={`${iconBtn} border-border text-muted hover:text-foreground`}
                     >
-                      {togglingId === t.id ? "…" : t.showOnGallery ? "Hide" : "Show"}
+                      {togglingId === t.id ? (
+                        <span className="text-xs">…</span>
+                      ) : t.showOnGallery ? (
+                        <IconEye className={iconClass} />
+                      ) : (
+                        <IconEyeOff className={iconClass} />
+                      )}
                     </button>
                     <Link
                       href={`/admin/therapists/${t.id}`}
-                      className="inline-flex min-h-9 items-center justify-center rounded-full bg-accent px-2 text-xs font-medium text-accent-foreground xs:min-h-10 xs:px-3 xs:text-sm sm:min-h-11"
+                      title="Edit"
+                      aria-label={`Edit ${t.displayName}`}
+                      className={`${iconBtn} border-transparent bg-accent text-accent-foreground`}
                     >
-                      Edit
+                      <IconPen className={iconClass} />
                     </Link>
                     <button
                       type="button"
                       disabled={busy}
                       onClick={() => void removeTherapist(t)}
-                      className="inline-flex min-h-9 items-center justify-center rounded-full border border-red-300 px-2 text-xs font-medium text-red-700 disabled:opacity-60 xs:min-h-10 xs:px-3 xs:text-sm sm:min-h-11"
+                      title="Delete permanently"
+                      aria-label={`Delete ${t.displayName}`}
+                      className={`${iconBtn} border-red-300 text-red-700`}
                     >
-                      {deletingId === t.id ? "…" : "Delete"}
+                      {deletingId === t.id ? (
+                        <span className="text-xs">…</span>
+                      ) : (
+                        <IconTrash className={iconClass} />
+                      )}
                     </button>
                   </div>
                 </li>
@@ -265,28 +334,44 @@ export function AdminTherapistsPanel() {
                         {t.location ? formatCity(t.location) : "—"}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex flex-wrap items-center gap-2 xs:gap-3">
+                        <div className="flex flex-wrap items-center gap-1.5 xs:gap-2">
                           <button
                             type="button"
                             disabled={busy}
                             onClick={() => void toggleGallery(t)}
-                            className="text-xs text-muted underline-offset-2 hover:text-foreground hover:underline disabled:opacity-60 xs:text-sm"
+                            title={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
+                            aria-label={t.showOnGallery ? "Hide from gallery" : "Show on gallery"}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-muted transition hover:bg-surface hover:text-foreground disabled:opacity-60"
                           >
-                            {togglingId === t.id ? "…" : t.showOnGallery ? "Hide" : "Show"}
+                            {togglingId === t.id ? (
+                              <span className="text-xs">…</span>
+                            ) : t.showOnGallery ? (
+                              <IconEye className="h-4 w-4" />
+                            ) : (
+                              <IconEyeOff className="h-4 w-4" />
+                            )}
                           </button>
                           <Link
                             href={`/admin/therapists/${t.id}`}
-                            className="text-xs text-accent underline-offset-2 hover:underline xs:text-sm"
+                            title="Edit"
+                            aria-label={`Edit ${t.displayName}`}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-accent transition hover:bg-surface"
                           >
-                            Edit
+                            <IconPen className="h-4 w-4" />
                           </Link>
                           <button
                             type="button"
                             disabled={busy}
                             onClick={() => void removeTherapist(t)}
-                            className="text-xs text-red-700 underline-offset-2 hover:underline disabled:opacity-60 xs:text-sm"
+                            title="Delete permanently"
+                            aria-label={`Delete ${t.displayName}`}
+                            className="inline-flex h-8 w-8 items-center justify-center rounded-full text-red-700 transition hover:bg-red-50 disabled:opacity-60"
                           >
-                            {deletingId === t.id ? "…" : "Delete"}
+                            {deletingId === t.id ? (
+                              <span className="text-xs">…</span>
+                            ) : (
+                              <IconTrash className="h-4 w-4" />
+                            )}
                           </button>
                         </div>
                       </td>
