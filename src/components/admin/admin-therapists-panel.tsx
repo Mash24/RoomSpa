@@ -111,7 +111,7 @@ export function AdminTherapistsPanel() {
         actions={
           <Link
             href="/admin/therapists/new"
-            className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-white px-5 text-sm font-medium text-[#1a221c] transition hover:bg-white/90 sm:w-auto"
+            className="inline-flex min-h-9 w-full items-center justify-center rounded-full bg-white px-4 text-xs font-medium text-[#1a221c] transition hover:bg-white/90 xs:min-h-10 xs:px-5 xs:text-sm sm:min-h-11 sm:w-auto"
           >
             + Add therapist
           </Link>
@@ -120,7 +120,7 @@ export function AdminTherapistsPanel() {
 
       {error ? <AdminAlert tone="error">{error}</AdminAlert> : null}
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-1.5 xs:gap-2">
         {(
           [
             ["all", "All"],
@@ -132,7 +132,7 @@ export function AdminTherapistsPanel() {
             key={value}
             type="button"
             onClick={() => setFilter(value)}
-            className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+            className={`rounded-full px-2.5 py-1 text-[0.7rem] font-medium transition xs:px-3 xs:py-1.5 xs:text-xs ${
               filter === value
                 ? "bg-accent text-accent-foreground"
                 : "bg-surface text-muted ring-1 ring-border hover:text-foreground"
@@ -153,43 +153,43 @@ export function AdminTherapistsPanel() {
               const busy = togglingId === t.id || deletingId === t.id;
               return (
                 <li key={t.id} className="admin-card p-4">
-                  <div className="flex gap-3">
-                    <div className="relative h-20 w-16 shrink-0 overflow-hidden rounded-sm bg-surface ring-1 ring-border">
+                  <div className="flex gap-2.5 xs:gap-3">
+                    <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded-sm bg-surface ring-1 ring-border xs:h-20 xs:w-16">
                       {photo ? (
                         <Image
                           src={photo}
                           alt={t.displayName}
                           fill
-                          sizes="64px"
+                          sizes="(max-width: 384px) 48px, 64px"
                           className="object-cover"
                         />
                       ) : (
-                        <span className="flex h-full items-center justify-center text-[0.65rem] text-muted">
+                        <span className="flex h-full items-center justify-center text-[0.6rem] text-muted xs:text-[0.65rem]">
                           No photo
                         </span>
                       )}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-foreground">{t.displayName}</p>
-                      <p className="mt-1 text-sm text-muted">
+                      <p className="text-sm font-medium text-foreground xs:text-base">{t.displayName}</p>
+                      <p className="mt-0.5 text-xs text-muted xs:mt-1 xs:text-sm">
                         {t.showOnGallery ? "Visible" : "Hidden"} ·{" "}
                         {t.acceptingBookings ? "Accepting" : "Not accepting"} ·{" "}
                         {t.location ? formatCity(t.location) : "—"}
                       </p>
                     </div>
                   </div>
-                  <div className="mt-3 grid grid-cols-3 gap-2">
+                  <div className="mt-3 grid grid-cols-3 gap-1.5 xs:gap-2">
                     <button
                       type="button"
                       disabled={busy}
                       onClick={() => void toggleGallery(t)}
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-border px-3 text-sm font-medium disabled:opacity-60"
+                      className="inline-flex min-h-9 items-center justify-center rounded-full border border-border px-2 text-xs font-medium disabled:opacity-60 xs:min-h-10 xs:px-3 xs:text-sm sm:min-h-11"
                     >
                       {togglingId === t.id ? "…" : t.showOnGallery ? "Hide" : "Show"}
                     </button>
                     <Link
                       href={`/admin/therapists/${t.id}`}
-                      className="inline-flex min-h-11 items-center justify-center rounded-full bg-accent px-3 text-sm font-medium text-accent-foreground"
+                      className="inline-flex min-h-9 items-center justify-center rounded-full bg-accent px-2 text-xs font-medium text-accent-foreground xs:min-h-10 xs:px-3 xs:text-sm sm:min-h-11"
                     >
                       Edit
                     </Link>
@@ -197,7 +197,7 @@ export function AdminTherapistsPanel() {
                       type="button"
                       disabled={busy}
                       onClick={() => void removeTherapist(t)}
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-red-300 px-3 text-sm font-medium text-red-700 disabled:opacity-60"
+                      className="inline-flex min-h-9 items-center justify-center rounded-full border border-red-300 px-2 text-xs font-medium text-red-700 disabled:opacity-60 xs:min-h-10 xs:px-3 xs:text-sm sm:min-h-11"
                     >
                       {deletingId === t.id ? "…" : "Delete"}
                     </button>
@@ -265,18 +265,18 @@ export function AdminTherapistsPanel() {
                         {t.location ? formatCity(t.location) : "—"}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex flex-wrap items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-2 xs:gap-3">
                           <button
                             type="button"
                             disabled={busy}
                             onClick={() => void toggleGallery(t)}
-                            className="text-sm text-muted underline-offset-2 hover:text-foreground hover:underline disabled:opacity-60"
+                            className="text-xs text-muted underline-offset-2 hover:text-foreground hover:underline disabled:opacity-60 xs:text-sm"
                           >
                             {togglingId === t.id ? "…" : t.showOnGallery ? "Hide" : "Show"}
                           </button>
                           <Link
                             href={`/admin/therapists/${t.id}`}
-                            className="text-sm text-accent underline-offset-2 hover:underline"
+                            className="text-xs text-accent underline-offset-2 hover:underline xs:text-sm"
                           >
                             Edit
                           </Link>
@@ -284,7 +284,7 @@ export function AdminTherapistsPanel() {
                             type="button"
                             disabled={busy}
                             onClick={() => void removeTherapist(t)}
-                            className="text-sm text-red-700 underline-offset-2 hover:underline disabled:opacity-60"
+                            className="text-xs text-red-700 underline-offset-2 hover:underline disabled:opacity-60 xs:text-sm"
                           >
                             {deletingId === t.id ? "…" : "Delete"}
                           </button>
