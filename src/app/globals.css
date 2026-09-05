@@ -123,14 +123,14 @@ textarea {
   display: none;
 }
 
-/* Clearance so fixed chat + WhatsApp never cover page content */
+/* Clearance so fixed chat + WhatsApp/LINE floats never cover page content */
 .page-bottom-clearance {
-  padding-bottom: max(7.5rem, calc(env(safe-area-inset-bottom) + 6.5rem));
+  padding-bottom: max(10rem, calc(env(safe-area-inset-bottom) + 9rem));
 }
 
 @media (min-width: 640px) {
   .page-bottom-clearance {
-    padding-bottom: max(7rem, calc(env(safe-area-inset-bottom) + 6rem));
+    padding-bottom: max(9.5rem, calc(env(safe-area-inset-bottom) + 8.5rem));
   }
 }
 

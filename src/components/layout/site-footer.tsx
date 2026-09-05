@@ -13,7 +13,7 @@ export function SiteFooter() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden bg-[#121816] text-white pb-[max(5.75rem,calc(env(safe-area-inset-bottom)+5rem))] lg:pb-[max(1.75rem,env(safe-area-inset-bottom))]">
+    <footer className="relative overflow-hidden bg-[#121816] text-white pb-[max(8rem,calc(env(safe-area-inset-bottom)+7.25rem))] lg:pb-[max(1.75rem,env(safe-area-inset-bottom))]">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0"

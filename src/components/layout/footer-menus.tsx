@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cities, cityStatusLabel } from "@/content/cities";
-import { site } from "@/content/site";
+import { lineHref, site } from "@/content/site";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 const bookLinks = [
@@ -90,22 +90,38 @@ export function FooterMenus() {
             <MenuLink key={item.href} href={item.href} label={item.label} />
           ))}
         </nav>
-        <div className="mt-3 space-y-1.5 border-t border-white/10 pt-3">
+        <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
           <a
             href={`mailto:${site.contact.email}`}
             className="block break-all text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
           >
-            <span className="sm:hidden">Email</span>
-            <span className="hidden sm:inline">{site.contact.email}</span>
+            {site.contact.email}
           </a>
-          <WhatsAppLink
-            cta="footer-menu"
-            className="block text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
-          >
-            <span className="sm:hidden">WhatsApp</span>
-            <span className="hidden sm:inline">WhatsApp {whatsappDisplay}</span>
-          </WhatsAppLink>
-          <p className="text-[0.65rem] leading-snug text-white/40 sm:text-xs">
+          <div>
+            <WhatsAppLink
+              cta="footer-menu"
+              className="block text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
+            >
+              WhatsApp {whatsappDisplay}
+            </WhatsAppLink>
+            <p className="mt-0.5 select-all font-mono text-[0.65rem] text-white/40 sm:text-xs">
+              {site.contact.whatsapp}
+            </p>
+          </div>
+          <div>
+            <a
+              href={lineHref}
+              target="_blank"
+              rel="noreferrer"
+              className="block text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
+            >
+              LINE {site.contact.lineId}
+            </a>
+            <p className="mt-0.5 select-all font-mono text-[0.65rem] text-white/40 sm:text-xs">
+              LINE ID: {site.contact.lineId}
+            </p>
+          </div>
+          <p className="pt-1 text-[0.65rem] leading-snug text-white/40 sm:text-xs">
             Thailand · Signature · 24/7 enquiries
           </p>
           {expandingCities.length > 0 ? (

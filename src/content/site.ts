@@ -8,6 +8,8 @@ export const site = {
   contact: {
     email: "hello@getroomspa.com",
     whatsapp: "+66984712237",
+    /** LINE user ID — also used in line.me deep links */
+    lineId: "mashth",
   },
   /** Primary chrome — Signature leads; wellness secondary; cities in Locations */
   nav: [
@@ -69,3 +71,6 @@ const whatsappNumber = site.contact.whatsapp.replace(/\D/g, "");
 export const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
   "Hi RoomSpa! I'd like to book a massage at my address. What openings are available?",
 )}`;
+
+/** Opens a chat with RoomSpa on LINE (user ID). */
+export const lineHref = `https://line.me/ti/p/~${site.contact.lineId}`;

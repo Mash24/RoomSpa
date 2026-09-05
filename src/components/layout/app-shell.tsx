@@ -3,9 +3,9 @@
 import dynamic from "next/dynamic";
 import { usePathname } from "next/navigation";
 import { AttributionBootstrap } from "@/components/analytics/attribution-bootstrap";
+import { ChatFloats } from "@/components/layout/chat-floats";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 
 const ChatWidget = dynamic(
   () => import("@/components/chat/chat-widget").then((mod) => mod.ChatWidget),
@@ -30,7 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {children}
       </main>
       {!isBooking ? <ChatWidget /> : null}
-      {!isBooking ? <WhatsAppFloat /> : null}
+      {!isBooking ? <ChatFloats /> : null}
       {!isTherapistGallery ? <SiteFooter /> : null}
     </>
   );
