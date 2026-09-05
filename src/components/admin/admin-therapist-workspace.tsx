@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { readApiJson } from "@/lib/admin/api";
 import { getCatalogProduct, isSignatureExperience } from "@/content/services";
@@ -44,10 +45,12 @@ const SCORE_FIELDS = [
 type Props = { therapistId: string };
 
 export function AdminTherapistWorkspace({ therapistId }: Props) {
+  const router = useRouter();
   const fileRef = useRef<HTMLInputElement>(null);
   const [tab, setTab] = useState<TabId>("overview");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -237,6 +240,28 @@ export function AdminTherapistWorkspace({ therapistId }: Props) {
       setError(err instanceof Error ? err.message : "Save failed.");
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function removeTherapist() {
+    const name = displayName || "this therapist";
+    const confirmed = window.confirm(
+      `Permanently delete ${name} from the database?\n\nThis cannot be undone. Past bookings stay, but their therapist link is cleared.`,
+    );
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setError(null);
+    setNotice(null);
+    try {
+      const res = await fetch(`/api/admin/therapists/${therapistId}`, { method: "DELETE" });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not delete therapist.");
+      router.push("/admin/therapists");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not delete therapist.");
+      setDeleting(false);
     }
   }
 
@@ -492,6 +517,22 @@ export function AdminTherapistWorkspace({ therapistId }: Props) {
             <p className="pt-2 text-xs text-muted">
               Verified badge is automatic when the therapist is public-ready (approved photo + approved services).
             </p>
+          </section>
+
+          <section className="admin-card space-y-3 border border-red-200/80 p-4 xs:p-5">
+            <h2 className="text-xs font-medium uppercase tracking-[0.16em] text-red-700">Remove therapist</h2>
+            <p className="text-sm text-muted">
+              Permanently deletes this therapist and their photos, services, and location from the database.
+              Past bookings are kept with the therapist link cleared.
+            </p>
+            <button
+              type="button"
+              disabled={saving || deleting}
+              onClick={() => void removeTherapist()}
+              className="rounded-sm border border-red-300 px-4 py-2.5 text-sm font-medium text-red-700 disabled:opacity-60"
+            >
+              {deleting ? "Deleting…" : "Delete permanently"}
+            </button>
           </section>
         </div>
       ) : null}

@@ -113,19 +113,24 @@ export async function DELETE(_request: Request, context: RouteContext) {
   }
 
   const { id } = await context.params;
-  const { error: updateError } = await supabase
-    .from("therapists")
-    .update({
-      status: "inactive",
-      is_active: false,
-      is_bookable: false,
-      accepting_bookings: false,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id);
 
-  if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 400 });
+  // Keep booking history; detach the therapist so the row can be removed.
+  const { error: bookingsError } = await supabase
+    .from("bookings")
+    .update({ therapist_id: null })
+    .eq("therapist_id", id);
+
+  if (bookingsError) {
+    return NextResponse.json(
+      { error: `Could not detach bookings: ${bookingsError.message}` },
+      { status: 400 },
+    );
+  }
+
+  const { error: deleteError } = await supabase.from("therapists").delete().eq("id", id);
+
+  if (deleteError) {
+    return NextResponse.json({ error: deleteError.message }, { status: 400 });
   }
 
   revalidatePublicTherapists();
