@@ -1,10 +1,11 @@
 import { site } from "@/content/site";
 import { coverageAreas } from "@/content/coverage";
-import { catalogServices } from "@/content/services";
+import { catalogServices, type CatalogService } from "@/content/services";
 import { faqItems } from "@/content/pages";
 import type { ServiceFaq } from "@/content/service-faqs";
 import type { PublicReview } from "@/lib/reviews/types";
 import { getServicePath, getServicePathBySlug } from "@/lib/catalog/service-paths";
+import { getServiceFromAmount } from "@/lib/catalog/prices";
 
 type JsonLdProps = {
   data: Record<string, unknown> | Record<string, unknown>[];
@@ -27,7 +28,7 @@ export function OrganizationJsonLd() {
         "@type": "Organization",
         "@id": `${site.url}/#organization`,
         name: site.name,
-        alternateName: "GetRoomSpa",
+        alternateName: "RoomSpa",
         url: site.url,
         email: site.contact.email,
         telephone: site.contact.whatsapp,
@@ -60,13 +61,17 @@ export function WebSiteJsonLd() {
 
 export function LocalBusinessJsonLd(input?: {
   aggregate?: { ratingValue: number; reviewCount: number } | null;
+  catalog?: CatalogService[];
 }) {
+  const offers = (input?.catalog?.length ? input.catalog : catalogServices).filter(
+    (service) => service.bookable,
+  );
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "HealthAndBeautyBusiness",
     "@id": `${site.url}/#business`,
     name: site.name,
-    alternateName: "GetRoomSpa",
+    alternateName: "RoomSpa",
     description: site.description,
     url: site.url,
     email: site.contact.email,
@@ -75,6 +80,9 @@ export function LocalBusinessJsonLd(input?: {
     priceRange: "฿฿",
     areaServed: [
       { "@type": "Country", name: "Thailand" },
+      { "@type": "City", name: "Bangkok" },
+      { "@type": "City", name: "Phuket" },
+      { "@type": "City", name: "Chiang Mai" },
       ...coverageAreas.map((area) => ({
         "@type": "Place",
         name: `${area.name}, ${area.city}`,
@@ -84,19 +92,17 @@ export function LocalBusinessJsonLd(input?: {
       "@type": "PostalAddress",
       addressCountry: "TH",
     },
-    makesOffer: catalogServices
-      .filter((service) => service.bookable)
-      .map((service) => ({
-        "@type": "Offer",
-        priceCurrency: "THB",
-        price: service.amountThb,
-        itemOffered: {
-          "@type": "Service",
-          name: service.name,
-          description: service.summary,
-          url: `${site.url}${getServicePath(service)}`,
-        },
-      })),
+    makesOffer: offers.map((service) => ({
+      "@type": "Offer",
+      priceCurrency: "THB",
+      price: getServiceFromAmount(service),
+      itemOffered: {
+        "@type": "Service",
+        name: service.name,
+        description: service.summary,
+        url: `${site.url}${getServicePath(service)}`,
+      },
+    })),
   };
 
   if (input?.aggregate) {

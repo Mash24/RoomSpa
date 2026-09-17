@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ServiceImage } from "@/components/media/service-image";
 import {
-  getServicePriceTiers,
+  getServiceFromAmount,
   productPriceLabel,
   serviceCategories,
 } from "@/content/services";
@@ -119,7 +119,7 @@ export default async function WellnessServicesPage() {
               <ul className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {services.map((service) => {
                   const media = mergeServiceMedia(service.slug, imageMap.get(service.slug), service.name);
-                  const from = getServicePriceTiers(service)[60];
+                  const from = getServiceFromAmount(service);
                   return (
                     <li key={service.slug} className="group min-w-0">
                       <Link

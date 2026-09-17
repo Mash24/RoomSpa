@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { catalogServices } from "@/content/services";
-import { productPriceLabel } from "@/content/services";
+import { catalogServices, getServiceFromAmount, productPriceLabel } from "@/content/services";
 import { ServiceDetailContent } from "@/components/services/service-detail-content";
 import { getPublicCatalogProduct } from "@/lib/catalog/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
@@ -25,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   return buildPageMetadata({
     title: `${service.name} Chiang Mai | In-room mobile massage`,
-    description: `${service.summary} Book ${service.name} at your hotel, condo, or home in Chiang Mai. From ${productPriceLabel(service.amountThb)}.`,
+    description: `${service.summary} Book ${service.name} at your hotel, condo, or home in Chiang Mai. From ${productPriceLabel(getServiceFromAmount(service))}.`,
     path: getServicePath(service),
   });
 }

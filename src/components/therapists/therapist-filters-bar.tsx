@@ -115,24 +115,24 @@ export function TherapistFiltersBar({
   }
 
   return (
-    <div className="space-y-4 rounded-sm border border-border bg-surface-elevated p-4">
-      <div className="flex flex-col gap-4 md:flex-row md:flex-wrap md:items-end">
-        <label className="block w-full text-sm md:min-w-[140px] md:flex-1">
+    <div className="space-y-4 rounded-sm border border-border bg-surface-elevated p-3.5 xs:p-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <label className="block min-w-0 text-sm">
           <span className="text-muted">Search</span>
           <input
             type="search"
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Name or service…"
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
+            className="mt-1 min-h-11 w-full border border-border bg-background px-3 py-2.5"
           />
         </label>
-        <label className="block w-full text-sm md:min-w-[140px] md:flex-1">
+        <label className="block min-w-0 text-sm">
           <span className="text-muted">Service</span>
           <select
             value={service}
             onChange={(e) => onServiceChange(e.target.value)}
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
+            className="mt-1 min-h-11 w-full border border-border bg-background px-3 py-2.5"
           >
             <option value="">All services</option>
             {serviceOptions.map((s) => (
@@ -142,12 +142,12 @@ export function TherapistFiltersBar({
             ))}
           </select>
         </label>
-        <label className="block w-full text-sm md:min-w-[120px] md:flex-1">
+        <label className="block min-w-0 text-sm">
           <span className="text-muted">Area</span>
           <select
             value={coverage}
             onChange={(e) => onCoverageChange(e.target.value)}
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
+            className="mt-1 min-h-11 w-full border border-border bg-background px-3 py-2.5"
           >
             <option value="">All areas</option>
             {coverageAreas.map((a) => (
@@ -157,12 +157,12 @@ export function TherapistFiltersBar({
             ))}
           </select>
         </label>
-        <label className="block w-full text-sm md:min-w-[100px] md:flex-1">
+        <label className="block min-w-0 text-sm">
           <span className="text-muted">Gender</span>
           <select
             value={gender}
             onChange={(e) => onGenderChange(e.target.value as TherapistGender | "any")}
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
+            className="mt-1 min-h-11 w-full border border-border bg-background px-3 py-2.5"
           >
             <option value="any">Any</option>
             <option value="female">Female</option>
@@ -173,14 +173,14 @@ export function TherapistFiltersBar({
       </div>
 
       <div className="flex flex-col gap-3 border-t border-border pt-4 sm:flex-row sm:items-end">
-        <form onSubmit={lookupPlace} className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-end sm:gap-1">
+        <form onSubmit={lookupPlace} className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row sm:items-end sm:gap-2">
           <label className="block min-w-0 flex-1 text-sm">
             <span className="text-muted">Where are you staying?</span>
             <input
               value={placeQuery}
               onChange={(e) => setPlaceQuery(e.target.value)}
               placeholder="Hotel, condo, or neighbourhood…"
-              className="mt-1 w-full border border-border bg-background px-3 py-2.5"
+              className="mt-1 min-h-11 w-full border border-border bg-background px-3 py-2.5"
             />
           </label>
           <button

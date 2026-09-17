@@ -11,7 +11,7 @@ import type { ServiceMedia } from "@/content/service-media";
 import type { PublicTherapist } from "@/lib/therapists/types";
 import { TherapistStrip } from "@/components/therapists/therapist-strip";
 import type { CatalogService } from "@/content/services";
-import { getServicePriceTiers, productPriceLabel } from "@/content/services";
+import { getServiceFromAmount, productPriceLabel } from "@/content/services";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { getServicePath } from "@/lib/catalog/service-paths";
 import type { PublicMediaItem } from "@/lib/media/public";
@@ -58,7 +58,7 @@ export function SensualServiceDetail({
         />
 
         <p className="mt-6 text-xs font-medium uppercase tracking-[0.24em] text-[#c9a86c]">
-          Signature Experiences · Chiang Mai · In-room
+          Signature Experiences · Thailand · In-room
         </p>
         <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-[#f5f0e8] xs:text-4xl md:text-5xl">
           {service.name}
@@ -88,7 +88,7 @@ export function SensualServiceDetail({
           <p className="text-xs uppercase tracking-[0.14em] text-[#c9a86c]">Duration & pricing</p>
           <ServicePriceTiers className="mt-3" service={service} onDark />
           <p className="mt-3 text-sm text-[#f5f0e8]/65">
-            From {productPriceLabel(getServicePriceTiers(service)[60])} · Private setup provided
+            From {productPriceLabel(getServiceFromAmount(service))} · Private setup provided
           </p>
         </div>
 
@@ -166,7 +166,7 @@ export function SensualServiceDetail({
               links={related.map((item) => ({
                 href: getServicePath(item),
                 label: item.name,
-                hint: productPriceLabel(item.amountThb),
+                hint: productPriceLabel(getServiceFromAmount(item)),
               }))}
             />
           </div>

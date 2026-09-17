@@ -39,7 +39,7 @@ export const privacyContent = {
     {
       heading: "Contact",
       body: [
-        "Privacy questions: hello@getroomspa.com. Operating area: Chiang Mai, Thailand.",
+        "Privacy questions: hello@getroomspa.com. Operating area: Bangkok, Phuket, and Chiang Mai, Thailand.",
       ],
     },
   ],
@@ -82,7 +82,7 @@ export const termsContent = {
     {
       heading: "Contact",
       body: [
-        "Questions: hello@getroomspa.com or WhatsApp. Chiang Mai, Thailand.",
+        "Questions: hello@getroomspa.com or WhatsApp. Bangkok, Phuket, and Chiang Mai, Thailand.",
       ],
     },
   ],

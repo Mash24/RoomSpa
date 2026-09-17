@@ -1,27 +1,28 @@
 import Link from "next/link";
-import { cities, cityStatusLabel } from "@/content/cities";
+import { getActiveCities } from "@/content/cities";
 import { lineHref, site } from "@/content/site";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 const bookLinks = [
-  { label: "Book Signature", href: "/book" },
-  { label: "My booking", href: "/my-booking" },
   { label: "Signature Experiences", href: "/services/signature" },
   { label: "Wellness Massage", href: "/services/wellness" },
+  { label: "Therapists", href: "/therapists" },
   { label: "Pricing", href: "/pricing" },
+  { label: "My Booking", href: "/my-booking" },
 ] as const;
 
-const exploreLinks = [
-  { label: "Locations", href: "/city" },
+const helpLinks = [
+  { label: "Contact", href: "/contact" },
+  { label: "FAQs", href: "/faq" },
   { label: "Reviews", href: "/reviews" },
-  { label: "Gallery", href: "/gallery" },
-  { label: "FAQ", href: "/faq" },
   { label: "Blog", href: "/blog" },
 ] as const;
 
 const companyLinks = [
   { label: "About", href: "/about" },
-  { label: "Contact", href: "/contact" },
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+  { label: "Cancellation", href: "/cancellation" },
 ] as const;
 
 function formatWhatsAppDisplay(raw: string) {
@@ -61,13 +62,11 @@ function Column({
 }
 
 export function FooterMenus() {
-  const expandingCities = cities.filter(
-    (city) => city.status === "enquiries" || city.status === "coming_soon",
-  );
+  const activeCities = getActiveCities();
   const whatsappDisplay = formatWhatsAppDisplay(site.contact.whatsapp);
 
   return (
-    <div className="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-5 md:gap-8">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-2 sm:gap-5 md:grid-cols-4 md:gap-8">
       <Column title="Book">
         <nav aria-label="Book" className="flex flex-col">
           {bookLinks.map((item) => (
@@ -76,9 +75,18 @@ export function FooterMenus() {
         </nav>
       </Column>
 
-      <Column title="Explore">
-        <nav aria-label="Explore" className="flex flex-col">
-          {exploreLinks.map((item) => (
+      <Column title="Cities">
+        <nav aria-label="Cities" className="flex flex-col">
+          {activeCities.map((city) => (
+            <MenuLink key={city.slug} href={`/city/${city.slug}`} label={city.name} />
+          ))}
+          <MenuLink href="/city" label="All cities" />
+        </nav>
+      </Column>
+
+      <Column title="Help">
+        <nav aria-label="Help" className="flex flex-col">
+          {helpLinks.map((item) => (
             <MenuLink key={item.href} href={item.href} label={item.label} />
           ))}
         </nav>
@@ -115,29 +123,12 @@ export function FooterMenus() {
               rel="noreferrer"
               className="block text-xs leading-snug text-white/70 transition hover:text-white sm:text-sm"
             >
-              LINE {site.contact.lineId}
+              LINE GetRoomSpa
             </a>
             <p className="mt-0.5 select-all font-mono text-[0.65rem] text-white/40 sm:text-xs">
               LINE ID: {site.contact.lineId}
             </p>
           </div>
-          <p className="pt-1 text-[0.65rem] leading-snug text-white/40 sm:text-xs">
-            Thailand · Signature · 24/7 enquiries
-          </p>
-          {expandingCities.length > 0 ? (
-            <p className="pt-1 text-[0.65rem] leading-snug text-white/40 sm:text-xs">
-              Expanding:{" "}
-              {expandingCities.map((city, index) => (
-                <span key={city.slug}>
-                  {index > 0 ? " · " : ""}
-                  <Link href={`/city/${city.slug}`} className="text-white/55 transition hover:text-white">
-                    {city.name}
-                  </Link>
-                  <span className="text-white/35"> ({cityStatusLabel(city.status)})</span>
-                </span>
-              ))}
-            </p>
-          ) : null}
         </div>
       </Column>
     </div>

@@ -5,7 +5,7 @@ import { SignatureIntro } from "@/components/signature/signature-intro";
 import { SensualZone } from "@/components/sensual/sensual-zone";
 import { ServiceImage } from "@/components/media/service-image";
 import {
-  getServicePriceTiers,
+  getServiceFromAmount,
   productPriceLabel,
 } from "@/content/services";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
@@ -64,18 +64,18 @@ export default async function SignatureExperiencesPage() {
           />
         </div>
 
-        <div className="relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end px-4 pb-16 pt-28 xs:px-5 md:justify-center md:px-8 md:pb-24 md:pt-32">
+        <div className="page-gutter relative mx-auto flex min-h-[100svh] max-w-6xl flex-col justify-end pb-[max(5.5rem,calc(env(safe-area-inset-bottom)+4.5rem))] pt-[max(5.75rem,calc(env(safe-area-inset-top)+4.5rem))] md:justify-center md:pb-24 md:pt-32 xl:max-w-7xl">
           <p className="animate-fade-up text-[0.62rem] font-medium uppercase tracking-[0.42em] text-[#c9a86c] drop-shadow-[0_1px_8px_rgba(0,0,0,0.65)] xs:text-[0.7rem]">
             RoomSpa · Signature
           </p>
-          <h1 className="animate-fade-up delay-1 mt-5 max-w-2xl font-display text-[2.25rem] leading-[1.02] tracking-tight text-[#f5f0e8] drop-shadow-[0_2px_20px_rgba(0,0,0,0.65)] xs:text-5xl sm:text-6xl md:text-7xl">
+          <h1 className="animate-fade-up delay-1 mt-4 max-w-2xl font-display text-[2rem] leading-[1.02] tracking-tight text-[#f5f0e8] drop-shadow-[0_2px_20px_rgba(0,0,0,0.65)] min-[360px]:text-[2.25rem] xs:mt-5 xs:text-5xl sm:text-6xl md:text-7xl">
             Signature Experiences
           </h1>
-          <p className="animate-fade-up delay-2 mt-5 max-w-md text-[0.95rem] leading-relaxed text-[#f5f0e8]/88 drop-shadow-[0_1px_10px_rgba(0,0,0,0.55)] xs:text-base md:text-lg">
+          <p className="animate-fade-up delay-2 mt-4 max-w-md text-[0.9rem] leading-relaxed text-[#f5f0e8]/88 drop-shadow-[0_1px_10px_rgba(0,0,0,0.55)] xs:mt-5 xs:text-base md:text-lg">
             A more intimate side of RoomSpa — private, consent-led sessions delivered discreetly to
             your hotel, condo, or home.
           </p>
-          <div className="animate-fade-up delay-3 mt-8 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap xs:gap-3">
+          <div className="animate-fade-up delay-3 mt-6 flex flex-col gap-2.5 xs:mt-8 xs:flex-row xs:flex-wrap xs:gap-3">
             <Link
               href="#signature-menu"
               className="sensual-btn-primary inline-flex min-h-12 items-center justify-center rounded-sm px-6 py-3.5 text-sm font-medium transition"
@@ -99,13 +99,13 @@ export default async function SignatureExperiencesPage() {
 
       <section
         id="signature-menu"
-        className="scroll-mt-[calc(5rem+env(safe-area-inset-top))] border-t border-[#c9a86c]/20 bg-[#0c0a09] px-4 py-14 xs:px-5 md:px-8 md:py-20"
+        className="page-gutter page-section scroll-mt-[calc(5rem+env(safe-area-inset-top))] border-t border-[#c9a86c]/20 bg-[#0c0a09]"
       >
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto max-w-6xl xl:max-w-7xl">
           <p className="text-[0.7rem] font-medium uppercase tracking-[0.24em] text-[#c9a86c]">
             The experiences
           </p>
-          <h2 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-[#f5f0e8] xs:text-4xl md:text-5xl">
+          <h2 className="mt-3 font-display text-[1.65rem] leading-tight tracking-tight text-[#f5f0e8] min-[360px]:text-[1.85rem] xs:text-4xl md:text-5xl">
             Choose your session
           </h2>
           <p className="mt-3 max-w-lg text-sm leading-relaxed text-[#f5f0e8]/65 md:text-base">
@@ -118,10 +118,10 @@ export default async function SignatureExperiencesPage() {
               Sessions updating — WhatsApp us to book Signature Experiences tonight.
             </p>
           ) : (
-            <ul className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="mt-10 grid gap-6 xs:mt-12 xs:gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {signature.map((service) => {
                 const media = mergeServiceMedia(service.slug, imageMap.get(service.slug), service.name);
-                const from = getServicePriceTiers(service)[60];
+                const from = getServiceFromAmount(service);
                 return (
                   <li key={service.slug} className="group min-w-0">
                     <Link
@@ -135,11 +135,11 @@ export default async function SignatureExperiencesPage() {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-[#0c0a09] via-[#0c0a09]/35 to-[#0c0a09]/10" />
                       <div className="absolute inset-0 bg-[#c9a86c]/[0.04] mix-blend-soft-light opacity-0 transition duration-500 group-hover:opacity-100" />
-                      <div className="absolute inset-x-0 bottom-0 p-5">
-                        <p className="font-display text-2xl tracking-tight text-[#f5f0e8]">
+                      <div className="absolute inset-x-0 bottom-0 p-4 xs:p-5">
+                        <p className="font-display text-xl tracking-tight text-[#f5f0e8] xs:text-2xl">
                           {service.name}
                         </p>
-                        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[#f5f0e8]/75">
+                        <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-[#f5f0e8]/75 xs:line-clamp-3">
                           {service.summary}
                         </p>
                         <p className="mt-3 text-sm font-medium text-[#c9a86c]">
@@ -150,16 +150,16 @@ export default async function SignatureExperiencesPage() {
                         </span>
                       </div>
                     </Link>
-                    <div className="mt-4 flex gap-2">
+                    <div className="mt-4 grid grid-cols-2 gap-2">
                       <Link
                         href={`/book?service=${service.slug}`}
-                        className="sensual-btn-primary inline-flex min-h-11 flex-1 items-center justify-center rounded-sm px-4 py-2.5 text-sm font-medium transition"
+                        className="sensual-btn-primary inline-flex min-h-11 items-center justify-center rounded-sm px-4 py-2.5 text-sm font-medium transition"
                       >
                         Book
                       </Link>
                       <Link
                         href={getServicePath(service)}
-                        className="sensual-btn-outline inline-flex min-h-11 flex-1 items-center justify-center rounded-sm border px-4 py-2.5 text-sm transition"
+                        className="sensual-btn-outline inline-flex min-h-11 items-center justify-center rounded-sm border px-4 py-2.5 text-sm transition"
                       >
                         Details
                       </Link>
@@ -170,7 +170,7 @@ export default async function SignatureExperiencesPage() {
             </ul>
           )}
 
-          <div className="mt-14 flex flex-col gap-4 border-t border-[#c9a86c]/15 pt-8 sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-12 flex flex-col gap-4 border-t border-[#c9a86c]/15 pt-8 xs:mt-14 sm:flex-row sm:items-center sm:justify-between">
             <p className="max-w-md text-xs leading-relaxed text-[#f5f0e8]/50">
               Consent first — professional intimate bodywork, not escort services. Boundaries are
               agreed before touch. You can pause or stop anytime.

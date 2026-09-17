@@ -22,7 +22,7 @@ export async function getApprovedReviews(limit = 50): Promise<PublicReview[]> {
         return [];
       }
     },
-    ["approved-reviews"],
+    ["approved-reviews", String(limit)],
     { revalidate: PUBLIC_REVALIDATE_SECONDS, tags: ["reviews"] },
   )(limit);
 }

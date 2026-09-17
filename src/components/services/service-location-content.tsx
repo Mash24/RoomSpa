@@ -7,7 +7,7 @@ import { RelatedLinks } from "@/components/seo/related-links";
 import { BreadcrumbJsonLd, FaqJsonLd, ServiceJsonLd } from "@/components/seo/json-ld";
 import { getServiceFaqs } from "@/content/service-faqs";
 import { ServiceImage } from "@/components/media/service-image";
-import { getCatalogProduct, productPriceLabel } from "@/content/services";
+import { getCatalogProduct, getServiceFromAmount, productPriceLabel } from "@/content/services";
 import { site } from "@/content/site";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { getRelatedServicesInTier } from "@/lib/catalog/related";
@@ -49,7 +49,7 @@ export async function ServiceLocationContent({ slug, locationSlug, expectedTier 
       question: `Can I book ${service.name} ${location.inPhrase}?`,
       answer: location.bookable
         ? `Yes. Choose ${service.name} on the booking form and select coverage for ${location.name}.`
-        : `${location.cityName} coverage is coming soon. Book Chiang Mai today, or WhatsApp us to hear when we launch.`,
+        : `We're not taking online bookings for ${location.cityName} yet. WhatsApp us with your area and preferred treatment, or choose Bangkok, Phuket, or Chiang Mai.`,
     },
     ...getServiceFaqs(service.slug).slice(0, 3),
   ];
@@ -98,7 +98,7 @@ export async function ServiceLocationContent({ slug, locationSlug, expectedTier 
       />
 
       <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">
-        {location.bookable ? "Available" : "Coming soon"} · {location.cityName}
+        {location.bookable ? "Available" : "Ask us"} · {location.cityName}
       </p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         {service.name} {location.inPhrase}
@@ -127,7 +127,7 @@ export async function ServiceLocationContent({ slug, locationSlug, expectedTier 
         No taxi. No waiting room. Your therapist comes to you {location.inPhrase}.
       </p>
 
-      <p className="mt-6 text-sm text-muted">From {productPriceLabel(service.amountThb)}</p>
+      <p className="mt-6 text-sm text-muted">From {productPriceLabel(getServiceFromAmount(service))}</p>
 
       <div className="mt-8 flex flex-col gap-2.5 xs:flex-row xs:flex-wrap">
         {location.bookable ? (
@@ -198,7 +198,7 @@ export async function buildServiceLocationMetadata(
   const { buildPageMetadata } = await import("@/lib/seo/metadata");
   return buildPageMetadata({
     title: `${service.name} ${location.inPhrase} | In-room massage`,
-    description: `Book ${service.name} ${location.inPhrase}. ${location.summary} From ${productPriceLabel(service.amountThb)}.`,
+    description: `Book ${service.name} ${location.inPhrase}. ${location.summary} From ${productPriceLabel(getServiceFromAmount(service))}.`,
     path: getServiceLocationPath(service, location.slug),
   });
 }

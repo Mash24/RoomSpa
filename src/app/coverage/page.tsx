@@ -2,37 +2,54 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { coverageAreas } from "@/content/coverage";
+import { getActiveCities } from "@/content/cities";
 import { formatThb } from "@/lib/currency";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Coverage zones | Live booking areas",
+  title: "Coverage zones | GetRoomSpa",
   description:
-    "Live RoomSpa booking zones today — hotels, condos, and homes. For Bangkok, Phuket, and other cities, see Locations or WhatsApp us.",
+    "GetRoomSpa booking areas across Thailand — Bangkok, Phuket, and Chiang Mai. See live zones and book private in-room massage.",
   path: "/coverage",
 });
 
 export default function CoveragePage() {
+  const cities = getActiveCities();
+
   return (
     <section className="mx-auto max-w-3xl px-4 py-12 xs:px-5 md:px-8 md:py-28">
       <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Coverage</p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
-        Live zones we book today
+        Where we book today
       </h1>
       <p className="mt-4 text-base leading-relaxed text-muted md:text-lg">
-        These are current online-booking areas. For other cities across Thailand — including Bangkok
-        and Phuket enquiries — see{" "}
-        <Link href="/city" className="text-accent underline">
-          Locations
-        </Link>
-        .
+        GetRoomSpa is available in{" "}
+        {cities.map((c) => c.name).join(", ").replace(/, ([^,]*)$/, ", and $1")}. Detailed travel
+        zones below help with Chiang Mai routing; for Bangkok and Phuket, tell us your hotel or
+        neighbourhood when you book.
       </p>
 
-      <ul className="mt-12 space-y-4">
+      <ul className="mt-8 flex flex-wrap gap-2">
+        {cities.map((city) => (
+          <li key={city.slug}>
+            <Link
+              href={`/city/${city.slug}`}
+              className="inline-flex rounded-full border border-border px-3 py-1.5 text-sm text-foreground transition hover:border-accent hover:text-accent"
+            >
+              {city.name}
+            </Link>
+          </li>
+        ))}
+      </ul>
+
+      <h2 className="mt-12 font-display text-2xl tracking-tight text-foreground">
+        Chiang Mai travel zones
+      </h2>
+      <ul className="mt-6 space-y-4">
         {coverageAreas.map((area) => (
           <li key={area.slug} className="border border-border bg-surface-elevated p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="font-display text-2xl text-foreground">{area.name}</h2>
+              <h3 className="font-display text-2xl text-foreground">{area.name}</h3>
               <span className="text-sm text-muted">{area.city}</span>
             </div>
             <p className="mt-3 text-sm text-muted">

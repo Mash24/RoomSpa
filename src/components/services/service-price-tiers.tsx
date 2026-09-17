@@ -29,7 +29,7 @@ export function ServicePriceTiers({
 
   return (
     <div
-      className={`grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3 ${className}`}
+      className={`grid grid-cols-3 gap-1.5 xs:gap-2 sm:gap-3 ${className}`}
       role={interactive ? "radiogroup" : undefined}
       aria-label={`${service.name} duration and price`}
     >
@@ -48,7 +48,7 @@ export function ServicePriceTiers({
               {DURATION_TIER_LABELS[minutes]}
             </p>
             <p
-              className={`mt-1 break-words font-display text-base tracking-tight xs:text-lg sm:mt-1.5 sm:text-xl md:text-2xl ${
+              className={`mt-1 break-words font-display text-sm tracking-tight xs:text-base sm:mt-1.5 sm:text-xl md:text-2xl ${
                 onDark
                   ? "text-white drop-shadow-[0_1px_8px_rgba(0,0,0,0.55)]"
                   : "text-accent"
@@ -67,7 +67,7 @@ export function ServicePriceTiers({
               role="radio"
               aria-checked={selected}
               onClick={() => onSelect?.(minutes)}
-              className={`min-h-11 rounded-sm border px-3 py-3.5 text-left transition sm:px-3 sm:py-4 ${
+              className={`min-h-11 rounded-sm border px-2 py-3 text-left transition xs:px-3 xs:py-3.5 sm:px-3 sm:py-4 ${
                 selected
                   ? onDark
                     ? "border-white/70 bg-white/15"

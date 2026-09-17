@@ -86,7 +86,7 @@ function mapService(row: DbService, priceRows: DbPrice[]): CatalogService {
   };
 }
 
-/** Active + bookable services from Supabase CMS. Falls back to static catalog if DB is empty. */
+/** Active + bookable services from Supabase CMS (authoritative public prices). Falls back to static catalog if DB is empty. */
 export const getPublicCatalog = unstable_cache(
   async (): Promise<CatalogService[]> => {
     try {

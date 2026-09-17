@@ -9,20 +9,20 @@ export function HomeExperienceChooser() {
   const { tiers } = site.hero;
 
   return (
-    <section className="border-b border-border bg-background px-4 py-14 xs:px-5 md:px-8 md:py-20">
-      <div className="mx-auto max-w-6xl">
+    <section className="page-gutter page-section border-b border-border bg-background">
+      <div className="mx-auto max-w-6xl xl:max-w-7xl">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
           What we&apos;re known for
         </p>
-        <h2 className="mt-3 max-w-xl font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
+        <h2 className="mt-3 max-w-xl font-display text-[1.65rem] leading-tight tracking-tight text-foreground min-[360px]:text-[1.85rem] xs:text-4xl md:text-5xl xl:max-w-2xl">
           Signature first. Wellness when you want it.
         </h2>
         <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted md:text-base">
           Most guests come for private Signature Experiences. Classic wellness massage is still
-          available — just not what leads RoomSpa.
+          available — just not what leads GetRoomSpa.
         </p>
 
-        <div className="mt-10 grid gap-6 md:grid-cols-2 md:gap-8">
+        <div className="mt-8 grid gap-5 sm:mt-10 sm:gap-6 md:grid-cols-2 md:gap-8">
           <ExperienceCard
             title={tiers.signature.label}
             summary={tiers.signature.summary}
@@ -72,7 +72,7 @@ function ExperienceCard({
   return (
     <Link
       href={href}
-      className={`group relative flex min-h-[22rem] flex-col justify-end overflow-hidden rounded-sm transition duration-500 md:min-h-[26rem] ${
+      className={`group relative flex min-h-[18rem] flex-col justify-end overflow-hidden rounded-sm transition duration-500 xs:min-h-[20rem] sm:min-h-[22rem] md:min-h-[26rem] ${
         isSignature
           ? "ring-1 ring-[#c9a86c]/35 hover:ring-[#c9a86c]/60 md:min-h-[28rem]"
           : "ring-1 ring-border hover:ring-accent/40"
@@ -93,7 +93,7 @@ function ExperienceCard({
             : "linear-gradient(180deg, rgba(18,24,22,0.1) 0%, rgba(18,24,22,0.45) 55%, rgba(18,24,22,0.88) 100%)",
         }}
       />
-      <div className="relative p-6 md:p-8">
+      <div className="relative p-5 xs:p-6 md:p-8">
         <p
           className={`text-[0.65rem] font-medium uppercase tracking-[0.24em] ${
             isSignature ? "text-[#c9a86c]" : "text-white/70"
@@ -102,7 +102,7 @@ function ExperienceCard({
           {isSignature ? "Primary · Signature" : "Also available · Wellness"}
         </p>
         <h3
-          className={`mt-2 font-display text-2xl tracking-tight md:text-3xl ${
+          className={`mt-2 font-display text-xl tracking-tight xs:text-2xl md:text-3xl ${
             isSignature ? "text-[#f5f0e8]" : "text-white"
           }`}
         >

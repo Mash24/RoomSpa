@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  getServicePriceTiers,
+  getServiceFromAmount,
   productPriceLabel,
   type CatalogService,
 } from "@/content/services";
@@ -57,7 +57,7 @@ export function HomeServices({ services }: Props) {
 
         <ul className="mt-8 divide-y divide-white/20 border-y border-white/20">
           {picks.map((service) => {
-            const from = getServicePriceTiers(service)[60];
+            const from = getServiceFromAmount(service);
             return (
               <li
                 key={service.slug}

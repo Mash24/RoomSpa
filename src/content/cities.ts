@@ -3,10 +3,8 @@ import { coverageAreas } from "@/content/coverage";
 /**
  * City status:
  * - active — therapists live; guests can book online
- * - enquiries — demand / expansion city; WhatsApp first, not full inventory yet
+ * - enquiries — reserved for future cities only (not Bangkok / Phuket / Chiang Mai)
  * - coming_soon — listed for SEO / roadmap only
- *
- * Add Nairobi (and other countries) the same way when you have local therapists.
  */
 export type CityStatus = "active" | "enquiries" | "coming_soon";
 
@@ -15,6 +13,8 @@ export type CityDefinition = {
   name: string;
   country: string;
   status: CityStatus;
+  /** Public discovery order: Bangkok → Phuket → Chiang Mai */
+  displayOrder: number;
   headline: string;
   summary: string;
   seoTitle: string;
@@ -29,16 +29,72 @@ export type CityDefinition = {
 
 export const cities: CityDefinition[] = [
   {
+    slug: "bangkok",
+    name: "Bangkok",
+    country: "Thailand",
+    status: "active",
+    displayOrder: 1,
+    headline: "In-room massage in Bangkok",
+    summary:
+      "Private Signature Experiences and wellness massage delivered to hotels, condos, and homes across Bangkok — including Sukhumvit, Silom, and Sathorn.",
+    seoTitle: "In-Room Massage Bangkok | GetRoomSpa",
+    seoDescription:
+      "Book private in-room massage in Bangkok — Signature and wellness sessions at your hotel, condo, or home. Same-day when therapists are available.",
+    neighborhoods: [
+      {
+        slug: "sukhumvit",
+        name: "Sukhumvit",
+        summary: "Hotels and condos along Sukhumvit — discreet in-room sessions.",
+      },
+      {
+        slug: "silom",
+        name: "Silom / Sathorn",
+        summary: "Business-district hotels and residences for private in-room massage.",
+      },
+    ],
+  },
+  {
+    slug: "phuket",
+    name: "Phuket",
+    country: "Thailand",
+    status: "active",
+    displayOrder: 2,
+    headline: "In-room massage in Phuket",
+    summary:
+      "Private Signature Experiences and wellness massage at resorts, hotels, and villas across Phuket — including Patong, Kata / Karon, and Rawai / Nai Harn.",
+    seoTitle: "In-Room Massage Phuket | GetRoomSpa",
+    seoDescription:
+      "Book private in-room massage in Phuket — Signature and wellness sessions at your resort, hotel, or villa. Tell us your area so we can match therapists nearby.",
+    neighborhoods: [
+      {
+        slug: "patong",
+        name: "Patong",
+        summary: "Resort and hotel stays in Patong for private in-room sessions.",
+      },
+      {
+        slug: "kata",
+        name: "Kata / Karon",
+        summary: "Beachside hotels and residences in Kata and Karon.",
+      },
+      {
+        slug: "rawai",
+        name: "Rawai / Nai Harn",
+        summary: "Villas and quieter stays around Rawai and Nai Harn — tell us your property when you book.",
+      },
+    ],
+  },
+  {
     slug: "chiang-mai",
     name: "Chiang Mai",
     country: "Thailand",
     status: "active",
-    headline: "Signature in-room massage in Chiang Mai",
+    displayOrder: 3,
+    headline: "In-room massage in Chiang Mai",
     summary:
-      "Book private Signature Experiences — Tantric, Nuru, body-to-body, and more — plus wellness massage at hotels, condos, and homes across Old City, Nimman, and the Airport / Hang Dong corridor.",
-    seoTitle: "Signature in-room massage Chiang Mai | Private hotel & condo",
+      "Private Signature Experiences and wellness massage at hotels, condos, and homes across Old City, Nimman, and the Airport / Hang Dong corridor.",
+    seoTitle: "In-Room Massage Chiang Mai | GetRoomSpa",
     seoDescription:
-      "Book private Signature massage in Chiang Mai — Tantric, Nuru, body-to-body, and more delivered to your hotel, condo, or home. Old City, Nimman, Airport corridor.",
+      "Book private in-room massage in Chiang Mai — Signature and wellness sessions delivered to your hotel, condo, or home. Old City, Nimman, Airport corridor.",
     neighborhoods: [
       {
         slug: "old-city",
@@ -51,7 +107,7 @@ export const cities: CityDefinition[] = [
         slug: "nimman",
         name: "Nimman / University area",
         summary:
-          "Hotel and condo massage near Nimmanhaemin Road, Maya, and the university strip — fast booking for travelers and couples.",
+          "Hotel and condo massage near Nimmanhaemin Road, Maya, and the university strip.",
         coverageSlug: "chiang-mai-nimman",
       },
       {
@@ -63,41 +119,6 @@ export const cities: CityDefinition[] = [
       },
     ],
   },
-  {
-    slug: "bangkok",
-    name: "Bangkok",
-    country: "Thailand",
-    status: "enquiries",
-    headline: "Signature in-room massage in Bangkok — enquiries open",
-    summary:
-      "We’re building Bangkok coverage for private Signature Experiences. WhatsApp us with your area and preferred treatment — availability varies while we onboard therapists.",
-    seoTitle: "Signature in-room massage Bangkok — enquiries open | RoomSpa",
-    seoDescription:
-      "RoomSpa accepts Bangkok enquiries for private Signature massage (Tantric, Nuru, and more). Message WhatsApp with your area — therapist availability varies.",
-    neighborhoods: [
-      { slug: "sukhumvit", name: "Sukhumvit", summary: "Enquiries open — tell us your hotel or condo." },
-      { slug: "silom", name: "Silom / Sathorn", summary: "Enquiries open for business-district stays." },
-    ],
-  },
-  {
-    slug: "phuket",
-    name: "Phuket",
-    country: "Thailand",
-    status: "enquiries",
-    headline: "Signature in-room massage in Phuket — enquiries open",
-    summary:
-      "Phuket guests already reach out for private Signature Experiences. WhatsApp us with your resort or villa area — we’ll confirm what we can cover while supply grows.",
-    seoTitle: "Signature in-room massage Phuket — enquiries open | RoomSpa",
-    seoDescription:
-      "RoomSpa accepts Phuket enquiries for private Signature massage at resorts and villas. Message WhatsApp — availability by area while we expand.",
-    neighborhoods: [
-      { slug: "patong", name: "Patong", summary: "Enquiries open for resort and hotel stays." },
-      { slug: "kata", name: "Kata / Karon", summary: "Enquiries open for beachside stays." },
-      { slug: "rawai", name: "Rawai / Nai Harn", summary: "Enquiries open for villa coverage." },
-    ],
-  },
-  // Next country when therapists are ready, e.g.:
-  // { slug: "nairobi", name: "Nairobi", country: "Kenya", status: "enquiries", ... }
 ];
 
 export function cityStatusLabel(status: CityStatus): string {
@@ -115,12 +136,19 @@ export function getCity(slug: string) {
   return cities.find((city) => city.slug === slug);
 }
 
+/** Active cities in public display order (Bangkok → Phuket → Chiang Mai). */
 export function getActiveCities() {
-  return cities.filter((city) => city.status === "active");
+  return cities
+    .filter((city) => city.status === "active")
+    .slice()
+    .sort((a, b) => a.displayOrder - b.displayOrder);
 }
 
 export function getBookableOrEnquiryCities() {
-  return cities.filter((city) => city.status === "active" || city.status === "enquiries");
+  return cities
+    .filter((city) => city.status === "active" || city.status === "enquiries")
+    .slice()
+    .sort((a, b) => a.displayOrder - b.displayOrder);
 }
 
 export function getNeighborhood(citySlug: string, areaSlug: string) {

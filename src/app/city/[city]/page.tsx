@@ -8,7 +8,7 @@ import { BreadcrumbJsonLd, FaqJsonLd, JsonLd } from "@/components/seo/json-ld";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 import { cities, cityStatusLabel, getCity } from "@/content/cities";
 import { faqItems } from "@/content/pages";
-import { productPriceLabel } from "@/content/services";
+import { getServiceFromAmount, productPriceLabel } from "@/content/services";
 import { site } from "@/content/site";
 import {
   getPublicSignatureServices,
@@ -60,8 +60,8 @@ export default async function CityPage({ params }: PageProps) {
       answer: live
         ? `Yes. We come to hotels, condos, and homes across ${city.neighborhoods.map((n) => n.name).join(", ")} for Signature Experiences and wellness massage.`
         : enquiries
-          ? `We're accepting ${city.name} enquiries now. WhatsApp us with your area and preferred Signature treatment — availability varies while we grow local therapists.`
-          : `Coming soon in ${city.name}. WhatsApp us for updates, or book a live city today.`,
+          ? `WhatsApp us with your area and preferred treatment in ${city.name} — we'll confirm what we can cover.`
+          : `WhatsApp us for updates on ${city.name}, or book in Bangkok, Phuket, or Chiang Mai.`,
     },
     ...faqItems.slice(0, 3),
   ];
@@ -71,7 +71,7 @@ export default async function CityPage({ params }: PageProps) {
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "/" },
-          { name: "Locations", path: "/city" },
+          { name: "Cities", path: "/city" },
           { name: city.name, path: `/city/${city.slug}` },
         ]}
       />
@@ -102,7 +102,7 @@ export default async function CityPage({ params }: PageProps) {
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "Locations", href: "/city" },
+          { label: "Cities", href: "/city" },
           { label: city.name },
         ]}
       />
@@ -138,6 +138,12 @@ export default async function CityPage({ params }: PageProps) {
             {enquiries ? `Enquire for ${city.name}` : "WhatsApp us"}
           </WhatsAppLink>
         )}
+        <Link
+          href="/therapists"
+          className="inline-flex min-h-12 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm"
+        >
+          View therapists
+        </Link>
         <Link
           href="/services/signature"
           className="inline-flex min-h-12 items-center justify-center rounded-sm border border-border px-5 py-3 text-sm"
@@ -187,7 +193,7 @@ export default async function CityPage({ params }: PageProps) {
                       {service.name}
                     </Link>
                     <span className="shrink-0 text-sm text-accent">
-                      From {productPriceLabel(service.amountThb)}
+                      From {productPriceLabel(getServiceFromAmount(service))}
                     </span>
                   </li>
                 ))}
@@ -214,7 +220,7 @@ export default async function CityPage({ params }: PageProps) {
                       {service.name}
                     </Link>
                     <span className="shrink-0 text-sm text-accent">
-                      From {productPriceLabel(service.amountThb)}
+                      From {productPriceLabel(getServiceFromAmount(service))}
                     </span>
                   </li>
                 ))}

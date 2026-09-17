@@ -6,7 +6,7 @@ import { aboutContent } from "@/content/pages";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "RoomSpa brings private Signature Experiences to hotels, condos, and homes across Thailand — consent-led, discreet, expanding city by city.",
+    "GetRoomSpa brings private Signature Experiences to hotels, condos, and villas in Bangkok, Phuket, and Chiang Mai — consent-led and discreet.",
 };
 
 export default function AboutPage() {

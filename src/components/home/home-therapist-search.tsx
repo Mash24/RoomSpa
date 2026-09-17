@@ -109,12 +109,12 @@ export function HomeTherapistSearch({ initialTherapists, serviceOptions }: Props
 
   return (
     <section className="border-t border-border bg-surface-elevated/40">
-      <div className="mx-auto max-w-6xl px-4 py-14 xs:px-5 md:px-8 md:py-20">
+      <div className="page-gutter page-section mx-auto max-w-6xl xl:max-w-7xl">
         <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Find your therapist</p>
-        <h2 className="mt-3 font-display text-3xl tracking-tight text-foreground md:text-4xl">
+        <h2 className="mt-3 font-display text-[1.65rem] tracking-tight text-foreground min-[360px]:text-3xl md:text-4xl">
           Therapists for Signature & beyond
         </h2>
-        <p className="mt-3 max-w-2xl text-base leading-relaxed text-muted">
+        <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted xs:text-base">
           Filter by service and area, or share your location to see therapists based in that city —
           nearest first.
         </p>

@@ -122,7 +122,7 @@ export const blogPosts: BlogPost[] = [
       "Old City and the center: guesthouses and heritage hotels inside and around the moat. Ideal after temple days and night markets, and covered as a RoomSpa core zone.",
       "Nimman and the university area: boutiques, condos, and digital-nomad stays near Nimmanhaemin and Maya. Short therapist travel times and strong evening demand for couples and recovery sessions.",
       "Airport and Hang Dong corridor: convenient after landing or for residences south of the center. A light travel fee may apply depending on distance and is shown at booking.",
-      "Bangkok and Phuket are on the roadmap; Chiang Mai is live today. Start with the Chiang Mai city page for neighborhoods, then book with your hotel name so routing stays accurate.",
+      "Bangkok, Phuket, and Chiang Mai are live for GetRoomSpa bookings. Start with the city page for your stay, then book with your hotel or villa name so routing stays accurate.",
     ],
     primaryCta: { label: "Explore Chiang Mai", href: "/city/chiang-mai" },
     secondaryCta: { label: "Book now", href: "/book" },

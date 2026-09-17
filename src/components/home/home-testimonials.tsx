@@ -26,17 +26,17 @@ export function HomeTestimonials({ items, fromGuests = false }: Props) {
   };
 
   return (
-    <section className="bg-background px-4 py-12 xs:px-5 xs:py-14 md:px-8 md:py-20">
-      <div className="mx-auto max-w-6xl">
+    <section className="page-gutter page-section bg-background">
+      <div className="mx-auto max-w-6xl xl:max-w-7xl">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-lg">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">Reviews</p>
-            <h2 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
+            <h2 className="mt-3 font-display text-[1.65rem] leading-tight tracking-tight text-foreground min-[360px]:text-[1.85rem] xs:text-4xl md:text-5xl">
               What guests say
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">
               {fromGuests
-                ? "Straight from guests who booked RoomSpa at their hotel, condo, or home."
+                ? "Straight from guests who booked GetRoomSpa at their hotel, condo, or home."
                 : "Calm, private, and easy to book — without leaving your room."}
             </p>
           </div>
@@ -72,12 +72,12 @@ export function HomeTestimonials({ items, fromGuests = false }: Props) {
 
       <div
         ref={scrollerRef}
-        className="mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-1 scrollbar-hide xs:px-5 md:px-8"
+        className="page-gutter mt-8 flex snap-x snap-mandatory gap-3 overflow-x-auto pb-1 scrollbar-hide"
       >
         {shown.map((item, index) => (
           <blockquote
             key={item.id ?? `${item.name}-${index}`}
-            className="w-[78vw] shrink-0 snap-start border-t border-border bg-surface-elevated p-5 sm:w-[300px] md:w-[320px]"
+            className="w-[min(78vw,20rem)] shrink-0 snap-start border-t border-border bg-surface-elevated p-5 sm:w-[300px] md:w-[320px]"
           >
             <p className="font-display text-xl leading-snug tracking-tight text-foreground md:text-2xl">
               “{item.quote}”
@@ -108,7 +108,7 @@ export function HomeTestimonials({ items, fromGuests = false }: Props) {
         </div>
       </div>
 
-      <div className="mx-auto mt-6 flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 xs:px-5 md:px-8">
+      <div className="page-gutter mx-auto mt-6 flex max-w-6xl flex-wrap items-center justify-between gap-3 xl:max-w-7xl">
         <Link href="/reviews" className="text-sm font-medium text-accent transition hover:opacity-80">
           All reviews →
         </Link>

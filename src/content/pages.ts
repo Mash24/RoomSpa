@@ -2,7 +2,7 @@ export const faqItems = [
   {
     question: "Where do you come?",
     answer:
-      "RoomSpa delivers private Signature Experiences and wellness massage to hotels, condos, and homes across Thailand. Book online where therapists are live. For Bangkok, Phuket, and other cities, WhatsApp us — availability depends on local therapists.",
+      "GetRoomSpa delivers private Signature Experiences and wellness massage to hotels, condos, and homes in Bangkok, Phuket, and Chiang Mai. Book online, or WhatsApp us if you're unsure about your area.",
   },
   {
     question: "What should I prepare in the room?",
@@ -56,14 +56,14 @@ export const faqItems = [
 ] as const;
 
 export const aboutContent = {
-  eyebrow: "About RoomSpa",
-  title: "Private Signature massage, to your door",
+  eyebrow: "About GetRoomSpa",
+  title: "Private in-room massage across Thailand",
   lead:
-    "RoomSpa brings consent-led Signature Experiences — and classic wellness massage when you want it — to hotels, condos, and homes. Built for privacy, not spa lobbies.",
+    "GetRoomSpa brings consent-led Signature Experiences — and classic wellness massage when you want it — to hotels, condos, and villas in Bangkok, Phuket, and Chiang Mai.",
   story: [
     "We started with a simple idea: the best session is the one you do not have to commute for. No traffic, no waiting room, no finding your way back afterward.",
     "What guests ask for most is Signature — Tantric, Nuru, body-to-body, and intimate couples work. Wellness massage remains available; it just isn’t the center of the brand.",
-    "We operate across Thailand with live booking where therapists are ready, and open enquiries as we expand. Other countries follow the same model once local therapists are onboard.",
+    "We book across Bangkok, Phuket, and Chiang Mai. Tell us where you’re staying and we’ll match you with a therapist who can come to you.",
   ],
   values: [
     {
@@ -75,8 +75,8 @@ export const aboutContent = {
       body: "We come to you. Discreet arrival, calm setup, and no shared waiting areas.",
     },
     {
-      title: "Real cities, real supply",
-      body: "Book where therapists are live. Enquire elsewhere — we don’t fake availability.",
+      title: "Real cities",
+      body: "Bangkok, Phuket, and Chiang Mai — book where you are staying today.",
     },
   ],
 } as const;

@@ -77,7 +77,8 @@ export const catalogServices: CatalogService[] = [
       "Ideal after travel or a long day. Medium pressure unless you ask otherwise. We bring oils, towels, and a portable table when space allows.",
     duration: "60 min",
     durationMinutes: 60,
-    amountThb: 800,
+    amountThb: 1499,
+    priceTiers: { 60: 1499, 90: 1699, 120: 1999 },
     category: "classic",
     featured: false,
     bookable: true,
@@ -126,7 +127,8 @@ export const catalogServices: CatalogService[] = [
       "Straightforward, highly customizable oil massage. Say if you want light, medium, or firm pressure.",
     duration: "60 min",
     durationMinutes: 60,
-    amountThb: 900,
+    amountThb: 999,
+    priceTiers: { 60: 999, 90: 1599, 120: 1899 },
     category: "classic",
     bookable: true,
   },
@@ -138,7 +140,8 @@ export const catalogServices: CatalogService[] = [
       "Slower strokes and deeper work on problem areas. Communicate pressure throughout — we adjust as we go.",
     duration: "60–90 min",
     durationMinutes: 75,
-    amountThb: 1100,
+    amountThb: 1499,
+    priceTiers: { 60: 1499, 90: 1699, 120: 1999 },
     category: "therapeutic",
     bookable: true,
   },
@@ -223,7 +226,8 @@ export const catalogServices: CatalogService[] = [
       "Requires enough floor or bed space for two setups. Choose matching styles (e.g. both Swedish) in the notes if you have a preference.",
     duration: "60 min",
     durationMinutes: 60,
-    amountThb: 2500,
+    amountThb: 4999,
+    priceTiers: { 60: 4999, 90: 6499, 120: 7999 },
     category: "shared",
     featured: false,
     bookable: true,
@@ -236,7 +240,8 @@ export const catalogServices: CatalogService[] = [
       "An immersive, deeply relaxing experience. Best with a bit of open floor space in your room or suite.",
     duration: "60 min",
     durationMinutes: 60,
-    amountThb: 2200,
+    amountThb: 2999,
+    priceTiers: { 60: 2999, 90: 3999, 120: 4999 },
     category: "shared",
     bookable: true,
   },
@@ -248,8 +253,9 @@ export const catalogServices: CatalogService[] = [
     details:
       "Performed on waterproof sheets we provide. Clear boundaries are set before the session begins. Shower access is helpful but not always required.",
     duration: "60–90 min",
-    durationMinutes: 75,
-    amountThb: 3500,
+    durationMinutes: 60,
+    amountThb: 2999,
+    priceTiers: { 60: 2999, 90: 3999, 120: 5600 },
     category: "sensual",
     featured: true,
     bookable: true,
@@ -261,8 +267,9 @@ export const catalogServices: CatalogService[] = [
     details:
       "A sensual full-body experience with agreed boundaries upfront. Discreet arrival and professional conduct throughout.",
     duration: "60–90 min",
-    durationMinutes: 75,
-    amountThb: 3000,
+    durationMinutes: 60,
+    amountThb: 2999,
+    priceTiers: { 60: 2999, 90: 3999, 120: 5600 },
     category: "sensual",
     featured: true,
     bookable: true,
@@ -275,8 +282,9 @@ export const catalogServices: CatalogService[] = [
     details:
       "Not a sexual service in the escort sense: sessions are structured, respectful, and paced by your comfort. A brief intake conversation happens before touch begins.",
     duration: "60–90 min",
-    durationMinutes: 75,
+    durationMinutes: 60,
     amountThb: 2800,
+    priceTiers: { 60: 2800, 90: 3900, 120: 4900 },
     category: "sensual",
     featured: true,
     bookable: true,
@@ -289,8 +297,9 @@ export const catalogServices: CatalogService[] = [
     details:
       "Clear consent and boundaries before and during the session. Designed as bodywork, not a rushed sexual appointment.",
     duration: "60–90 min",
-    durationMinutes: 75,
-    amountThb: 2800,
+    durationMinutes: 60,
+    amountThb: 2999,
+    priceTiers: { 60: 2999, 90: 4500, 120: 5600 },
     category: "sensual",
     featured: true,
     bookable: true,
@@ -301,9 +310,10 @@ export const catalogServices: CatalogService[] = [
     summary: "Slow, full-body tantric touch combining breath, presence, and energy awareness.",
     details:
       "May include sensual full-body work depending on your stated boundaries. Ideal when you want something slower, more present, and deeply intimate.",
-    duration: "90 min",
-    durationMinutes: 90,
+    duration: "60 / 90 / 120 min",
+    durationMinutes: 60,
     amountThb: 3200,
+    priceTiers: { 60: 3200, 90: 4500, 120: 5600 },
     category: "sensual",
     featured: true,
     bookable: true,
@@ -314,9 +324,10 @@ export const catalogServices: CatalogService[] = [
     summary: "Guided dual session for partners who want shared intimacy and relaxation at home.",
     details:
       "Two therapists or a facilitated couples format depending on availability. Boundaries and goals are confirmed before we begin.",
-    duration: "90 min",
-    durationMinutes: 90,
-    amountThb: 4500,
+    duration: "60 / 90 / 120 min",
+    durationMinutes: 60,
+    amountThb: 5999,
+    priceTiers: { 60: 5999, 90: 6300, 120: 8999 },
     category: "sensual",
     featured: true,
     bookable: true,
@@ -364,6 +375,11 @@ export function getServicesByCategory(category: ServiceCategoryId) {
 /** 60 / 90 / 120 THB tiers for pricing tables and booking. */
 export function getServicePriceTiers(service: CatalogService) {
   return resolveTiers(service);
+}
+
+/** Starting / “From” price used on home, menus, and city pages — always 60-min tier. */
+export function getServiceFromAmount(service: CatalogService) {
+  return getServicePriceTiers(service)[60];
 }
 
 export function getServiceAmountForDuration(

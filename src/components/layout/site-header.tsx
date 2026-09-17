@@ -43,8 +43,8 @@ export function SiteHeader() {
     : "sticky top-0 z-40 border-b border-border bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur-md";
 
   const brand = onHero
-    ? "font-display text-[1.35rem] tracking-tight text-white drop-shadow-sm xs:text-2xl md:text-[1.65rem]"
-    : "font-display text-[1.35rem] tracking-tight text-foreground xs:text-2xl md:text-[1.65rem]";
+    ? "font-display text-[1.25rem] tracking-tight text-white drop-shadow-sm min-[360px]:text-[1.35rem] xs:text-2xl md:text-[1.65rem]"
+    : "font-display text-[1.25rem] tracking-tight text-foreground min-[360px]:text-[1.35rem] xs:text-2xl md:text-[1.65rem]";
 
   const link = onHero
     ? "text-sm text-white/80 transition hover:text-white"
@@ -55,8 +55,8 @@ export function SiteHeader() {
     : "inline-flex min-h-10 items-center justify-center rounded-sm bg-accent px-3 py-2 text-sm font-medium text-accent-foreground transition hover:opacity-90 xs:px-4";
 
   const menuBtn = onHero
-    ? "inline-flex h-11 w-11 items-center justify-center rounded-sm border border-white/30 text-white"
-    : "inline-flex h-11 w-11 items-center justify-center rounded-sm border border-border text-foreground";
+    ? "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-white/30 text-white"
+    : "inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-sm border border-border text-foreground";
 
   const mobileLink = onHero
     ? "min-h-11 rounded-sm px-1 py-2.5 text-base text-white/90"
@@ -64,30 +64,28 @@ export function SiteHeader() {
 
   return (
     <header className={shell}>
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3.5 xs:gap-3 xs:px-5 xs:py-4 md:gap-4 md:px-8 md:py-5">
-        <Link href="/" className={`${brand} min-w-0 max-w-[46%] truncate xs:max-w-none`}>
+      <div className="page-gutter mx-auto flex max-w-6xl items-center justify-between gap-2 py-3.5 xs:gap-3 xs:py-4 md:gap-4 md:py-5 xl:max-w-7xl">
+        <Link href="/" className={`${brand} min-w-0 shrink`}>
           {site.name}
         </Link>
 
-        <nav className="hidden items-center gap-6 lg:flex lg:gap-7" aria-label="Primary">
+        <nav className="hidden items-center gap-5 xl:gap-7 lg:flex" aria-label="Primary">
           {site.nav.map((item) => (
             <Link key={item.href} href={item.href} className={link}>
               {item.label}
             </Link>
           ))}
-          <WhatsAppLink cta="header" className={link}>
-            WhatsApp
-          </WhatsAppLink>
           <ThemeToggle lightOnDark={onHero} />
           <Link href="/book" className={book}>
-            Book
+            Book now
           </Link>
         </nav>
 
-        <div className="flex items-center gap-1.5 xs:gap-2 lg:hidden">
+        <div className="flex shrink-0 items-center gap-1.5 xs:gap-2 lg:hidden">
           <ThemeToggle lightOnDark={onHero} />
           <Link href="/book" className={book}>
-            Book
+            <span className="xs:hidden">Book</span>
+            <span className="hidden xs:inline">Book now</span>
           </Link>
           <button
             type="button"
@@ -109,8 +107,8 @@ export function SiteHeader() {
           id="mobile-nav"
           className={
             onHero
-              ? "animate-fade-in max-h-[min(calc(100dvh-4.5rem-env(safe-area-inset-top)),28rem)] overflow-y-auto overscroll-contain border-t border-white/15 bg-[rgba(18,28,24,0.96)] px-4 py-4 backdrop-blur-md xs:px-5 lg:hidden"
-              : "animate-fade-in max-h-[min(calc(100dvh-4.5rem-env(safe-area-inset-top)),28rem)] overflow-y-auto overscroll-contain border-t border-border bg-background px-4 py-4 xs:px-5 lg:hidden"
+              ? "page-gutter animate-fade-in max-h-[min(calc(100dvh-4.5rem-env(safe-area-inset-top)),32rem)] overflow-y-auto overscroll-contain border-t border-white/15 bg-[rgba(18,28,24,0.96)] py-4 backdrop-blur-md lg:hidden"
+              : "page-gutter animate-fade-in max-h-[min(calc(100dvh-4.5rem-env(safe-area-inset-top)),32rem)] overflow-y-auto overscroll-contain border-t border-border bg-background py-4 lg:hidden"
           }
         >
           <nav className="flex flex-col" aria-label="Mobile">

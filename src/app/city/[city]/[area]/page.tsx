@@ -55,7 +55,7 @@ export default async function NeighborhoodPage({ params }: PageProps) {
       <BreadcrumbJsonLd
         items={[
           { name: "Home", path: "/" },
-          { name: "Locations", path: "/city" },
+          { name: "Cities", path: "/city" },
           { name: city.name, path: `/city/${city.slug}` },
           { name: area.name, path: `/city/${city.slug}/${area.slug}` },
         ]}
@@ -75,7 +75,7 @@ export default async function NeighborhoodPage({ params }: PageProps) {
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "Locations", href: "/city" },
+          { label: "Cities", href: "/city" },
           { label: city.name, href: `/city/${city.slug}` },
           { label: area.name },
         ]}

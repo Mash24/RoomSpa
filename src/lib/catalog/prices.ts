@@ -51,6 +51,11 @@ export function getServicePriceTiers(service: TierSource): Record<DurationMinute
   return buildPriceTiers(service.amountThb);
 }
 
+/** Starting / “From” price — always the 60-minute tier (same value as catalog amountThb when synced). */
+export function getServiceFromAmount(service: TierSource) {
+  return getServicePriceTiers(service)[60];
+}
+
 export function priceForDuration(
   tiers: Partial<Record<DurationMinutes, number>> | undefined,
   minutes: DurationMinutes,

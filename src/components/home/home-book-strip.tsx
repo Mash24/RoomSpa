@@ -35,17 +35,17 @@ export function HomeBookStrip({ treatments }: Props) {
 
   return (
     <section className="border-b border-border bg-surface-elevated">
-      <div className="mx-auto max-w-6xl px-4 py-7 xs:px-5 md:px-8 md:py-8">
+      <div className="page-gutter mx-auto max-w-6xl py-7 md:py-8 xl:max-w-7xl xl:py-10">
         <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-8">
           <div className="min-w-0 flex-1">
             <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
               Book Signature
             </p>
-            <p className="mt-2 font-display text-2xl tracking-tight text-foreground md:text-3xl">
+            <p className="mt-2 font-display text-[1.65rem] tracking-tight text-foreground xs:text-2xl md:text-3xl">
               Private experiences — we come to you
             </p>
 
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <label className="block text-sm">
                 <span className="text-xs uppercase tracking-[0.14em] text-muted">Coverage</span>
                 <span className="mt-1.5 flex min-h-11 items-center border border-border bg-background px-3 text-sm font-medium text-foreground">
@@ -96,7 +96,7 @@ export function HomeBookStrip({ treatments }: Props) {
                 </select>
               </label>
 
-              <label className="block text-sm">
+              <label className="block text-sm sm:col-span-2 xl:col-span-1">
                 <span className="text-xs uppercase tracking-[0.14em] text-muted">We come to</span>
                 <select
                   value={placeType}
@@ -115,7 +115,7 @@ export function HomeBookStrip({ treatments }: Props) {
 
           <Link
             href={href}
-            className="inline-flex min-h-12 w-full shrink-0 items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 lg:w-auto"
+            className="inline-flex min-h-12 w-full shrink-0 items-center justify-center rounded-sm bg-accent px-6 py-3.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 lg:w-auto lg:min-w-[11rem]"
           >
             Check availability →
           </Link>

@@ -132,8 +132,8 @@ export async function POST(request: Request) {
       ? requestedDuration
       : (60 as DurationMinutes);
 
-    let amountThb = catalog ? getServiceAmountForDuration(catalog, durationMinutes) : 0;
-
+    // Prefer live service_prices (same source as public menus), then catalog fallback.
+    let amountThb = 0;
     const { data: tierPrice } = await supabase
       .from("service_prices")
       .select("price_thb")
@@ -144,8 +144,10 @@ export async function POST(request: Request) {
 
     if (tierPrice?.price_thb != null) {
       amountThb = Number(tierPrice.price_thb);
-    } else if (!(amountThb > 0)) {
-      amountThb = Number(catalog?.amountThb ?? service.price_thb);
+    } else if (catalog) {
+      amountThb = getServiceAmountForDuration(catalog, durationMinutes);
+    } else {
+      amountThb = Number(service.price_thb);
     }
 
     const serviceName = catalog?.name ?? service.name;

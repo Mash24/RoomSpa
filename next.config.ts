@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
   // sharp is a native Node dependency used by admin image upload routes.
   // Keep it external so Vercel loads the correct Linux binary at runtime.
   serverExternalPackages: ["sharp"],
+  async redirects() {
+    return [
+      { source: "/services/sensual", destination: "/services/signature", permanent: true },
+      { source: "/services/sensual/:slug", destination: "/services/signature/:slug", permanent: true },
+      { source: "/locations", destination: "/city", permanent: true },
+      { source: "/locations/:path*", destination: "/city/:path*", permanent: true },
+    ];
+  },
   images: {
     remotePatterns: [
       {

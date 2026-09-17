@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import {
   catalogProducts,
   getServiceAmountForDuration,
+  getServiceFromAmount,
   isSignatureExperience,
   productPriceLabel,
   serviceAcceptsCardNow,
@@ -962,7 +963,7 @@ function ServiceGroup({
                 {shortTagline(service.summary)}
               </span>
               <span className="mt-2 block text-sm text-accent">
-                From {productPriceLabel(service.amountThb)}
+                From {productPriceLabel(getServiceFromAmount(service))}
               </span>
             </button>
           );

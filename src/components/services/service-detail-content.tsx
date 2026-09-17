@@ -15,7 +15,7 @@ import { ServiceImage } from "@/components/media/service-image";
 import { SensualServiceDetail } from "@/components/sensual/sensual-service-detail";
 import { ServicePriceTiers } from "@/components/services/service-price-tiers";
 import {
-  getServicePriceTiers,
+  getServiceFromAmount,
   productPriceLabel,
   serviceCategories,
 } from "@/content/services";
@@ -140,7 +140,7 @@ export async function ServiceDetailContent({ slug, expectedTier }: Props) {
       />
 
       <p className="mt-6 text-xs font-medium uppercase tracking-[0.2em] text-accent">
-        {category?.title ?? "Service"} · Chiang Mai · In-room
+        {category?.title ?? "Service"} · Thailand · In-room
       </p>
       <h1 className="mt-3 font-display text-[1.85rem] leading-tight tracking-tight text-foreground xs:text-4xl md:text-5xl">
         {service.name}
@@ -179,7 +179,7 @@ export async function ServiceDetailContent({ slug, expectedTier }: Props) {
         <p className="text-xs uppercase tracking-[0.14em] text-muted">Duration & pricing</p>
         <ServicePriceTiers className="mt-3" service={service} />
         <p className="mt-3 text-sm text-muted">
-          From {productPriceLabel(getServicePriceTiers(service)[60])} · Oils, towels, and equipment
+          From {productPriceLabel(getServiceFromAmount(service))} · Oils, towels, and equipment
           provided
         </p>
       </div>
@@ -285,7 +285,7 @@ export async function ServiceDetailContent({ slug, expectedTier }: Props) {
             links={related.map((item) => ({
               href: getServicePath(item),
               label: item.name,
-              hint: productPriceLabel(item.amountThb),
+                hint: productPriceLabel(getServiceFromAmount(item)),
             }))}
           />
         </div>

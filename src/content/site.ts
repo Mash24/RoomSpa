@@ -1,8 +1,8 @@
 export const site = {
-  name: "RoomSpa",
-  tagline: "Private Signature massage, to your door",
+  name: "GetRoomSpa",
+  tagline: "Private in-room massage across Thailand",
   description:
-    "Private Signature Experiences delivered to your hotel, condo, or home across Thailand — Tantric, Nuru, body-to-body, and more. Consent-led, discreet, and bookable where therapists are live.",
+    "Private Signature and wellness massage delivered to your hotel, condo, or villa in Bangkok, Phuket, and Chiang Mai. Consent-led, discreet, and bookable online.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en",
   contact: {
@@ -11,66 +11,64 @@ export const site = {
     /** LINE user ID — also used in line.me deep links */
     lineId: "mashth",
   },
-  /** Primary chrome — Signature leads; wellness secondary; cities in Locations */
+  /** Keep primary chrome short — company links live in the footer */
   nav: [
-    { label: "Signature", href: "/services/signature" },
-    { label: "Wellness", href: "/services/wellness" },
+    { label: "Services", href: "/services" },
+    { label: "Therapists", href: "/therapists" },
+    { label: "Cities", href: "/city" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Locations", href: "/city" },
-    { label: "Reviews", href: "/reviews" },
-    { label: "Gallery", href: "/gallery" },
-    { label: "FAQ", href: "/faq" },
+    { label: "My Booking", href: "/my-booking" },
   ],
   hero: {
-    brand: "RoomSpa",
-    eyebrow: "Private Signature Experiences · Thailand",
-    headline: "Intimate massage, delivered to your room",
+    brand: "GetRoomSpa",
+    eyebrow: "Private in-room massage · Thailand",
+    headline: "Massage, delivered to your room",
     support:
-      "Tantric, Nuru, body-to-body, and more — discreet arrival at your hotel, condo, or home. Book where therapists are live; enquire for other cities.",
-    primaryCta: { label: "Book Signature", href: "/book" },
-    secondaryCta: { label: "View Signature menu", href: "/services/signature" },
+      "Book private Signature and wellness massage at your hotel, condo or villa in Bangkok, Phuket or Chiang Mai.",
+    primaryCta: { label: "Book now", href: "/book" },
+    secondaryCta: { label: "Explore experiences", href: "/services/signature" },
     tiers: {
       signature: {
         label: "Signature Experiences",
         href: "/services/signature",
         summary:
-          "Private, sensual, consent-led sessions — Tantric, Nuru, body-to-body, Yoni, Lingam, and couples. This is what RoomSpa is known for.",
+          "Private, sensual, consent-led sessions — Tantric, Nuru, body-to-body, Yoni, Lingam, and couples.",
       },
       wellness: {
         label: "Wellness Massage",
         href: "/services/wellness",
         summary:
-          "Classic Swedish, Thai, deep tissue, and recovery massage — also available when you want something quieter.",
+          "Classic Swedish, Thai, deep tissue, and recovery massage — available when you want something quieter.",
       },
     },
   },
   howItWorks: [
     {
       step: "01",
-      title: "Choose your Signature",
-      body: "Pick Tantric, Nuru, body-to-body, or another private experience — or wellness if you prefer classic massage.",
+      title: "Choose your experience",
+      body: "Select the massage or therapist you want — Signature or wellness.",
     },
     {
       step: "02",
-      title: "Tell us where you are",
-      body: "Hotel, condo, or home anywhere we cover — same-day when slots are open.",
+      title: "Tell us where and when",
+      body: "Hotel, condo or villa in Bangkok, Phuket, or Chiang Mai — same-day when slots are open.",
     },
     {
       step: "03",
-      title: "Relax in place",
-      body: "Your therapist arrives prepared and discreet. You stay where you are.",
+      title: "Relax in your room",
+      body: "Your confirmed therapist comes to you. You stay where you are.",
     },
   ],
   coverageNote:
-    "Serving Thailand — book live cities now; enquire for Bangkok, Phuket, and expanding coverage.",
+    "Serving Bangkok, Phuket, and Chiang Mai — private in-room massage across Thailand.",
 } as const;
 
 const whatsappNumber = site.contact.whatsapp.replace(/\D/g, "");
 
 /** Static SSR fallback — prefer <WhatsAppLink cta="..." /> for tracked clicks. */
 export const whatsappHref = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
-  "Hi RoomSpa! I'd like to book a massage at my address. What openings are available?",
+  "Hi GetRoomSpa! I'd like to book a massage at my address. What openings are available?",
 )}`;
 
-/** Opens a chat with RoomSpa on LINE (user ID). */
+/** Opens a chat with GetRoomSpa on LINE (user ID). */
 export const lineHref = `https://line.me/ti/p/~${site.contact.lineId}`;

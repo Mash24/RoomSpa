@@ -23,29 +23,29 @@ export function SiteFooter() {
         }}
       />
 
-      <div className="relative mx-auto max-w-6xl px-4 pt-12 xs:px-5 sm:pt-14 md:px-8 md:pt-16">
+      <div className="page-gutter relative mx-auto max-w-6xl pt-12 sm:pt-14 md:pt-16 xl:max-w-7xl">
         <div className="flex flex-col gap-8 sm:flex-row sm:items-end sm:justify-between">
-          <div>
+          <div className="min-w-0">
             <Link
               href="/"
-              className="inline-block font-display text-[2rem] tracking-tight text-white xs:text-4xl md:text-5xl"
+              className="inline-block font-display text-[1.85rem] tracking-tight text-white min-[360px]:text-[2rem] xs:text-4xl md:text-5xl"
             >
               {site.name}
             </Link>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-white/55">
-              In-room massage in Chiang Mai — hotel, condo, or home.
+              Private in-room massage across Thailand — Bangkok, Phuket, and Chiang Mai.
             </p>
           </div>
-          <div className="flex w-full flex-col gap-2.5 xs:flex-row sm:w-auto">
+          <div className="grid w-full grid-cols-1 gap-2.5 xs:grid-cols-2 sm:w-auto sm:flex">
             <Link
               href="/book"
-              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm bg-white px-5 py-3 text-sm font-medium text-[#1a221c] transition hover:bg-white/90 sm:flex-none sm:min-w-[9rem]"
+              className="inline-flex min-h-12 items-center justify-center rounded-sm bg-white px-5 py-3 text-sm font-medium text-[#1a221c] transition hover:bg-white/90 sm:min-w-[9rem]"
             >
               Book now
             </Link>
             <WhatsAppLink
               cta="footer-cta"
-              className="inline-flex min-h-12 flex-1 items-center justify-center rounded-sm border border-white/30 px-5 py-3 text-sm font-medium text-white transition hover:border-white hover:bg-white/10 sm:flex-none sm:min-w-[9rem]"
+              className="inline-flex min-h-12 items-center justify-center rounded-sm border border-white/30 px-5 py-3 text-sm font-medium text-white transition hover:border-white hover:bg-white/10 sm:min-w-[9rem]"
             >
               WhatsApp
             </WhatsAppLink>
@@ -60,10 +60,8 @@ export function SiteFooter() {
       </div>
 
       <div className="relative border-t border-white/10">
-        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-5 text-xs leading-relaxed text-white/40 xs:px-5 sm:flex-row sm:items-center sm:justify-between sm:gap-6 md:px-8">
-          <p>
-            © {year} GetRoomSpa · Chiang Mai
-          </p>
+        <div className="page-gutter mx-auto flex max-w-6xl flex-col gap-3 py-5 text-xs leading-relaxed text-white/40 sm:flex-row sm:items-center sm:justify-between sm:gap-6 xl:max-w-7xl">
+          <p>© {year} GetRoomSpa · Thailand</p>
           <nav aria-label="Legal" className="flex flex-wrap items-center gap-x-1 gap-y-1">
             {legalLinks.map((item, index) => (
               <span key={item.href} className="inline-flex items-center">

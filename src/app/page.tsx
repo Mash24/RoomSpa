@@ -50,7 +50,7 @@ export default async function HomePage() {
     <>
       <OrganizationJsonLd />
       <WebSiteJsonLd />
-      <LocalBusinessJsonLd aggregate={aggregate} />
+      <LocalBusinessJsonLd aggregate={aggregate} catalog={catalog} />
       <HomeHero />
       <HomeBookStrip treatments={bookTreatments} />
       {signature.length > 0 ? <HomeSignaturePreview services={signature} /> : null}
