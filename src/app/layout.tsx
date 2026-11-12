@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { AppShell } from "@/components/layout/app-shell";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { site } from "@/content/site";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -72,6 +73,7 @@ export default function RootLayout({
     <html lang="en" className={`${display.variable} ${sans.variable} h-full`} suppressHydrationWarning>
       <body className="min-h-full flex flex-col font-sans antialiased">
         <GoogleAnalytics />
+        <Analytics />
         <ThemeProvider>
           <AppShell>{children}</AppShell>
         </ThemeProvider>
