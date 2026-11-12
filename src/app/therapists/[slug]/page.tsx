@@ -4,7 +4,6 @@ import { notFound } from "next/navigation";
 import { SensualZone } from "@/components/sensual/sensual-zone";
 import { TherapistProfile } from "@/components/therapists/therapist-profile";
 import { getTherapistProfileAccess } from "@/lib/therapists/public";
-import { getPublicCatalog } from "@/lib/catalog/public";
 import { buildPageMetadata } from "@/lib/seo/metadata";
 
 type PageProps = { params: Promise<{ slug: string }> };
@@ -25,9 +24,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   return buildPageMetadata({
     title: `${access.therapist.displayName} | RoomSpa therapist`,
-    description: `${access.therapist.displayName} — ${access.therapist.serviceNames.join(", ")} in ${access.therapist.city}. ${access.therapist.bio.slice(0, 120)}`,
+    description: `${access.therapist.displayName} in ${access.therapist.city || "Thailand"}. View photos and request a booking with RoomSpa.`,
     path: `/therapists/${slug}`,
-    noIndex: true,
   });
 }
 
@@ -53,11 +51,10 @@ export default async function TherapistDetailPage({ params }: PageProps) {
     );
   }
 
-  const catalog = await getPublicCatalog();
   return (
     <div className="therapist-gallery-shell min-h-screen">
       <SensualZone>
-        <TherapistProfile therapist={access.therapist} catalog={catalog} dark />
+        <TherapistProfile therapist={access.therapist} dark />
       </SensualZone>
     </div>
   );

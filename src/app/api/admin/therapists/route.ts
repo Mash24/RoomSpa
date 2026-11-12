@@ -161,6 +161,13 @@ export async function POST(request: Request) {
 
   const status = body.status || (body.isActive === false ? "inactive" : "applicant");
   const statusFlags = therapistStatusFlags(status);
+  const { data: lastTherapist } = await supabase
+    .from("therapists")
+    .select("sort_order")
+    .order("sort_order", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const nextSortOrder = Number(lastTherapist?.sort_order ?? -1) + 1;
 
   const { data: therapist, error: insertError } = await supabase
     .from("therapists")
@@ -207,7 +214,7 @@ export async function POST(request: Request) {
       is_active: statusFlags.is_active,
       is_bookable: statusFlags.is_bookable,
       featured: Boolean(body.featured),
-      sort_order: Number(body.sortOrder ?? 100),
+      sort_order: Number(body.sortOrder ?? nextSortOrder),
     })
     .select("id")
     .single();

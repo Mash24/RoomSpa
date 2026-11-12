@@ -35,7 +35,7 @@ export function TherapistCard({
     return (
       <Link
         href={`/therapists/${therapist.slug}`}
-        className="group block"
+        className="group block rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#C8A96B]"
       >
         <article>
           <div className="relative aspect-[4/5] overflow-hidden rounded-sm bg-[#191715]">
@@ -60,6 +60,9 @@ export function TherapistCard({
             {therapist.city ? (
               <p className="mt-1 text-sm tracking-wide text-[#B8B0A3]">{therapist.city}</p>
             ) : null}
+            <span className="mt-3 inline-block text-xs font-medium tracking-wide text-[#C8A96B] opacity-80 transition group-hover:opacity-100">
+              View profile →
+            </span>
           </div>
         </article>
       </Link>
@@ -108,9 +111,6 @@ export function TherapistCard({
           <Link href={`/therapists/${therapist.slug}`} className="font-display text-lg tracking-tight text-foreground hover:underline">
             {therapist.displayName}
           </Link>
-          {therapist.serviceNames.length > 0 ? (
-            <p className="mt-0.5 line-clamp-1 text-xs text-accent">{therapist.serviceNames.slice(0, 3).join(" · ")}</p>
-          ) : null}
           <p className="mt-1 text-xs text-muted">{therapist.city}</p>
           <Link href={requestHref} className="mt-2 inline-block text-xs font-medium text-accent hover:underline">
             Request →
@@ -137,9 +137,7 @@ export function TherapistCard({
       </div>
       <div className="flex flex-1 flex-col p-4">
         <h3 className="font-display text-xl tracking-tight text-foreground">{therapist.displayName}</h3>
-        {therapist.serviceNames.length > 0 ? (
-          <p className="mt-3 line-clamp-2 text-sm text-accent">{therapist.serviceNames.join(" · ")}</p>
-        ) : null}
+        {therapist.city ? <p className="mt-1 text-sm text-muted">{therapist.city}</p> : null}
         <div className="mt-auto grid grid-cols-2 gap-2 pt-4">
           <Link
             href={`/therapists/${therapist.slug}`}

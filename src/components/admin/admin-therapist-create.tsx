@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { readApiJson } from "@/lib/admin/api";
-import type { TherapistGender } from "@/lib/therapists/types";
 
 function slugify(value: string) {
   return value
@@ -23,10 +22,6 @@ export function AdminTherapistCreate() {
 
   const [displayName, setDisplayName] = useState("");
   const [city, setCity] = useState("Chiang Mai");
-  const [gender, setGender] = useState<TherapistGender>("female");
-  const [phone, setPhone] = useState("");
-  const [languages, setLanguages] = useState("English, Thai");
-  const [country, setCountry] = useState("Thailand");
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
   const [primaryIndex, setPrimaryIndex] = useState(0);
 
@@ -62,8 +57,6 @@ export function AdminTherapistCreate() {
 
     const name = displayName.trim();
     const cityValue = city.trim();
-    const langs = languages.trim();
-    const countryValue = country.trim();
     const slug = slugify(name);
 
     if (!name || !slug) {
@@ -73,16 +66,6 @@ export function AdminTherapistCreate() {
     }
     if (!cityValue) {
       setError("City is required.");
-      setSaving(false);
-      return;
-    }
-    if (!langs) {
-      setError("Languages are required.");
-      setSaving(false);
-      return;
-    }
-    if (!countryValue) {
-      setError("Country is required.");
       setSaving(false);
       return;
     }
@@ -103,10 +86,8 @@ export function AdminTherapistCreate() {
         body: JSON.stringify({
           displayName: name,
           slug,
-          gender,
-          phone: phone.trim() || null,
-          languages: langs,
-          nationality: countryValue,
+          gender: "unspecified",
+          nationality: "Thailand",
           ethnicity: "",
           status: "active",
           showOnGallery: true,
@@ -116,7 +97,7 @@ export function AdminTherapistCreate() {
           mediaApprovals,
           location: {
             city: cityValue,
-            country: countryValue,
+            country: "Thailand",
             region: "",
             publicAreaSummary: "",
             latitude: null,
@@ -145,7 +126,7 @@ export function AdminTherapistCreate() {
           Add therapist
         </h1>
         <p className="mt-2 text-sm text-muted">
-          Name, photo, city, country, gender, and languages — then finish the rest in their workspace.
+          Add the essentials your clients see: a name, city, and photos. You can complete internal details later.
         </p>
       </div>
 
@@ -242,52 +223,6 @@ export function AdminTherapistCreate() {
           />
         </label>
 
-        <label className="block text-sm">
-          <span className="text-muted">Country</span>
-          <input
-            required
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            placeholder="Thailand"
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
-          />
-        </label>
-
-        <label className="block text-sm">
-          <span className="text-muted">Gender</span>
-          <select
-            required
-            value={gender}
-            onChange={(e) => setGender(e.target.value as TherapistGender)}
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
-          >
-            <option value="female">Female</option>
-            <option value="male">Male</option>
-            <option value="nonbinary">Non-binary</option>
-            <option value="unspecified">Unspecified</option>
-          </select>
-        </label>
-
-        <label className="block text-sm">
-          <span className="text-muted">Languages</span>
-          <input
-            required
-            value={languages}
-            onChange={(e) => setLanguages(e.target.value)}
-            placeholder="Thai, English"
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
-          />
-        </label>
-
-        <label className="block text-sm">
-          <span className="text-muted">WhatsApp / phone (optional)</span>
-          <input
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            placeholder="+66…"
-            className="mt-1 w-full border border-border bg-background px-3 py-2.5"
-          />
-        </label>
       </section>
 
       <button

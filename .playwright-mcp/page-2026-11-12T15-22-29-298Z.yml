@@ -1,0 +1,113 @@
+- generic [ref=f8e1]:
+  - banner [ref=f8e2]:
+    - generic [ref=f8e3]:
+      - link "GetRoomSpa" [ref=f8e4] [cursor=pointer]:
+        - /url: /
+      - navigation "Primary" [ref=f8e5]:
+        - link "Services" [ref=f8e6] [cursor=pointer]:
+          - /url: /services
+        - link "Therapists" [ref=f8e7] [cursor=pointer]:
+          - /url: /therapists
+        - link "Cities" [ref=f8e8] [cursor=pointer]:
+          - /url: /city
+        - link "Pricing" [ref=f8e9] [cursor=pointer]:
+          - /url: /pricing
+        - link "My Booking" [ref=f8e10] [cursor=pointer]:
+          - /url: /my-booking
+        - link "Book now" [ref=f8e12] [cursor=pointer]:
+          - /url: /book
+  - main [ref=f8e13]:
+    - status [ref=f8e15]:
+      - paragraph [ref=f8e18]: Loading…
+  - generic [ref=f8e19]:
+    - link "Chat on WhatsApp" [ref=f8e20] [cursor=pointer]:
+      - /url: https://wa.me/66984712237?text=Hi%20RoomSpa!%20I'd%20like%20to%20book%20a%20massage%20at%20my%20address.%20What%20openings%20are%20available%3F
+      - generic [ref=f8e23]: WhatsApp
+    - link "Chat on LINE" [ref=f8e24] [cursor=pointer]:
+      - /url: https://line.me/ti/p/~mashth
+      - generic [ref=f8e27]: LINE
+  - contentinfo [ref=f8e28]:
+    - generic [ref=f8e29]:
+      - generic [ref=f8e30]:
+        - generic [ref=f8e31]:
+          - link "GetRoomSpa" [ref=f8e32] [cursor=pointer]:
+            - /url: /
+          - paragraph [ref=f8e33]: Private in-room massage across Thailand — Bangkok, Phuket, and Chiang Mai.
+        - generic [ref=f8e34]:
+          - link "Book now" [ref=f8e35] [cursor=pointer]:
+            - /url: /book
+          - link "WhatsApp" [ref=f8e36] [cursor=pointer]:
+            - /url: https://wa.me/66984712237?text=Hi%20RoomSpa!%20I'd%20like%20to%20book%20a%20massage%20at%20my%20address.%20What%20openings%20are%20available%3F
+      - generic [ref=f8e39]:
+        - generic [ref=f8e40]:
+          - heading "Book" [level=3] [ref=f8e41]
+          - navigation "Book" [ref=f8e43]:
+            - link "Signature Experiences" [ref=f8e44] [cursor=pointer]:
+              - /url: /services/signature
+            - link "Wellness Massage" [ref=f8e45] [cursor=pointer]:
+              - /url: /services/wellness
+            - link "Therapists" [ref=f8e46] [cursor=pointer]:
+              - /url: /therapists
+            - link "Pricing" [ref=f8e47] [cursor=pointer]:
+              - /url: /pricing
+            - link "My Booking" [ref=f8e48] [cursor=pointer]:
+              - /url: /my-booking
+        - generic [ref=f8e49]:
+          - heading "Cities" [level=3] [ref=f8e50]
+          - navigation "Cities" [ref=f8e52]:
+            - link "Bangkok" [ref=f8e53] [cursor=pointer]:
+              - /url: /city/bangkok
+            - link "Phuket" [ref=f8e54] [cursor=pointer]:
+              - /url: /city/phuket
+            - link "Chiang Mai" [ref=f8e55] [cursor=pointer]:
+              - /url: /city/chiang-mai
+            - link "All cities" [ref=f8e56] [cursor=pointer]:
+              - /url: /city
+        - generic [ref=f8e57]:
+          - heading "Help" [level=3] [ref=f8e58]
+          - navigation "Help" [ref=f8e60]:
+            - link "Contact" [ref=f8e61] [cursor=pointer]:
+              - /url: /contact
+            - link "FAQs" [ref=f8e62] [cursor=pointer]:
+              - /url: /faq
+            - link "Reviews" [ref=f8e63] [cursor=pointer]:
+              - /url: /reviews
+            - link "Blog" [ref=f8e64] [cursor=pointer]:
+              - /url: /blog
+        - generic [ref=f8e65]:
+          - heading "Company" [level=3] [ref=f8e66]
+          - generic [ref=f8e67]:
+            - navigation "Company" [ref=f8e68]:
+              - link "About" [ref=f8e69] [cursor=pointer]:
+                - /url: /about
+              - link "Privacy" [ref=f8e70] [cursor=pointer]:
+                - /url: /privacy
+              - link "Terms" [ref=f8e71] [cursor=pointer]:
+                - /url: /terms
+              - link "Cancellation" [ref=f8e72] [cursor=pointer]:
+                - /url: /cancellation
+            - generic [ref=f8e73]:
+              - link "hello@getroomspa.com" [ref=f8e74] [cursor=pointer]:
+                - /url: mailto:hello@getroomspa.com
+              - generic [ref=f8e75]:
+                - link "WhatsApp +66 984 712 237" [ref=f8e76] [cursor=pointer]:
+                  - /url: https://wa.me/66984712237?text=Hi%20RoomSpa!%20I'd%20like%20to%20book%20a%20massage%20at%20my%20address.%20What%20openings%20are%20available%3F
+                - paragraph [ref=f8e77]: "+66984712237"
+              - generic [ref=f8e78]:
+                - link "LINE GetRoomSpa" [ref=f8e79] [cursor=pointer]:
+                  - /url: https://line.me/ti/p/~mashth
+                - paragraph [ref=f8e80]: "LINE ID: mashth"
+    - generic [ref=f8e82]:
+      - paragraph [ref=f8e83]: © 2026 GetRoomSpa · Thailand
+      - navigation "Legal" [ref=f8e84]:
+        - link "Privacy" [ref=f8e86] [cursor=pointer]:
+          - /url: /privacy
+        - generic [ref=f8e87]:
+          - generic [aria-hidden] [ref=f8e88]: ·
+          - link "Terms" [ref=f8e89] [cursor=pointer]:
+            - /url: /terms
+        - generic [ref=f8e90]:
+          - generic [aria-hidden] [ref=f8e91]: ·
+          - link "Cancellation" [ref=f8e92] [cursor=pointer]:
+            - /url: /cancellation
+  - button "Open Next.js Dev Tools" [ref=f8e98] [cursor=pointer]

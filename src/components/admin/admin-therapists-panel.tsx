@@ -36,6 +36,7 @@ export function AdminTherapistsPanel() {
   const [filter, setFilter] = useState<Filter>("all");
   const [togglingId, setTogglingId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [reordering, setReordering] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -102,6 +103,44 @@ export function AdminTherapistsPanel() {
     }
   }
 
+  async function moveTherapist(t: AdminTherapistRow, direction: -1 | 1) {
+    if (reordering) return;
+
+    const currentIndex = therapists.findIndex((row) => row.id === t.id);
+    const nextIndex = currentIndex + direction;
+    if (currentIndex < 0 || nextIndex < 0 || nextIndex >= therapists.length) return;
+
+    const previous = therapists;
+    const next = [...therapists];
+    const [moved] = next.splice(currentIndex, 1);
+    next.splice(nextIndex, 0, moved);
+    setTherapists(next);
+    setReordering(true);
+    setError(null);
+
+    try {
+      const responses = await Promise.all(
+        next.map((row, index) =>
+          fetch(`/api/admin/therapists/${row.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sortOrder: index }),
+          }),
+        ),
+      );
+      const failed = responses.find((response) => !response.ok);
+      if (failed) {
+        const data = await failed.json().catch(() => null);
+        throw new Error(data?.error || "Could not save therapist order.");
+      }
+    } catch (err) {
+      setTherapists(previous);
+      setError(err instanceof Error ? err.message : "Could not save therapist order.");
+    } finally {
+      setReordering(false);
+    }
+  }
+
   const filtered = useMemo(() => {
     switch (filter) {
       case "visible":
@@ -114,7 +153,8 @@ export function AdminTherapistsPanel() {
   }, [filter, therapists]);
 
   function actionButtons(t: AdminTherapistRow, compact = false) {
-    const busy = togglingId === t.id || deletingId === t.id;
+    const index = therapists.findIndex((row) => row.id === t.id);
+    const busy = reordering || togglingId === t.id || deletingId === t.id;
     const btn = compact
       ? "inline-flex h-8 w-8 items-center justify-center rounded-full transition disabled:opacity-60"
       : iconBtn;
@@ -122,6 +162,34 @@ export function AdminTherapistsPanel() {
 
     return (
       <div className={`flex flex-wrap items-center ${compact ? "gap-1.5 xs:gap-2" : "gap-1.5 xs:gap-2"}`}>
+        <button
+          type="button"
+          disabled={busy || index <= 0}
+          onClick={() => void moveTherapist(t, -1)}
+          title="Move therapist up"
+          aria-label={`Move ${t.displayName} up`}
+          className={
+            compact
+              ? `${btn} text-muted hover:bg-surface hover:text-foreground`
+              : `${btn} border-border text-muted hover:text-foreground`
+          }
+        >
+          ↑
+        </button>
+        <button
+          type="button"
+          disabled={busy || index === -1 || index >= therapists.length - 1}
+          onClick={() => void moveTherapist(t, 1)}
+          title="Move therapist down"
+          aria-label={`Move ${t.displayName} down`}
+          className={
+            compact
+              ? `${btn} text-muted hover:bg-surface hover:text-foreground`
+              : `${btn} border-border text-muted hover:text-foreground`
+          }
+        >
+          ↓
+        </button>
         <Link
           href={`/admin/therapists/${t.id}/view`}
           title="View profile"

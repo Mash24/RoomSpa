@@ -1,36 +1,24 @@
 import Link from "next/link";
 import { Breadcrumbs } from "@/components/seo/breadcrumbs";
 import { TherapistPhotoGallery } from "@/components/therapists/therapist-photo-gallery";
-import type { CatalogService } from "@/content/services";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
-import { formatTherapistHeadline } from "@/lib/therapists/public";
-import { getServicePath } from "@/lib/catalog/service-paths";
 import { anyoneBookHref, therapistBookHref } from "@/lib/therapists/booking-links";
 import type { PublicTherapist } from "@/lib/therapists/types";
 
 type Props = {
   therapist: PublicTherapist;
-  catalog: CatalogService[];
   dark?: boolean;
 };
 
-export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
+export function TherapistProfile({ therapist, dark = false }: Props) {
   const gallery = therapist.media.filter((m) => m.type === "photo");
-  const headline = formatTherapistHeadline(therapist);
   const firstName = therapist.displayName.split(" ")[0] || therapist.displayName;
   const bookHref = therapistBookHref(therapist.id, { serviceFallback: therapist.serviceSlugs[0] });
   const bookAnyoneHref = anyoneBookHref({ service: therapist.serviceSlugs[0] });
-  const languages = therapist.languages?.length ? therapist.languages.join(" · ") : null;
-  const experience =
-    therapist.yearsExperience != null
-      ? `${therapist.yearsExperience} year${therapist.yearsExperience === 1 ? "" : "s"} experience`
-      : null;
 
   const textMain = dark ? "text-[#F5F1E8]" : "text-foreground";
-  const textMuted = dark ? "text-[#B8B0A3]" : "text-muted";
   const textAccent = dark ? "text-[#C8A96B]" : "text-accent";
   const labelClass = `text-xs font-medium uppercase tracking-[0.16em] ${dark ? "text-[#C8A96B]" : "text-muted"}`;
-  const ring = dark ? "ring-[rgba(200,169,107,0.25)]" : "ring-border";
 
   return (
     <article className="mx-auto max-w-3xl px-4 pb-28 pt-12 xs:px-5 md:px-8 md:pb-24 md:pt-16">
@@ -55,90 +43,23 @@ export function TherapistProfile({ therapist, catalog, dark = false }: Props) {
             <span className={`text-sm font-medium ${textAccent}`}>Verified</span>
           ) : null}
         </div>
-        {headline ? <p className={`mt-2 text-base ${textMuted}`}>{headline}</p> : null}
-        <div className={`mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm ${textMuted}`}>
-          {languages ? <span>{languages}</span> : null}
-          {experience ? <span>{experience}</span> : null}
-          {therapist.height ? <span>{therapist.height}</span> : null}
-        </div>
+        <p className={`mt-4 max-w-md text-sm leading-relaxed ${dark ? "text-[#B8B0A3]" : "text-muted"}`}>
+          Thoughtfully selected for private, in-room experiences arranged around your stay.
+        </p>
       </header>
 
       <section className="mt-8">
-        <h2 className={labelClass}>Available in</h2>
-        <dl className={`mt-3 grid gap-3 text-base ${textMain} sm:grid-cols-2`}>
+        <h2 className={labelClass}>City</h2>
+        <dl className={`mt-3 text-base ${textMain}`}>
           {therapist.city ? (
             <div>
-              <dt className={`text-xs uppercase tracking-[0.12em] ${textMuted}`}>City</dt>
               <dd className="mt-1">{therapist.city}</dd>
             </div>
           ) : null}
-          {therapist.region ? (
-            <div>
-              <dt className={`text-xs uppercase tracking-[0.12em] ${textMuted}`}>Province / state</dt>
-              <dd className="mt-1">{therapist.region}</dd>
-            </div>
-          ) : null}
-          {therapist.country ? (
-            <div>
-              <dt className={`text-xs uppercase tracking-[0.12em] ${textMuted}`}>Country</dt>
-              <dd className="mt-1">{therapist.country}</dd>
-            </div>
-          ) : null}
         </dl>
-        {!therapist.city && !therapist.region && !therapist.country ? (
+        {!therapist.city ? (
           <p className={`mt-3 text-base ${textMain}`}>Location coming soon</p>
         ) : null}
-        {therapist.areaSummary ? (
-          <p className={`mt-3 text-sm ${textMuted}`}>
-            <span className={`block text-xs uppercase tracking-[0.12em] ${textMuted}`}>Neighbourhood</span>
-            <span className={`mt-1 block ${textMain}`}>{therapist.areaSummary}</span>
-          </p>
-        ) : null}
-        {therapist.serviceAreaNames.length > 0 ? (
-          <ul className={`mt-3 flex flex-wrap gap-2 ${textMain}`}>
-            {therapist.serviceAreaNames.map((area) => (
-              <li key={area} className={`rounded-sm px-3 py-1.5 text-sm ring-1 ${ring}`}>
-                {area}
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </section>
-
-      {therapist.bio ? (
-        <section className="mt-10">
-          <h2 className={labelClass}>About</h2>
-          <p className={`mt-3 text-sm leading-relaxed md:text-base ${textMuted}`}>{therapist.bio}</p>
-        </section>
-      ) : null}
-
-      {therapist.training ? (
-        <section className="mt-8">
-          <h2 className={labelClass}>Training</h2>
-          <p className={`mt-3 text-sm leading-relaxed ${textMuted}`}>{therapist.training}</p>
-        </section>
-      ) : null}
-
-      <section className="mt-10">
-        <h2 className={labelClass}>Services</h2>
-        <ul className={`mt-4 divide-y ${dark ? "divide-[rgba(200,169,107,0.15)]" : "divide-border"}`}>
-          {therapist.serviceSlugs.map((slug, i) => {
-            const svc = catalog.find((c) => c.slug === slug);
-            return (
-              <li key={slug} className="flex items-center justify-between gap-4 py-3">
-                <Link
-                  href={svc ? getServicePath(svc) : `/services/${slug}`}
-                  className={`text-sm font-medium hover:underline ${textMain}`}
-                >
-                  {therapist.serviceNames[i] ?? slug}
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-        <p className={`mt-3 text-sm ${textMuted}`}>
-          Availability is confirmed when you request a booking — we don’t show live calendars here.
-        </p>
       </section>
 
       {/* Desktop CTAs */}

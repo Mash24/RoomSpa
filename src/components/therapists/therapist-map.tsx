@@ -129,9 +129,6 @@ export function TherapistMap({
               <div className="min-w-[160px] text-sm">
                 <p className="font-medium text-foreground">{therapist.displayName}</p>
                 <p className="mt-1 text-xs text-muted">{formatTherapistLocation(therapist)}</p>
-                {therapist.serviceNames.length ? (
-                  <p className="mt-1 text-xs text-accent">{therapist.serviceNames.slice(0, 3).join(" · ")}</p>
-                ) : null}
                 {formatApproxDistance(therapist.distanceKm) ? (
                   <p className="mt-1 text-xs text-muted">{formatApproxDistance(therapist.distanceKm)}</p>
                 ) : null}

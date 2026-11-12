@@ -322,18 +322,20 @@ export function ChatWidget() {
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-controls="roomspa-chat-panel"
-        className="fixed bottom-[max(4.75rem,calc(env(safe-area-inset-bottom)+4rem))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 inline-flex min-h-12 max-w-[calc(100vw-4.5rem)] items-center gap-2 rounded-full border border-border bg-foreground px-3.5 py-3 text-sm font-medium text-background shadow-lg shadow-black/20 transition hover:opacity-90 xs:right-[max(1rem,env(safe-area-inset-right))] xs:px-4 sm:bottom-[max(5.25rem,calc(env(safe-area-inset-bottom)+4.5rem))]"
+        className="fixed bottom-[max(9rem,calc(env(safe-area-inset-bottom)+8.25rem))] right-[max(0.75rem,env(safe-area-inset-right))] z-50 inline-flex min-h-12 max-w-[calc(100vw-4.5rem)] items-center gap-2 rounded-full border border-border bg-foreground px-3.5 py-3 text-sm font-medium text-background shadow-lg shadow-black/20 transition hover:opacity-90 xs:right-[max(1rem,env(safe-area-inset-right))] xs:px-4 sm:bottom-[max(9.5rem,calc(env(safe-area-inset-bottom)+8.75rem))]"
       >
         <span aria-hidden className="text-base leading-none">
           ✦
         </span>
-        <span className="truncate">{open ? "Close" : "Ask RoomSpa"}</span>
+        <span className={`truncate ${pathname === "/therapists" || pathname.startsWith("/therapists/") ? "hidden sm:inline" : ""}`}>
+          {open ? "Close" : "Ask RoomSpa"}
+        </span>
       </button>
 
       {open ? (
         <div
           id="roomspa-chat-panel"
-          className="fixed inset-x-2 bottom-[max(8.75rem,calc(env(safe-area-inset-bottom)+8rem))] z-50 flex h-[min(34rem,calc(100svh-10rem))] max-h-[calc(100dvh-10rem)] flex-col overflow-hidden rounded-sm border border-border bg-background shadow-2xl shadow-black/25 xs:inset-x-3 sm:inset-x-auto sm:bottom-[max(9.25rem,calc(env(safe-area-inset-bottom)+8.5rem))] sm:right-[max(1.25rem,env(safe-area-inset-right))] sm:h-[min(34rem,72svh)] sm:w-[min(24rem,calc(100vw-1.5rem))] sm:max-h-none"
+          className="fixed inset-x-2 bottom-[max(12.75rem,calc(env(safe-area-inset-bottom)+11.75rem))] z-50 flex h-[min(34rem,calc(100svh-14rem))] max-h-[calc(100dvh-14rem)] flex-col overflow-hidden rounded-sm border border-border bg-background shadow-2xl shadow-black/25 xs:inset-x-3 sm:inset-x-auto sm:bottom-[max(13.25rem,calc(env(safe-area-inset-bottom)+12.25rem))] sm:right-[max(1.25rem,env(safe-area-inset-right))] sm:h-[min(34rem,72svh)] sm:w-[min(24rem,calc(100vw-1.5rem))] sm:max-h-none"
         >
           <div className="border-b border-border bg-surface px-4 py-3">
             <p className="text-xs font-medium uppercase tracking-[0.18em] text-accent">

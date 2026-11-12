@@ -446,10 +446,6 @@ export async function findEligibleTherapists(
       })
       .filter((t): t is PublicTherapist => Boolean(t));
 
-    if (hasClientLocation) {
-      mapped = mapped.sort((a, b) => (a.distanceKm ?? 999) - (b.distanceKm ?? 999));
-    }
-
     mapped = applyDiscoveryFilters(mapped, query);
 
     if (query.experienceTier && query.experienceTier !== "any") {

@@ -7,16 +7,30 @@ import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
 
 export const revalidate = 60;
 
+const THERAPIST_LOAD_TIMEOUT_MS = 5000;
+
+async function loadTherapistsForGallery() {
+  try {
+    return await Promise.race([
+      getPublicTherapists({}),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("Therapist directory timed out")), THERAPIST_LOAD_TIMEOUT_MS);
+      }),
+    ]);
+  } catch {
+    return [];
+  }
+}
+
 export const metadata: Metadata = buildPageMetadata({
   title: "Meet Your RoomSpa Therapists",
   description:
     "Meet the therapists behind RoomSpa — carefully selected for private experiences at your hotel, residence, or villa.",
   path: "/therapists",
-  noIndex: true,
 });
 
 export default async function TherapistsPage() {
-  const therapists = await getPublicTherapists({});
+  const therapists = await loadTherapistsForGallery();
 
   return (
     <div className="therapist-gallery-shell min-h-screen">
@@ -26,24 +40,55 @@ export default async function TherapistsPage() {
           Our therapists
         </h1>
         <p className="mt-5 max-w-xl text-base leading-relaxed text-[#B8B0A3] md:text-lg">
-          The people who make RoomSpa feel personal — selected with care for quiet, private sessions
-          wherever you’re staying.
+          Meet the therapists who bring private in-room massage to your hotel, condo, or villa —
+          selected with care for a calm experience wherever you’re staying.
         </p>
 
-        <div className="mt-14 md:mt-16">
-          <TherapistsDirectory initialTherapists={therapists} galleryMode />
-        </div>
-
-        <div className="mt-20 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-[rgba(200,169,107,0.16)] pt-8">
+        <div className="mt-7 flex flex-wrap items-center gap-3">
           <Link
             href="/book"
-            className="text-sm font-medium text-[#C8A96B] underline-offset-4 hover:underline"
+            className="inline-flex min-h-11 items-center justify-center rounded-sm bg-[#C8A96B] px-5 py-3 text-sm font-medium text-[#11100F] transition hover:bg-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A96B]"
           >
             Request a booking →
           </Link>
-          <WhatsAppLink cta="therapists" className="text-sm text-[#B8B0A3] hover:text-[#C8A96B]">
+          <WhatsAppLink
+            cta="therapists-intro"
+            className="inline-flex min-h-11 items-center justify-center rounded-sm border border-[rgba(200,169,107,0.35)] px-5 py-3 text-sm text-[#F5F1E8] transition hover:border-[#C8A96B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A96B]"
+          >
             WhatsApp
           </WhatsAppLink>
+        </div>
+
+        <div className="mt-10 md:mt-12">
+          <TherapistsDirectory initialTherapists={therapists} galleryMode />
+        </div>
+
+        <div className="mt-20 border-t border-[rgba(200,169,107,0.16)] pt-10 md:mt-28 md:pt-12">
+          <div className="max-w-xl">
+            <p className="text-xs font-medium uppercase tracking-[0.22em] text-[#C8A96B]">
+              Not sure who to choose?
+            </p>
+            <h2 className="mt-4 font-display text-3xl tracking-tight text-[#F5F1E8] md:text-4xl">
+              We can make the introduction.
+            </h2>
+            <p className="mt-3 text-base leading-relaxed text-[#B8B0A3]">
+              Tell us where you’re staying and when. We’ll help you find a thoughtful match.
+            </p>
+          </div>
+          <div className="mt-7 flex flex-wrap items-center gap-3">
+            <Link
+              href="/book"
+              className="inline-flex min-h-11 items-center justify-center rounded-sm bg-[#C8A96B] px-5 py-3 text-sm font-medium text-[#11100F] transition hover:bg-[#D4B87A] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A96B]"
+            >
+              Request a booking →
+            </Link>
+            <WhatsAppLink
+              cta="therapists"
+              className="inline-flex min-h-11 items-center justify-center rounded-sm border border-[rgba(200,169,107,0.35)] px-5 py-3 text-sm text-[#F5F1E8] transition hover:border-[#C8A96B] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C8A96B]"
+            >
+              WhatsApp
+            </WhatsAppLink>
+          </div>
         </div>
       </section>
     </div>
