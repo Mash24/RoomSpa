@@ -15,7 +15,7 @@ const SIGNATURE_BACKDROP = "/media/marketing/home-hero-sensual.jpg";
 
 /** Compact signature teaser — full menu lives on /services/signature only. */
 export function HomeSignaturePreview({ services }: Props) {
-  const picks = services.slice(0, 4);
+  const picks = services.slice(0, 6);
 
   return (
     <section className="sensual-zone relative overflow-x-clip">

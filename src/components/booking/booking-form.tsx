@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
@@ -27,6 +27,7 @@ import {
 import { formatSlot12h } from "@/components/booking/booking-therapist-picker";
 import { redirectToUrl } from "@/lib/navigation";
 import { readApiJson } from "@/lib/admin/api";
+import { trackClientEvent } from "@/lib/analytics/attribution";
 
 function todayInBangkok() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -121,6 +122,19 @@ export function BookingForm({ products: initialProducts }: Props) {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<BookingResult | null>(null);
+  const bookingStartedTracked = useRef(false);
+
+  useEffect(() => {
+    if (!bookingStartedTracked.current) {
+      bookingStartedTracked.current = true;
+      trackClientEvent({
+        eventName: "booking_form_started",
+        cta: "book-page",
+        serviceSlug,
+        meta: { step: activeStep },
+      });
+    }
+  }, [activeStep, serviceSlug]);
 
   useEffect(() => {
     let cancelled = false;
@@ -198,6 +212,12 @@ export function BookingForm({ products: initialProducts }: Props) {
       setError("Choose an experience to continue.");
       return;
     }
+    trackClientEvent({
+      eventName: "booking_step_completed",
+      cta: "booking-service",
+      serviceSlug,
+      meta: { step: 1, durationMinutes },
+    });
     goToStep(2);
   }
 
@@ -224,10 +244,23 @@ export function BookingForm({ products: initialProducts }: Props) {
       );
       return;
     }
+    trackClientEvent({
+      eventName: "booking_step_completed",
+      cta: "booking-when-where",
+      cityHint: city.trim(),
+      serviceSlug,
+      meta: { step: 2, locationType },
+    });
     goToStep(3);
   }
 
   function advanceFromTherapist() {
+    trackClientEvent({
+      eventName: "booking_step_completed",
+      cta: "booking-therapist",
+      serviceSlug,
+      meta: { step: 3, therapistPreference },
+    });
     goToStep(4);
   }
 
@@ -236,6 +269,12 @@ export function BookingForm({ products: initialProducts }: Props) {
       setError("Name, email, and WhatsApp are required.");
       return;
     }
+    trackClientEvent({
+      eventName: "booking_step_completed",
+      cta: "booking-details",
+      serviceSlug,
+      meta: { step: 4, paymentPreference: effectivePaymentPreference },
+    });
     goToStep(5);
   }
 
@@ -288,6 +327,18 @@ export function BookingForm({ products: initialProducts }: Props) {
       if (!response.ok) {
         throw new Error(data.error || "Booking failed.");
       }
+
+      trackClientEvent({
+        eventName: "booking_submitted",
+        cta: payNow ? "booking-pay-now" : "booking-request",
+        cityHint: city.trim(),
+        serviceSlug,
+        meta: {
+          durationMinutes,
+          paymentPreference: effectivePaymentPreference,
+          checkoutRequired: Boolean(data.checkoutUrl),
+        },
+      });
 
       if (data.checkoutUrl) {
         redirectToUrl(data.checkoutUrl);
@@ -393,6 +444,11 @@ export function BookingForm({ products: initialProducts }: Props) {
               onSelect={(slug) => {
                 setServiceSlug(slug);
                 setError(null);
+                trackClientEvent({
+                  eventName: "booking_service_selected",
+                  cta: "booking-service-picker",
+                  serviceSlug: slug,
+                });
               }}
             />
           ) : null}
@@ -405,6 +461,11 @@ export function BookingForm({ products: initialProducts }: Props) {
               onSelect={(slug) => {
                 setServiceSlug(slug);
                 setError(null);
+                trackClientEvent({
+                  eventName: "booking_service_selected",
+                  cta: "booking-service-picker",
+                  serviceSlug: slug,
+                });
               }}
             />
           ) : null}
@@ -415,7 +476,15 @@ export function BookingForm({ products: initialProducts }: Props) {
               <ServicePriceTiers
                 service={selectedService}
                 selectedMinutes={durationMinutes}
-                onSelect={setDurationMinutes}
+                onSelect={(minutes) => {
+                  setDurationMinutes(minutes);
+                  trackClientEvent({
+                    eventName: "booking_duration_selected",
+                    cta: "booking-duration-picker",
+                    serviceSlug: selectedService.slug,
+                    meta: { durationMinutes: minutes },
+                  });
+                }}
               />
             </div>
           ) : null}

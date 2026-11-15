@@ -20,7 +20,7 @@ export const revalidate = 60;
 export default async function HomePage() {
   const [signature, bookTreatments, therapists, catalog, approved, allForRating] =
     await Promise.all([
-      getPublicSignatureServices(4),
+      getPublicSignatureServices(6),
       getBookStripTreatments(),
       getPublicTherapists({ limit: 12 }),
       getPublicCatalog(),

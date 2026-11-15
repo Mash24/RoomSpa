@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { WhatsAppLink } from "@/components/analytics/whatsapp-link";
-import { featuredServices, productPriceLabel } from "@/content/services";
+import { ServicePriceTiers } from "@/components/services/service-price-tiers";
+import { featuredServices } from "@/content/services";
 
 export function HomePricing() {
   return (
@@ -27,13 +28,11 @@ export function HomePricing() {
                   {product.name}
                 </h3>
                 <span className="shrink-0 text-[0.65rem] uppercase tracking-[0.14em] text-muted xs:text-xs">
-                  {product.duration}
+                  60 · 90 · 120 min
                 </span>
               </div>
               <p className="mt-3 text-sm leading-relaxed text-muted md:text-base">{product.summary}</p>
-              <p className="mt-5 font-display text-2xl tracking-tight text-accent xs:mt-6 xs:text-3xl">
-                {productPriceLabel(product.amountThb)}
-              </p>
+              <ServicePriceTiers service={product} className="mt-5 xs:mt-6" />
               <div className="mt-6 flex flex-col gap-2.5 xs:mt-7 xs:gap-3 sm:flex-row">
                 <Link
                   href={`/book?service=${product.slug}`}
