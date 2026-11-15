@@ -196,57 +196,6 @@ export default async function PricingPage() {
         </div>
       </section>
 
-      <section className="bg-background px-4 py-14 xs:px-5 md:px-8 md:py-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
-                {experienceTierLabels.wellness}
-              </p>
-              <h2 className="mt-2 font-display text-3xl tracking-tight text-foreground md:text-4xl">
-                The wellness rate card
-              </h2>
-              <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted md:text-base">
-                Swedish · Thai · Deep Tissue · Hot Oil · Sports · Prenatal · Couples · and more.
-              </p>
-            </div>
-            <Link
-              href="/services/wellness"
-              className="inline-flex min-h-10 shrink-0 items-center text-sm font-medium text-accent underline underline-offset-4"
-            >
-              Explore Wellness →
-            </Link>
-          </div>
-
-          <div className="mt-10 space-y-12 md:space-y-14">
-            {wellnessCategories.map((category) => {
-              const products = wellness.filter((p) => p.category === category.id);
-              if (products.length === 0) return null;
-
-              return (
-                <div key={category.id}>
-                  <h3 className="font-display text-xl tracking-tight text-foreground md:text-2xl">
-                    {category.title}
-                  </h3>
-                  <ul className="mt-3">
-                    {products.map((product, index) => (
-                      <PricingServiceRow key={product.slug} product={product} index={index} />
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-
-          {wellnessFrom > 0 ? (
-            <p className="mt-10 text-sm text-muted">
-              Wellness from {formatThb(wellnessFrom)} · Pay by card when you book, pay later, or cash
-              on arrival.
-            </p>
-          ) : null}
-        </div>
-      </section>
-
       <div id="signature">
       <SensualZone>
         <SignatureIntro />
@@ -298,6 +247,57 @@ export default async function PricingPage() {
         </section>
       </SensualZone>
       </div>
+
+      <section className="bg-background px-4 py-14 xs:px-5 md:px-8 md:py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-accent">
+                {experienceTierLabels.wellness}
+              </p>
+              <h2 className="mt-2 font-display text-3xl tracking-tight text-foreground md:text-4xl">
+                The wellness rate card
+              </h2>
+              <p className="mt-3 max-w-lg text-sm leading-relaxed text-muted md:text-base">
+                Swedish · Thai · Deep Tissue · Hot Oil · Sports · Prenatal · Couples · and more.
+              </p>
+            </div>
+            <Link
+              href="/services/wellness"
+              className="inline-flex min-h-10 shrink-0 items-center text-sm font-medium text-accent underline underline-offset-4"
+            >
+              Explore Wellness →
+            </Link>
+          </div>
+
+          <div className="mt-10 space-y-12 md:space-y-14">
+            {wellnessCategories.map((category) => {
+              const products = wellness.filter((p) => p.category === category.id);
+              if (products.length === 0) return null;
+
+              return (
+                <div key={category.id}>
+                  <h3 className="font-display text-xl tracking-tight text-foreground md:text-2xl">
+                    {category.title}
+                  </h3>
+                  <ul className="mt-3">
+                    {products.map((product, index) => (
+                      <PricingServiceRow key={product.slug} product={product} index={index} />
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+
+          {wellnessFrom > 0 ? (
+            <p className="mt-10 text-sm text-muted">
+              Wellness from {formatThb(wellnessFrom)} · Pay by card when you book, pay later, or cash
+              on arrival.
+            </p>
+          ) : null}
+        </div>
+      </section>
 
       <section className="bg-surface px-4 py-14 xs:px-5 md:px-8 md:py-20">
         <div className="mx-auto flex max-w-6xl flex-col gap-7 border-y border-border py-10 sm:flex-row sm:items-center sm:justify-between sm:gap-10">

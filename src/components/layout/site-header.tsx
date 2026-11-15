@@ -64,7 +64,7 @@ export function SiteHeader() {
 
   return (
     <header className={shell}>
-      <div className="page-gutter mx-auto flex max-w-6xl items-center justify-between gap-2 py-3.5 xs:gap-3 xs:py-4 md:gap-4 md:py-5 xl:max-w-7xl">
+      <div className="page-gutter mx-auto flex max-w-6xl items-center justify-between gap-1.5 py-3 xs:gap-3 xs:py-4 md:gap-4 md:py-5 xl:max-w-7xl">
         <Link href="/" className={`${brand} min-w-0 shrink`}>
           {site.name}
         </Link>
@@ -81,7 +81,7 @@ export function SiteHeader() {
           </Link>
         </nav>
 
-        <div className="flex shrink-0 items-center gap-1.5 xs:gap-2 lg:hidden">
+        <div className="flex shrink-0 items-center gap-1 xs:gap-2 lg:hidden">
           <ThemeToggle lightOnDark={onHero} />
           <Link href="/book" className={book}>
             <span className="xs:hidden">Book</span>

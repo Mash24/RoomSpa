@@ -953,10 +953,10 @@ function StepCard({
     <section
       className={`rounded-sm border transition ${
         active
-          ? "border-accent/40 bg-surface-elevated p-5 shadow-[0_0_0_1px_rgba(0,0,0,0.02)]"
+          ? "border-accent/40 bg-surface-elevated p-3.5 shadow-[0_0_0_1px_rgba(0,0,0,0.02)] xs:p-5"
           : locked
-            ? "border-border/70 bg-surface px-5 py-4 opacity-55"
-            : "border-border bg-surface px-5 py-4"
+            ? "border-border/70 bg-surface px-3.5 py-3.5 opacity-55 xs:px-5 xs:py-4"
+            : "border-border bg-surface px-3.5 py-3.5 xs:px-5 xs:py-4"
       }`}
     >
       <div className="flex items-start justify-between gap-3">

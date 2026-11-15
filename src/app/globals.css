@@ -289,7 +289,8 @@ textarea {
   z-index: 40;
   border-top: 1px solid var(--border);
   background: color-mix(in srgb, var(--surface-elevated) 94%, transparent);
-  padding: 0.75rem 1rem max(0.75rem, env(safe-area-inset-bottom));
+  padding: 0.75rem max(1rem, env(safe-area-inset-left)) max(0.75rem, env(safe-area-inset-bottom))
+    max(1rem, env(safe-area-inset-right));
   backdrop-filter: blur(10px);
   box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.06);
 }
@@ -302,6 +303,17 @@ textarea {
 
 .booking-form-with-bar {
   padding-bottom: 6.5rem;
+}
+
+@media (max-width: 359px) {
+  .booking-mobile-bar {
+    padding-top: 0.625rem;
+    padding-bottom: max(0.625rem, env(safe-area-inset-bottom));
+  }
+
+  .booking-form-with-bar {
+    padding-bottom: 6rem;
+  }
 }
 
 @media (min-width: 768px) {
