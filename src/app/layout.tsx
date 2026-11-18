@@ -5,6 +5,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { GoogleAnalytics } from "@/components/analytics/google-analytics";
 import { site } from "@/content/site";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const display = Cormorant_Garamond({
@@ -74,6 +75,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-sans antialiased">
         <GoogleAnalytics />
         <Analytics />
+        <SpeedInsights />
         <ThemeProvider>
           <AppShell>{children}</AppShell>
         </ThemeProvider>
